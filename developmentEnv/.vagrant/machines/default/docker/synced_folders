@@ -1,1 +1,0 @@
-{"docker":{"/home/vagrant/devel":{"owner":"vagrant","group":"zpp","mount_options":["dmode=775,fmode=664"],"guestpath":"/home/vagrant/devel","hostpath":"/home/michal/Desktop/lss","disabled":false},"/vagrant":{"guestpath":"/vagrant","hostpath":"/home/michal/Desktop/lss/developmentEnv","disabled":false}}}
