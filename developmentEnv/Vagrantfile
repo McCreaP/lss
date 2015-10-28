@@ -1,0 +1,16 @@
+VAGRANT_API_VERSION = "2"
+
+ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
+
+Vagrant.configure(VAGRANT_API_VERSION) do |config|
+	config.vm.provider "docker" do |d|
+		d.build_dir = "./debianDockerImage"
+		d.privileged = true
+		d.has_ssh = true
+		d.remains_running = true
+	end
+
+	config.ssh.private_key_path = "vagrant_id_rsa"
+	config.vm.synced_folder "../", "/home/vagrant/devel/", owner: "vagrant", group: "zpp",
+	mount_options: ["dmode=775,fmode=664"]
+end
