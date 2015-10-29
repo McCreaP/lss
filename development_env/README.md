@@ -30,7 +30,7 @@ Add your user to the group "zpp":
 
 ## Basic information
 
-In the **development_env** directory, the command `vagrant up` will build and run a docker container defined in **developmen_env/debia_docker_image/Dockerfile**. You can SSH into this container with `vagrant ssh`.
+In the **development_env** directory, the command `vagrant up` will build and run a docker container defined in **development_env/debian_docker_image/Dockerfile**. You can SSH into this container with `vagrant ssh`.
 
 Inside the docker container the directory **~/lss/** is synchronized with the git root directory on the host machine. The idea is to develop locally on your machine and compile / run programs inside the docker container, so all dependencies should be installed there.
 
