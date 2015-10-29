@@ -28,7 +28,10 @@ RUN apt-get update \
     openssh-server \
     wget \
     curl \
-    sudo
+    sudo \
+    make \
+    cmake \
+    tree
 
 # configure shell
 RUN usermod -s /bin/bash vagrant
