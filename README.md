@@ -2,6 +2,7 @@
 
 ### Organizational matters
 * We're having a video conference every Monday at 19:00.
+* We meet at the Proseminar every Thursday at 8:30
 
 ### Technical matters
 * The code is written in __C++14__.
@@ -10,8 +11,7 @@
   pushed to master.
 * The project is built with __CMake__.
 * We use __Bitbucket issue tracker__.
-* The code is documented by comments in sources and __README.md__ files
-  in project directories.
+* We write a self-documented source code. The code is also documented by README.md in project directories. No additional documentation is planed to be prepared.
 * Code is being developed in separate __feature branches__ and regularly merged
   into master.
 * To merge a branch into master the code __must be reviewed__ by another person,
