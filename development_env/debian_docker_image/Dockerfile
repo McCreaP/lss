@@ -31,16 +31,24 @@ RUN apt-get update \
     sudo \
     make \
     cmake \
-    tree
+    tree \
+    python3
 
 # configure shell
 RUN usermod -s /bin/bash vagrant
-RUN echo "umask 002" >> /home/vagrant/.bashrc
 RUN echo "if [ -f ~/.bashrc ]; then . ~/.bashrc; fi" >> /home/vagrant/.bash_profile
+ADD bashrc /home/vagrant/.bashrc
 RUN chown vagrant /home/vagrant/.bashrc
 
 # allow passwordless sudo
 RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+# install pip
+RUN mkdir -p /env
+ADD https://bootstrap.pypa.io/get-pip.py /env/
+RUN python3 /env/get-pip.py
+
+RUN pip install colorlog
 
 RUN mkdir -p /var/run/sshd
 
