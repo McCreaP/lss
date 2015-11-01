@@ -8,6 +8,8 @@
 namespace lss {
 namespace io {
 
+static constexpr int kContextN = 3;
+
 enum class MachineState {
   kIdle = 0,
   kWorking = 1,
@@ -17,17 +19,18 @@ enum class MachineState {
 struct Job {
   int id;
   int batch_id;
-  int account_id;
-  int duration;
+  int duration;  // Expected duration barring setup time.
   int machineset_id;
-  int context[3];
+  int context[kContextN];
 };
 
-// TODO: Possibly find better names for fields: timely_reward, reward,
-// expected_time. They are called A, B, T respectively in objective funciton
-// definition.
+// The following fields are not named in objective function definition:
+// - timely_reward (called A in paper),
+// - reward (called B in paper),
+// - expected_time (called T in paper).
 struct Batch {
   int id;
+  int account_id;
   int timely_reward;
   int reward;
   int expected_time;
@@ -49,11 +52,9 @@ struct Account {
   double alloc;
 };
 
-// TODO: It is very unclear what contexts are and thus it is difficult to say
-// what these fields mean and if their names are suitable.
 struct ContextChange {
-  int context_changed[3];
-  int switch_cost;
+  bool changed[kContextN];
+  int cost;
 };
 
 }  // namespace io
