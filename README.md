@@ -2,7 +2,7 @@
 
 ### Licensing
 This software is released under Simplified BSD License which you can read
-in `LICENSE.md`. The licence applies to all files in project directory
+in `LICENSE.txt`. The licence applies to all files in project directory
 unless otherwise stated. Zppintel Team members are:
 
 * Leon Logvinov
