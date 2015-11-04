@@ -2,8 +2,9 @@
 
 ### Licensing
 This software is released under Simplified BSD License which you can read
-in LICENSE.md. The licence applies to all files in project directory
+in `LICENSE.md`. The licence applies to all files in project directory
 unless otherwise stated. Zppintel Team members are:
+
 * Leon Logvinov
 * Magda Stasiewicz
 * Michał Żak
@@ -20,7 +21,9 @@ unless otherwise stated. Zppintel Team members are:
   pushed to master.
 * The project is built with __CMake__.
 * We use __Bitbucket issue tracker__.
-* We write a self-documented source code. The code is also documented by __README.md__ in project directories. No additional documentation is planned to be prepared.
+* We write a self-documented source code. The code is also documented
+  by __README.md__ in project directories. No additional documentation
+  is planned to be prepared.
 * Code is being developed in separate __feature branches__ and regularly merged
   into master.
 * To merge a branch into master the code __must be reviewed__ by another person,
