@@ -17,8 +17,9 @@ class State:
         self.__story = story
         self.__input_writer = InputWriter(lss_input_dir, story)
         self.__machines = {
-            m['id']: Machine(m['id'], lss_input_dir) for m in story['machines']}
+            m['id']: Machine(m['id'], lss_input_dir, story['context_changes']) for m in story['machines']}
         self.__ready_jobs = {}
+        self.__finished_jobs = {}
 
     def add_ready_job(self, job):
         self.__ready_jobs[job['id']] = job
@@ -34,12 +35,35 @@ class State:
         assert job in self.__ready_jobs.values()
         del self.__ready_jobs[job['id']]
         job['real_duration'] = now - job['real_start_time']
-        history.record_job(job)
+        self.__finished_jobs[job['id']] = job
 
         machine_id = job['real_machine']
         machine = self.__machines[machine_id]
         assert machine.get_state() == MachineState.MACHINE_WORKING
         machine.free()
+
+    def calculate_objective_function(self):
+        pass
+
+    def write_history(self):
+        path = './logs/history_' + time.time() + '.log'
+        with open(path, 'wb') as f:
+            pickle.dump(story, f)
+        with open(path + '.json', 'wt') as f:
+            json.dump(story, f, indent=2)
+
+    def __prepare_history_to_write(self):
+
+        def for_one(k, v):
+            if k == 'jobs':
+                return list(self.__finished_jobs.values())
+            elif k == 'context_changes':
+                return list(v.items())
+            else:
+                return v
+
+        story = {k: for_one(k, v) for k, v in self.__story.items()}
+        return story
 
 #     def try_to_take_job(self, machine_id):
 # return self.__machines[machine_id].try_to_take_job(timer.now(),

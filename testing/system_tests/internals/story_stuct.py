@@ -1,7 +1,3 @@
-import pickle
-import json
-
-
 timestamp = float
 
 structure = \
@@ -60,10 +56,3 @@ structure = \
         ,'names_of_batches': dict
         ,'names_of_accounts': dict
         }
-        
-
-def write(path, story):
-    with open(path, 'wb') as f:
-        pickle.dump(story, f)
-    with open(path + '.json', 'wt') as f:
-        json.dump(story, f, indent=2)
