@@ -15,10 +15,10 @@ LOGGER = logging.getLogger("test_runner")
 
 class EventLoop:
 
-    def __init__(self, story):
+    def __init__(self, story, state):
         self.__story = story
         self.__events = PriorityQueue()
-        self.__state = State(story, '.')  # TODO
+        self.__state = state
         self.__progress_bar = ProgressBar(
             self.__story['mint'], self.__story['maxt'])
 
@@ -55,5 +55,5 @@ class ProgressBar:
         progress = int(100 * (now - self.__min_t) / (self.__timespan))
         if self.__progress_shown != progress:
             self.__progress_shown = progress
-            LOGGER.info(
+            LOGGER.debug(
                 '%s%% of the simulated period elapsed (of %s s)', progress, self.__timespan)
