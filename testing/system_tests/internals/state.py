@@ -1,12 +1,16 @@
+import os
+import pickle
+import json
 import logging
 
 from internals import utils
-from internals import history
 from internals import timer
 from internals.input_writer import InputWriter
 from internals.machine import Machine, MachineState
+from internals.exceptions import InvalidJobException
 
 LSS_ASSIGNMENTS_DIR = 'assignments'
+LSS_INPUT_FILE = 'input'
 
 LOGGER = logging.getLogger('test_runner')
 
@@ -14,10 +18,15 @@ LOGGER = logging.getLogger('test_runner')
 class State:
 
     def __init__(self, story, lss_input_dir):
+        lss_assignments_dir = os.path.join(lss_input_dir, LSS_ASSIGNMENTS_DIR)
+        lss_input_file = os.path.join(lss_input_dir, LSS_INPUT_FILE)
+        utils.clean_dir(lss_assignments_dir)
+        utils.remove_file(lss_input_file)
+
         self.__story = story
-        self.__input_writer = InputWriter(lss_input_dir, story)
+        self.__input_writer = InputWriter(lss_input_file, story)
         self.__machines = {
-            m['id']: Machine(m['id'], lss_input_dir, story['context_changes']) for m in story['machines']}
+            m['id']: Machine(m['id'], lss_assignments_dir, story['context_changes']) for m in story['machines']}
         self.__ready_jobs = {}
         self.__finished_jobs = {}
 
@@ -32,7 +41,9 @@ class State:
 
     def finish_job(self, job):
         now = timer.now()
-        assert job in self.__ready_jobs.values()
+        if job not in self.__ready_jobs.values():
+            raise InvalidJobException(
+                job['id'], "Cannot finish job. It probably has already been finished by other machine")
         del self.__ready_jobs[job['id']]
         job['real_duration'] = now - job['real_start_time']
         self.__finished_jobs[job['id']] = job
@@ -42,15 +53,13 @@ class State:
         assert machine.get_state() == MachineState.MACHINE_WORKING
         machine.free()
 
-    def calculate_objective_function(self):
-        pass
-
-    def write_history(self):
-        path = './logs/history_' + time.time() + '.log'
-        with open(path, 'wb') as f:
-            pickle.dump(story, f)
-        with open(path + '.json', 'wt') as f:
-            json.dump(story, f, indent=2)
+    def write_history(self, log_dir):
+        log_file = os.path.join(log_dir, 'history')
+        history = self.__prepare_history_to_write()
+        with open(log_file, 'wb') as f:
+            pickle.dump(history, f)
+        with open(log_file + '.json', 'wt') as f:
+            json.dump(history, f, indent=2)
 
     def __prepare_history_to_write(self):
 

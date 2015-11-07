@@ -4,7 +4,6 @@ from queue import PriorityQueue
 
 from internals.events import JobReady
 from internals.events import UseIdleMachines
-from internals.state import State
 from internals import timer
 
 
@@ -25,8 +24,7 @@ class EventLoop:
     def run(self):
         self.__add_jobs_ready_events()
         self.add_event(UseIdleMachines(timer.now(), self, self.__state))
-        # This condition isn't a proper condition yet
-        while JobReady.counter > 0:
+        while timer.now() < self.__story['maxt']:
             event = self.__events.get()
             now = timer.now()
             if now < event.get_execution_time():
@@ -55,5 +53,5 @@ class ProgressBar:
         progress = int(100 * (now - self.__min_t) / (self.__timespan))
         if self.__progress_shown != progress:
             self.__progress_shown = progress
-            LOGGER.debug(
-                '%s%% of the simulated period elapsed (of %s s)', progress, self.__timespan)
+            LOGGER.debug('%s%% of the simulated period elapsed (of %s s)', 
+                         progress, self.__timespan)

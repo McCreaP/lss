@@ -2,13 +2,11 @@ import os
 
 from internals import utils
 
-LSS_INPUT_FILENAME = 'input'
-
 
 class InputWriter:
 
-    def __init__(self, lss_input_dir, story):
-        self.__lss_input_path = os.path.join(lss_input_dir, LSS_INPUT_FILENAME)
+    def __init__(self, lss_input_file, story):
+        self.__lss_input_file = lss_input_file
         self.__story = story
 
     def write(self, machines, ready_jobs):
@@ -31,11 +29,11 @@ class InputWriter:
         self.__write_input_file(utils.flatten(glue(*p) for p in pieces))
 
     def __write_input_file(self, lines):
-        tmp_path = self.__lss_input_path + '-new'
+        tmp_path = self.__lss_input_file + '-new'
         with open(tmp_path, 'wt') as f:
             for line in lines:
                 f.write(line + '\n')
-        os.rename(tmp_path, self.__lss_input_path)
+        os.rename(tmp_path, self.__lss_input_file)
 
 
 def show_fields(fields):
