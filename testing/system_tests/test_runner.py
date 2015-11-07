@@ -19,7 +19,6 @@ def parse_args():
     parser = ArgumentParser(description="System tests runner")
     parser.add_argument('scheduler',
                         metavar='SCHEDULER',
-                        nargs=1,
                         help="The scheduler executable path")
     parser.add_argument('test_name',
                         metavar='TEST_NAME',
