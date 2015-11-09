@@ -17,8 +17,10 @@ unless otherwise stated. Zppintel Team members are:
 ### Technical matters
 * The code is written in __C++14__.
 * We adhere to [__Google C++ Style Guide__](https://google-styleguide.googlecode.com/svn/trunk/cppguide.html).
-* We use __GoogleTest__. Code without proper tests cannot be
-  pushed to master.
+* We use __GoogleTest__.
+  Every `.cc` file comes with a corresponding `_test.cc` file
+  in the same directory.
+  Code without proper tests cannot be pushed to master.
 * The project is built with __CMake__.
 * We use __Bitbucket issue tracker__.
 * We write a self-documented source code. The code is also documented
