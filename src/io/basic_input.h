@@ -22,17 +22,16 @@ struct RawData {
 
 class BasicReader {
  public:
-  BasicReader(const std::string& input_path);
+  BasicReader(const std::string &input_path);
 
-  void SetInputPath(const std::string& input_path);
+  void SetInputPath(const std::string &input_path);
 
-  void Read(RawData& destination);
+  void Read(RawData &destination);
 
  private:
   template<class T>
-  void ReadRecords(const std::string& file_name, std::vector<T>& destination) {
+  void ReadRecords(const std::string &file_name, std::vector<T> &destination) {
     std::ifstream input(input_path_ + '/' + file_name);
-
     T buf;
     while (input >> buf) destination.push_back(buf);
   }

@@ -15,28 +15,28 @@ const char kBatchesFile[] = "batches";
 const char kAccountsFile[] = "accounts";
 const char kContextChangesFile[] = "context-changes";
 
-std::istream& operator>>(std::istream& input, Job& job) {
+std::istream &operator>>(std::istream &input, Job &job) {
   input >> job.id >> job.batch_id >> job.duration >> job.machineset_id;
   for (int i = 0; i < kContextN; ++i)
     input >> job.context[i];
   return input;
 }
 
-std::istream& operator>>(std::istream& input, Batch& batch) {
+std::istream &operator>>(std::istream &input, Batch &batch) {
   input >> batch.id >> batch.account_id;
   input >> batch.timely_reward >> batch.reward >> batch.expected_time;
   input >> batch.due;
   return input;
 }
 
-std::istream& operator>>(std::istream& input, Machine& machine) {
+std::istream &operator>>(std::istream &input, Machine &machine) {
   int state;
   input >> machine.id >> state;
   machine.state = static_cast<MachineState>(state);
   return input;
 }
 
-std::istream& operator>>(std::istream& input, MachineSet& set) {
+std::istream &operator>>(std::istream &input, MachineSet &set) {
   input >> set.id;
 
   std::string line;
@@ -48,12 +48,12 @@ std::istream& operator>>(std::istream& input, MachineSet& set) {
   return input;
 }
 
-std::istream& operator>>(std::istream& input, Account& account) {
+std::istream &operator>>(std::istream &input, Account &account) {
   input >> account.id >> account.alloc;
   return input;
 }
 
-std::istream& operator>>(std::istream& input, ContextChange& change) {
+std::istream &operator>>(std::istream &input, ContextChange &change) {
   for (int i = 0; i < kContextN; ++i)
     input >> change.changed[i];
   input >> change.cost;
@@ -63,14 +63,14 @@ std::istream& operator>>(std::istream& input, ContextChange& change) {
 }  // namespace
 
 
-BasicReader::BasicReader(const std::string& input_path)
-    : input_path_(input_path) {}
+BasicReader::BasicReader(const std::string &input_path)
+    : input_path_(input_path) { }
 
-void BasicReader::SetInputPath(const std::string& input_path) {
+void BasicReader::SetInputPath(const std::string &input_path) {
   input_path_ = input_path;
 }
 
-void BasicReader::Read(RawData& destination) {
+void BasicReader::Read(RawData &destination) {
   ReadRecords(kMachinesFile, destination.machines);
   ReadRecords(kMachineSetsFile, destination.machine_sets);
   ReadRecords(kFairMachineSetsFile, destination.fair_machine_sets);

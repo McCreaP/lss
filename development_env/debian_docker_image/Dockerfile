@@ -25,6 +25,7 @@ RUN rm -rf /root/packages/
 RUN apt-get update \
     && apt-get install -y \
     gcc \
+    g++ \
     openssh-server \
     wget \
     curl \
