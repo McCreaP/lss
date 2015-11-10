@@ -7,7 +7,7 @@ namespace lss {
 namespace io {
 
 TEST(IoTest, Primitive) {
-  EXPECT_EQ(kContextN,3);
+  EXPECT_EQ(kContextN, 3);
 }
 
 }  // namespace io
