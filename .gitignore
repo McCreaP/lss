@@ -7,3 +7,6 @@
 
 testing/system_tests/input
 testing/system_tests/assignments
+
+.idea
+build
