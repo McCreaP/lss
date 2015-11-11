@@ -19,7 +19,7 @@
   
 ### Building, running and testing
 * This repo contains git submodules, so you need to clone it with `--recursive` option or just run `git submodule update --init --recursive` on existing repo to pull them.
-* Create and enter build directory, which will contain all build files and cmake cache `mkdir -p directory && cd build`
+* Create and enter build directory, which will contain all build files and cmake cache `mkdir -p build && cd build`
 * Generate makefile `cmake ..`. There is no need to repeat it every time, cause generated makefile automatically detects changes in CMakeLists.txt
 * Run `make lss` for building scheduler or `make unit_tests`. You can use `-j [Number of jobs]` make option to run in parallel and speed up the build.
 * Scheduler will be placed in `build/src/lss` and tests in `build/test/unit_tests`

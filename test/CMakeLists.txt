@@ -18,3 +18,10 @@ add_executable(unit_tests
         io/raw_input_types_test.cc)
 
 TARGET_LINK_LIBRARIES(unit_tests libgmock)
+
+install(TARGETS unit_tests DESTINATION ${CMAKE_SOURCE_DIR})
+
+set_target_properties(unit_tests
+        PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+        )
