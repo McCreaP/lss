@@ -33,7 +33,8 @@ RUN apt-get update \
     make \
     cmake \
     tree \
-    python3
+    python3 \
+    git
 
 # configure shell
 RUN usermod -s /bin/bash vagrant
