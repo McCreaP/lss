@@ -13,14 +13,13 @@ class InputWriter:
         pieces = \
             [('machines', [m.show() for m in machines.values()]),
              ('machine-sets', [show_machine_set(x)
-                               for x in self.__story['machine_sets']]),
+                               for x in self.__story.get_raw('machine_sets')]),
              ('fair-service-machine-sets', [show_machine_set(x)
-                                            for x in self.__story['fair_service_machine_sets']]),
+                                            for x in self.__story.get_raw('fair_service_machine_sets')]),
              ('jobs', [show_job(job) for job in ready_jobs.values()]),
-             ('batches', [show_batch(x) for x in self.__story['batches']]),
-             ('accounts', [show_account(x) for x in self.__story['accounts']]),
-             ('context-changes',
-              show_context_changes(self.__story['context_changes']))
+             ('batches', [show_batch(x) for x in self.__story.get_raw('batches')]),
+             ('accounts', [show_account(x) for x in self.__story.get_raw('accounts')]),
+             ('context-changes', show_context_changes(self.__story.get_raw('context_changes')))
              ]
 
         def glue(title, data):

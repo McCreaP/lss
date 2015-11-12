@@ -18,13 +18,12 @@ class EventLoop:
         self.__story = story
         self.__events = PriorityQueue()
         self.__state = state
-        self.__progress_bar = ProgressBar(
-            self.__story['mint'], self.__story['maxt'])
+        self.__progress_bar = ProgressBar(self.__story.get_raw('mint'), self.__story.get_raw('maxt'))
 
     def run(self):
         self.__add_jobs_ready_events()
         self.add_event(UseIdleMachines(timer.now(), self, self.__state))
-        while timer.now() < self.__story['maxt']:
+        while timer.now() < self.__story.get_raw('maxt'):
             event = self.__events.get()
             now = timer.now()
             if now < event.get_execution_time():
@@ -37,7 +36,7 @@ class EventLoop:
         self.__events.put(event)
 
     def __add_jobs_ready_events(self):
-        for job in self.__story['jobs']:
+        for job in self.__story.get_raw('jobs'):
             self.add_event(JobReady(job, self.__state))
 
 

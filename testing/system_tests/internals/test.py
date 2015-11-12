@@ -8,6 +8,7 @@ import signal
 from internals import timer
 from internals.loop import EventLoop
 from internals.state import State
+from internals.story.story import Story
 
 LOGGER = logging.getLogger('test_runner')
 
@@ -22,7 +23,7 @@ class Test:
         self.__log_dir = log_dir
         test_data_path = os.path.join(test_data_dir, test_name)
         with open(test_data_path, 'rb') as f:
-            self.__story = pickle.load(f)
+            self.__story = Story(pickle.load(f))
 
     def run(self):
         self.__prepare_for_running()

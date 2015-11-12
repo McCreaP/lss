@@ -25,8 +25,10 @@ class State:
 
         self.__story = story
         self.__input_writer = InputWriter(lss_input_file, story)
+
         self.__machines = {
-            m['id']: Machine(m['id'], lss_assignments_dir, story['context_changes']) for m in story['machines']}
+            m['id']: Machine(m['id'], lss_assignments_dir, story.get_raw('context_changes')) for m in story.get_raw('machines')}
+
         self.__ready_jobs = {}
         self.__finished_jobs = {}
 
@@ -71,7 +73,7 @@ class State:
             else:
                 return v
 
-        story = {k: for_one(k, v) for k, v in self.__story.items()}
+        story = {k: for_one(k, v) for k, v in self.__story.get_items()}
         return story
 
 #     def try_to_take_job(self, machine_id):
