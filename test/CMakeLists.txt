@@ -14,8 +14,8 @@ include_directories("${GTEST_DIR}/include"
         "${GMOCK_DIR}")
 
 add_executable(unit_tests
-        main.cc
-        io/raw_input_types_test.cc)
+        "main.cc"
+        "io/basic_input_test.cc")
 
 TARGET_LINK_LIBRARIES(unit_tests libgmock)
 
