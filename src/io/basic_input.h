@@ -39,6 +39,13 @@ class BasicReader {
   std::string input_path_;
 };
 
+std::istream& operator>>(std::istream& input, Job& job);
+std::istream& operator>>(std::istream& input, Batch& batch);
+std::istream& operator>>(std::istream& input, Machine& machine);
+std::istream& operator>>(std::istream& input, MachineSet& set);
+std::istream& operator>>(std::istream& input, Account& account);
+std::istream& operator>>(std::istream& input, ContextChange& change);
+
 }  // namespace io
 }  // namespace lss
 
