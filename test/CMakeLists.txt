@@ -15,6 +15,7 @@ include_directories("${GTEST_DIR}/include"
 
 add_executable(unit_tests
         "main.cc"
+        "${CMAKE_SOURCE_DIR}/src/io/basic_input.cc"  # A quick hack
         "io/basic_input_test.cc")
 
 TARGET_LINK_LIBRARIES(unit_tests libgmock)
