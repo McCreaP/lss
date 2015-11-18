@@ -37,7 +37,7 @@ class StartJob(Event):
         return "Start: %s at %s" % (str(self._job), self._execution_time)
 
     def _execute_impl(self):
-        return self.__imbalance_ingredient()
+        return -self.__imbalance_ingredient()
 
     def __imbalance_ingredient(self):
         fair_machine_set = self._job.get_fair_machine_set()
@@ -54,7 +54,7 @@ class FinishJob(Event):
         return "Finish: %s at %s" % (str(self._job), self._execution_time)
 
     def _execute_impl(self):
-        value = self.__imbalance_ingredient()
+        value = -self.__imbalance_ingredient()
         value += self.__finish_job_ingredient()
         return value
 
