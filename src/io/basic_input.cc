@@ -24,14 +24,16 @@ void BasicReader::SetInputPath(const std::string& input_path) {
   input_path_ = input_path;
 }
 
-void BasicReader::Read(RawData& destination) {
-  ReadRecords(kMachinesFile, destination.machines);
-  ReadRecords(kMachineSetsFile, destination.machine_sets);
-  ReadRecords(kFairMachineSetsFile, destination.fair_machine_sets);
-  ReadRecords(kJobsFile, destination.jobs);
-  ReadRecords(kBatchesFile, destination.batches);
-  ReadRecords(kAccountsFile, destination.accounts);
-  ReadRecords(kContextChangesFile, destination.context_changes);
+bool BasicReader::Read(RawData& destination) {
+  bool ok = true;
+  ok &= ReadRecords(kMachinesFile, destination.machines);
+  ok &= ReadRecords(kMachineSetsFile, destination.machine_sets);
+  ok &= ReadRecords(kFairMachineSetsFile, destination.fair_machine_sets);
+  ok &= ReadRecords(kJobsFile, destination.jobs);
+  ok &= ReadRecords(kBatchesFile, destination.batches);
+  ok &= ReadRecords(kAccountsFile, destination.accounts);
+  ok &= ReadRecords(kContextChangesFile, destination.context_changes);
+  return ok;
 }
 
 std::istream& operator>>(std::istream& input, Job& job) {
