@@ -21,10 +21,10 @@ class InputWriter:
             (self.MACHINES_FILE, show_machines(machines)),
             (self.MACHINE_SETS_FILE, show_machine_sets(self.__story.get_raw('machine_sets'))),
             (self.FAIR_MACHINE_SETS_FILE, show_machine_sets(self.__story.get_raw('fair_service_machine_sets'))),
-            (self.JOBS_FILE, show_jobs(self.__story.get_raw('jobs'))),
+            (self.JOBS_FILE, show_jobs(ready_jobs)),
             (self.BATCHES_FILE, show_batches(self.__story.get_raw('batches'))),
             (self.ACCOUNTS_FILE, show_accounts(self.__story.get_raw('accounts'))),
-            (self.CONTEXT_CHANGES_FILE, show_context_changes(self.__story.get_raw('contex_changes')))
+            (self.CONTEXT_CHANGES_FILE, show_context_changes(self.__story.get_raw('context_changes')))
         ])
 
     def __clean_input_dir(self):

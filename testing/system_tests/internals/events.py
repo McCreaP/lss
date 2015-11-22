@@ -70,6 +70,7 @@ class JobReady(Event):
         super(JobReady, self).__init__(job['ready'])
         self.__job = job
         self.__state = state
+
     def __str__(self):
         return "Job %s ready" % self.__job['id']
 

@@ -31,6 +31,7 @@ RUN apt-get update \
     tree \
     python3 \
     git \
+    python3-pip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -47,13 +48,8 @@ RUN chown vagrant /home/vagrant/.bashrc
 # allow passwordless sudo
 RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-# install pip
-RUN mkdir -p /env
-ADD https://bootstrap.pypa.io/get-pip.py /env/
-RUN python3 /env/get-pip.py
-
-RUN pip install colorlog
-RUN pip install bottle
+RUN pip3 install colorlog
+RUN pip3 install bottle
 
 RUN mkdir -p /var/run/sshd
 

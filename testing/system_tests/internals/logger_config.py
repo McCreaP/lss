@@ -49,7 +49,7 @@ class LoggerConfig:
         handler = logging.FileHandler(log_file)
         handler.setLevel(logging.DEBUG)
 
-        formatter = logging.Formatter(COLOR_LOG_FORMAT)
+        formatter = ColoredFormatter(COLOR_LOG_FORMAT)
         handler.setFormatter(formatter)
 
         LOGGER.addHandler(handler)

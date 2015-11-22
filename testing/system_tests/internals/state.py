@@ -33,7 +33,7 @@ class State:
 
     def add_ready_job(self, job):
         self.__ready_jobs[job['id']] = job
-        self.__input_writer.write(self.__machines, self.__ready_jobs)
+        self.__input_writer.write(self.__machines, self.__ready_jobs.values())
 
     def use_idle_machines(self):
         finish_job_events_args = [
