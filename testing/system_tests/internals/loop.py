@@ -7,8 +7,6 @@ from internals.events import UseIdleMachines
 from internals import timer
 
 
-INPUT_UPDATE_PERIOD = 3
-
 LOGGER = logging.getLogger("test_runner")
 
 

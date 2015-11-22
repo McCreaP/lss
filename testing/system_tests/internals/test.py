@@ -8,7 +8,7 @@ import signal
 from internals import timer
 from internals.loop import EventLoop
 from internals.state import State
-from internals.story.story import Story
+from internals.story import Story
 
 LOGGER = logging.getLogger('test_runner')
 
