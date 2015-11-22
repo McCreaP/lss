@@ -65,17 +65,13 @@ class UseIdleMachines(Event):
 
 
 class JobReady(Event):
-    counter = 0
 
     def __init__(self, job, state):
         super(JobReady, self).__init__(job['ready'])
         self.__job = job
         self.__state = state
-        JobReady.counter += 1
-
     def __str__(self):
         return "Job %s ready" % self.__job['id']
 
     def _execute_impl(self):
         self.__state.add_ready_job(self.__job)
-        JobReady.counter -= 1

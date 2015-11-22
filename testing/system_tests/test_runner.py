@@ -1,16 +1,12 @@
 #!/usr/bin/env python3
 import os
-import time
 import logging
 from argparse import ArgumentParser
 
-from internals import utils
-from internals import logger_config
+from internals.logger_config import LoggerConfig
 from internals.test import Test
 
 TESTS_DATA_PATH = './scenarios/'
-
-LOG_ROOT_DIR = './logs/'
 
 LOGGER = logging.getLogger("test_runner")
 
@@ -37,27 +33,24 @@ def parse_args():
 
 
 def get_all_tests_names():
-    return [f for f in os.listdir(TESTS_DATA_PATH)]
-
-
-def make_log_dir(test_name):
-    log_dir = os.path.join(
-        LOG_ROOT_DIR, test_name + '_' + utils.human_readable_time(time.time()))
-    os.makedirs(log_dir, mode=0o775)
-    return log_dir
+    return sorted([f for f in os.listdir(TESTS_DATA_PATH)])
 
 
 def run_single_test(test_name, lss_input_dir, scheduler_path):
-    log_dir = make_log_dir(test_name)
-    logger_config.add_file_handler(log_dir)
-    LOGGER.info("Test: %s ... ", test_name)
-    test = Test(
-        TESTS_DATA_PATH, test_name, lss_input_dir, scheduler_path, log_dir)
-    test.run()
-    if test.has_failed():
-        LOGGER.error("Test: %s ... FAILED", test_name)
-    else:
-        LOGGER.info("Test: %s ... PASSED", test_name)
+    with LoggerConfig.test_file_handler(test_name) as test_log_dir:
+        LOGGER.info("Test: %s ... ", test_name)
+        test = Test(
+            TESTS_DATA_PATH,
+            test_name,
+            lss_input_dir,
+            scheduler_path,
+            test_log_dir
+        )
+        test.run()
+        if test.has_failed():
+            LOGGER.error("Test: %s ... FAILED", test_name)
+        else:
+            LOGGER.info("Test: %s ... PASSED", test_name)
 
 
 def run_all_tests(lss_input_dir, scheduler_path):
@@ -68,7 +61,7 @@ def run_all_tests(lss_input_dir, scheduler_path):
 
 if __name__ == "__main__":
     args = parse_args()
-    logger_config.setup(args.verbose)
+    LoggerConfig.setup(args.test_name, args.verbose)
 
     if args.list:
         for test_name in get_all_tests_names():

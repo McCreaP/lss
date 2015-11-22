@@ -18,13 +18,9 @@ RUN chown -R vagrant /home/vagrant/
 RUN chmod 0600 /home/vagrant/.ssh/authorized_keys
 RUN chmod 0700 /home/vagrant/.ssh
 
-# cleanup packages
-RUN rm -rf /root/packages/
-
 # install apps
 RUN apt-get update \
     && apt-get install -y \
-    gcc \
     g++ \
     openssh-server \
     wget \
@@ -34,7 +30,13 @@ RUN apt-get update \
     cmake \
     tree \
     python3 \
-    git
+    git \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# clone gmock
+RUN mkdir -p /home/vagrant/gmock-1.7.0
+RUN git clone https://github.com/paulsapps/gmock-1.7.0.git /home/vagrant/gmock-1.7.0
 
 # configure shell
 RUN usermod -s /bin/bash vagrant

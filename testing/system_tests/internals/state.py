@@ -10,7 +10,6 @@ from internals.machine import Machine, MachineState
 from internals.exceptions import InvalidJobException
 
 LSS_ASSIGNMENTS_DIR = 'assignments'
-LSS_INPUT_FILE = 'input'
 
 LOGGER = logging.getLogger('test_runner')
 
@@ -19,15 +18,15 @@ class State:
 
     def __init__(self, story, lss_input_dir):
         lss_assignments_dir = os.path.join(lss_input_dir, LSS_ASSIGNMENTS_DIR)
-        lss_input_file = os.path.join(lss_input_dir, LSS_INPUT_FILE)
         utils.clean_dir(lss_assignments_dir)
-        utils.remove_file(lss_input_file)
 
         self.__story = story
-        self.__input_writer = InputWriter(lss_input_file, story)
+        self.__input_writer = InputWriter(lss_input_dir, story)
 
         self.__machines = {
-            m['id']: Machine(m['id'], lss_assignments_dir, story.get_raw('context_changes')) for m in story.get_raw('machines')}
+            m['id']: Machine(m['id'], lss_assignments_dir, story.get_raw('context_changes'))
+            for m in story.get_raw('machines')
+        }
 
         self.__ready_jobs = {}
         self.__finished_jobs = {}
@@ -37,15 +36,20 @@ class State:
         self.__input_writer.write(self.__machines, self.__ready_jobs)
 
     def use_idle_machines(self):
-        finish_job_events_args = [m.try_to_take_job(timer.now(), self.__ready_jobs)
-                                  for m in self.__machines.values() if m.get_state() == MachineState.MACHINE_IDLE]
+        finish_job_events_args = [
+            m.try_to_take_job(timer.now(), self.__ready_jobs)
+            for m in self.__machines.values()
+            if m.get_state() == MachineState.MACHINE_IDLE
+        ]
         return utils.flatten(finish_job_events_args)
 
     def finish_job(self, job):
         now = timer.now()
         if job not in self.__ready_jobs.values():
             raise InvalidJobException(
-                job['id'], "Cannot finish job. It probably has already been finished by other machine")
+                job['id'],
+                "Cannot finish job. It probably has already been finished by other machine"
+            )
         del self.__ready_jobs[job['id']]
         job['real_duration'] = now - job['real_start_time']
         self.__finished_jobs[job['id']] = job

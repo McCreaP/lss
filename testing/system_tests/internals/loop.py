@@ -6,8 +6,6 @@ from internals.events import UseIdleMachines
 from internals.skipper_api import SkipperApi
 from threading import Condition
 
-INPUT_UPDATE_PERIOD = 3
-
 LOGGER = logging.getLogger("test_runner")
 
 
