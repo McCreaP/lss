@@ -1,3 +1,0 @@
-[submodule "test/gmock-1.7.0"]
-	path = test/gmock-1.7.0
-	url = https://github.com/paulsapps/gmock-1.7.0.git
