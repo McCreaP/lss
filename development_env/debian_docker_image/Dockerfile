@@ -51,6 +51,7 @@ ADD https://bootstrap.pypa.io/get-pip.py /env/
 RUN python3 /env/get-pip.py
 
 RUN pip install colorlog
+RUN pip install bottle
 
 RUN mkdir -p /var/run/sshd
 

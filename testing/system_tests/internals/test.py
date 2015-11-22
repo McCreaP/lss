@@ -8,7 +8,7 @@ import signal
 from internals import timer
 from internals.loop import EventLoop
 from internals.state import State
-from internals.story.story import Story
+from internals.story import Story
 
 LOGGER = logging.getLogger('test_runner')
 
@@ -44,4 +44,4 @@ class Test:
     def __prepare_for_running(self):
         self.__state = State(self.__story, self.__lss_input_dir)
         self.__has_failed = False
-        timer.setup(self.__story['mint'])
+        timer.setup(self.__story.get_raw('mint'))
