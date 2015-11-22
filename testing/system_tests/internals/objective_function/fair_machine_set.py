@@ -7,6 +7,9 @@ class FairMachineSet:
         self.__active_jobs_ct = {acc_id: 0 for acc_id in self.__accounts.keys()}
         self.__last_change = {acc_id: mint for acc_id in self.__accounts.keys()}
 
+    def __str__(self):
+        return "Fair machine set: %d" % self.__raw_fair_machine_set['id']
+
     def get_machines_ids(self):
         return self.__raw_fair_machine_set['initial_contents']
     

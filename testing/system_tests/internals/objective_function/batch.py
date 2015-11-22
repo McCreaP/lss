@@ -9,14 +9,14 @@ class Batch:
         self.__number_of_finished_jobs = 0
         # According to the paper it should be nonzero only for the largest batches
         # but so far we don't have batch's 'beta' value
-        self.__beta = 1 / self.__number_of_jobs
+        self.__beta = 1 / self.__number_of_jobs if self.__number_of_jobs else 0
 
     def get_raw(self, key):
         return self.__raw_batch[key]
     
     def finish_job(self, job):
         self.__number_of_finished_jobs += 1
-        sigmoid = self.__sigmoid(job.get_finish_time())
+        sigmoid = self.__sigmoid((job.get_finish_time() - self.__raw_batch['due']) / self.__raw_batch['T'])
         penalty_for_job_tardiness = self.__beta * sigmoid
         penalty_for_batch_tardiness = sigmoid if self.__all_jobs_finished() else 0.0
         return penalty_for_job_tardiness + penalty_for_batch_tardiness
