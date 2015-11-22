@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(lss CXX)
+project(lss)
 
 set(CXX_WARNINGS_FLAGS "-Wall -Wextra -pedantic -Werror")
 # Gtest contains warnings of this type
