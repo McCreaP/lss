@@ -1,5 +1,6 @@
 import os
 
+from internals import utils
 
 class InputWriter:
     MACHINES_FILE = 'machines'
@@ -10,9 +11,10 @@ class InputWriter:
     ACCOUNTS_FILE = 'accounts'
     CONTEXT_CHANGES_FILE = 'context-changes'
 
-    def __init__(self, lss_input_file, story):
-        self.__lss_input_file = lss_input_file
+    def __init__(self, lss_input_dir, story):
+        self.__lss_input_dir = lss_input_dir
         self.__story = story
+        self.__clean_input_dir()
 
     def write(self, machines, ready_jobs):
         self.__write_to_files([
@@ -24,6 +26,21 @@ class InputWriter:
             (self.ACCOUNTS_FILE, show_accounts(self.__story.get_raw('accounts'))),
             (self.CONTEXT_CHANGES_FILE, show_context_changes(self.__story.get_raw('contex_changes')))
         ])
+
+    def __clean_input_dir(self):
+        self.__rm_files_from_input_dir([
+            self.MACHINES_FILE,
+            self.MACHINE_SETS_FILE,
+            self.FAIR_MACHINE_SETS_FILE,
+            self.JOBS_FILE,
+            self.BATCHES_FILE,
+            self.ACCOUNTS_FILE,
+            self.CONTEXT_CHANGES_FILE
+        ])
+
+    def __rm_files_from_input_dir(self, file_names):
+        for file_name in file_names:
+            utils.remove_file(os.path.join(self.__lss_input_dir, file_name))
 
     def __write_to_files(self, data):
         for file_name, lines in data:
