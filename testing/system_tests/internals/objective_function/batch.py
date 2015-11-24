@@ -13,7 +13,7 @@ class Batch:
 
     def get_raw(self, key):
         return self.__raw_batch[key]
-    
+
     def finish_job(self, job):
         self.__number_of_finished_jobs += 1
         sigmoid = self.__sigmoid((job.get_finish_time() - self.__raw_batch['due']) / self.__raw_batch['T'])

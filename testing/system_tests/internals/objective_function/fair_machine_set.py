@@ -12,7 +12,7 @@ class FairMachineSet:
 
     def get_machines_ids(self):
         return self.__raw_fair_machine_set['initial_contents']
-    
+
     def start_job(self, account_id, execution_time):
         value = self.__compute_from_last_update(account_id, execution_time)
         self.__active_jobs_ct[account_id] += 1

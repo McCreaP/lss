@@ -60,11 +60,11 @@ class FinishJob(JobEvent):
     def __imbalance_ingredient(self):
         fair_machine_set = self._job.get_fair_machine_set()
         imbalance_ingredient = fair_machine_set.finish_job(self._job.get_account_id(), self._execution_time)
-        LOGGER.debug("Imbalance_ingredient", imbalance_ingredient)
+        LOGGER.debug("Imbalance ingredient: %f", imbalance_ingredient)
         return imbalance_ingredient
 
     def __finish_job_ingredient(self):
         batch = self._job.get_batch()
         finish_job_ingredient = batch.finish_job(self._job)
-        LOGGER.debug("Finish job ingredient", finish_job_ingredient)
+        LOGGER.debug("Finish job ingredient: %s", finish_job_ingredient)
         return finish_job_ingredient

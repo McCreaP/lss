@@ -2,6 +2,7 @@ import os
 
 from internals import utils
 
+
 class InputWriter:
     MACHINES_FILE = 'machines'
     MACHINE_SETS_FILE = 'machine-set'

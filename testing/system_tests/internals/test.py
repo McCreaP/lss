@@ -21,6 +21,7 @@ class Test:
         self.__lss_input_dir = lss_input_dir
         self.__lss_executable_path = lss_executable_path
         self.__log_dir = log_dir
+        self.__state = None
         test_data_path = os.path.join(test_data_dir, test_name)
         with open(test_data_path, 'rb') as f:
             self.__story = Story(pickle.load(f))

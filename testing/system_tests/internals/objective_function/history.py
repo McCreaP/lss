@@ -30,7 +30,7 @@ class History:
         fair_machine_set_of_machine = {}
         for fair_machine_set in fair_machine_sets:
             for machine_id in fair_machine_set.get_machines_ids():
-                fair_machine_set_of_machine[machine_id] = fair_machine_set               
+                fair_machine_set_of_machine[machine_id] = fair_machine_set
         self.__jobs = [
             Job(raw_job, self.__batches[raw_job['batch']], fair_machine_set_of_machine[raw_job['real_machine']])
             for raw_job in self.__raw_history['jobs']

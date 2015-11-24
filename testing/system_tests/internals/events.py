@@ -28,6 +28,7 @@ class Event:
     def _execute_impl(self):
         return
 
+
 class FinishJob(Event):
 
     def __init__(self, execution_time, job, state):

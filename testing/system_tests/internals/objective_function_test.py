@@ -75,15 +75,15 @@ SAMPLE_HISTORY = {
 
 
 class RawHistoryBuilder:
-    
+
     def __init__(self):
         self.__raw_history = SAMPLE_HISTORY
-    
+
     def with_finished_jobs(self, raw_jobs):
         for raw_job in raw_jobs:
             self.__raw_history['jobs'].append(raw_job)
         return self
-    
+
     def get(self):
         return self.__raw_history
 
@@ -138,7 +138,7 @@ class TestObjectiveFunction(unittest.TestCase):
         raw_history = RawHistoryBuilder().get()
         value = ObjectiveFunction(History(raw_history, [])).compute()
         self.assertEqual(-90.0, value)
-        
+
     def test_one_job(self):
         all_raw_jobs = [JOB_1]
         raw_history = RawHistoryBuilder().with_finished_jobs(all_raw_jobs).get()
