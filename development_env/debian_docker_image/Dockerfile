@@ -28,6 +28,7 @@ RUN apt-get update \
     make \
     cmake \
     tree \
+    python \
     python3 \
     python3-pip \
     unzip \
@@ -36,7 +37,10 @@ RUN apt-get update \
 
 RUN pip3 install colorlog
 RUN pip3 install bottle
-RUN pip3 install cpplint
+
+# add cpplint
+ADD https://raw.githubusercontent.com/McCreaP/styleguide/gh-pages/cpplint/cpplint.py /home/vagrant/
+RUN chmod +x /home/vagrant/cpplint.py
 
 # install google test
 ADD https://googletest.googlecode.com/files/gtest-1.7.0.zip /home/vagrant/

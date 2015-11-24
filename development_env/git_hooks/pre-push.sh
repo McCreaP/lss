@@ -6,7 +6,7 @@ git stash -q --keep-index
 
 vagrant ssh --command "./lss/build.sh"
 [ $? -ne 0 ] && ABORT="TRUE"
-vagrant ssh --command "cpplint --filter=-legal/copyright \`find lss/src -type f\`"
+vagrant ssh --command "cpplint --project=lss --root=src --filter=-legal/copyright \`find lss/src -type f\`"
 [ $? -ne 0 ] && ABORT="TRUE"
 
 git stash pop -q
