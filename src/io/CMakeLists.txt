@@ -6,4 +6,6 @@ foreach (test ${IO_TEST})
 endforeach ()
 
 add_library(io ${IO_SRC})
-add_library(io_test ${IO_TEST})
+add_library(io_test STATIC ${IO_TEST})
+
+target_link_libraries(io_test io)
