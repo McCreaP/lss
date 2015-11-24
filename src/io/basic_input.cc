@@ -1,4 +1,4 @@
-#include "basic_input.h"
+#include "io/basic_input.h"
 
 #include <functional>
 #include <sstream>
@@ -24,15 +24,15 @@ void BasicReader::SetInputPath(const std::string& input_path) {
   input_path_ = input_path;
 }
 
-bool BasicReader::Read(RawData& destination) {
+bool BasicReader::Read(RawData* destination) {
   bool ok = true;
-  ok &= ReadRecords(kMachinesFile, destination.machines);
-  ok &= ReadRecords(kMachineSetsFile, destination.machine_sets);
-  ok &= ReadRecords(kFairMachineSetsFile, destination.fair_machine_sets);
-  ok &= ReadRecords(kJobsFile, destination.jobs);
-  ok &= ReadRecords(kBatchesFile, destination.batches);
-  ok &= ReadRecords(kAccountsFile, destination.accounts);
-  ok &= ReadRecords(kContextChangesFile, destination.context_changes);
+  ok &= ReadRecords(kMachinesFile, &destination->machines);
+  ok &= ReadRecords(kMachineSetsFile, &destination->machine_sets);
+  ok &= ReadRecords(kFairMachineSetsFile, &destination->fair_machine_sets);
+  ok &= ReadRecords(kJobsFile, &destination->jobs);
+  ok &= ReadRecords(kBatchesFile, &destination->batches);
+  ok &= ReadRecords(kAccountsFile, &destination->accounts);
+  ok &= ReadRecords(kContextChangesFile, &destination->context_changes);
   return ok;
 }
 
