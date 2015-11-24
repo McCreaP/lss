@@ -6,6 +6,6 @@ using lss::io::RawData;
 int main() {
   RawData rawData;
   BasicReader basicReader(".");
-  basicReader.Read(rawData);
+  basicReader.Read(&rawData);
   return 0;
 }
