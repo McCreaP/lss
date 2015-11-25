@@ -1,8 +1,8 @@
 #include "io/basic_output.h"
 
+#include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <fcntl.h>
 
 namespace lss {
 namespace io {
@@ -20,28 +20,26 @@ bool BasicWriter::Assign(int machine_id, int job_id) {
   const std::string content = std::to_string(job_id);
 
   // Use open with O_CREAT | O_EXCL to ensure the file is actually created.
-  // This makes Assign() safe for concurrent calls.
+  // This functions as a lock and makes Assign() safe for concurrent calls.
   int fd = open(tmp_path.c_str(), O_WRONLY | O_CREAT | O_EXCL);
   if (fd == -1) return false;
 
-  bool ok = true;
-  ok &= (write(fd, content.c_str(), content.size()) != -1);
-  ok &= (close(fd) != -1);
+  // Poor man's way to check if file does not exist (i.e. there is not pending
+  // assignment) - call to access() might fail for other reasons than
+  // nonexistence of the file.
+  bool ok = (access(path.c_str(), F_OK) == -1);
+
   if (ok) {
-    int ret = renameat2(AT_FDCWD, tmp_path.c_str(), AT_FDCWD, path.c_str(),
-                        RENAME_NOREPLACE);
-    ok &= (ret != -1);
+    ok &= (write(fd, content.c_str(), content.size()) != -1);
+    ok &= (close(fd) != -1);
   }
-
-  auto ptr = &renameat2;
-  ptr = nullptr;
-
-  if (ok) {
+  if (ok)
+    ok &= (rename(tmp_path.c_str(), path.c_str()) != -1);
+  if (ok)
     return true;
-  } else {
-    remove(tmp_path.c_str());
-    return false;
-  }
+
+  remove(tmp_path.c_str());
+  return false;
 }
 
 bool BasicWriter::Unassign(int machine_id) {
