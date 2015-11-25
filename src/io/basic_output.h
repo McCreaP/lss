@@ -12,8 +12,12 @@ class BasicWriter {
 
   void SetOutputPath(const std::string& output_path);
 
+  // Returns true on success. The assignment might fail if there is already
+  // a pending assignment but that's not the only possibility.
   bool Assign(int machine_id, int job_id);
 
+  // Attempts to cancel a pending assignment. Returns false upon failure
+  // or if there is no pending assignment.
   bool Unassign(int machine_id);
 
  private:
