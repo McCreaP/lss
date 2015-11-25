@@ -34,7 +34,7 @@ bool FileLock::IsLocked() const {
 
 bool FileLock::TryLock() {
   if (file_descriptor_ == -1) {
-    file_descriptor_ = open(lock_name_.c_str(), O_WRONLY);
+    file_descriptor_ = open(lock_name_.c_str(), O_WRONLY | O_CREAT | O_EXCL);
     return file_descriptor_ != -1;
   }
   return false;
