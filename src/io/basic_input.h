@@ -20,13 +20,41 @@ struct RawData {
   std::vector<ContextChange> context_changes;
 };
 
+// Represents a simple cooperative file lock.
+class FileLock {
+ public:
+  // Constructs a FileLock that will be represented by file 'lock_name'.
+  // You have to explicitely call TryLock() to acquire it.
+  explicit FileLock(const std::string& lock_name);
+
+  // Calls Unlock().
+  ~FileLock();
+
+  bool IsLocked() const;
+
+  // Does nothing and returns false if lock is already acquired.
+  // Otherwise attempts to create lock file and returns true on success.
+  bool TryLock();
+
+  // Attempts to remove lock file and returns FileLock to fresh state.
+  // Does nothing if FileLock was not acquired.
+  void Unlock();
+
+ private:
+  int file_descriptor_;
+  const std::string lock_name_;
+};
+
 class BasicReader {
  public:
-  explicit BasicReader(const std::string &input_path);
+  explicit BasicReader(const std::string& input_path);
 
-  void SetInputPath(const std::string &input_path);
+  void SetInputPath(const std::string& input_path);
 
-  // Returns true iff all input files are successfully opened.
+  // Returns true iff file 'lock' is successfully created in 'input_dir'
+  // and subsequently all input files are opened. File 'lock' is deleted
+  // before Read() returns.
+  //
   // The contents of the files are not validated and reading malformed
   // records will quietly result in corrupted data.
   bool Read(RawData* destination);

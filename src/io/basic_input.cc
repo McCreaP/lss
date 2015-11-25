@@ -1,6 +1,10 @@
 #include "io/basic_input.h"
 
+#include <cstring>
+#include <fcntl.h>
+
 #include <functional>
+#include <iostream>
 #include <sstream>
 
 namespace lss {
@@ -17,6 +21,34 @@ const char kContextChangesFile[] = "context-changes";
 
 }  // namespace
 
+FileLock::FileLock(const std::string& lock_name)
+  : file_descriptor_(-1), lock_name_(lock_name) {}
+
+FileLock::~FileLock() {
+  Unlock();
+}
+
+bool FileLock::IsLocked() const {
+  return file_descriptor_ != -1;
+}
+
+bool FileLock::TryLock() {
+  if (file_descriptor_ == -1) {
+    file_descriptor_ = open(lock_name_.c_str(), O_WRONLY);
+    return file_descriptor_ != -1;
+  }
+  return false;
+}
+
+void FileLock::Unlock() {
+  if (file_descriptor_ != -1) {
+    if (remove(lock_name_.c_str()) == -1) {
+      std::cerr << "Removing lock file failed: " << strerror(errno) << '\n';
+    }
+    file_descriptor_ = -1;
+  }
+}
+
 BasicReader::BasicReader(const std::string& input_path)
     : input_path_(input_path) { }
 
@@ -25,6 +57,10 @@ void BasicReader::SetInputPath(const std::string& input_path) {
 }
 
 bool BasicReader::Read(RawData* destination) {
+  FileLock lock(input_path_ + "/lock");
+  if (!lock.TryLock())
+    return false;
+
   bool ok = true;
   ok &= ReadRecords(kMachinesFile, &destination->machines);
   ok &= ReadRecords(kMachineSetsFile, &destination->machine_sets);
