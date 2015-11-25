@@ -32,6 +32,8 @@ RUN apt-get update \
     python3 \
     python3-pip \
     unzip \
+    lcov \
+    bc \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
