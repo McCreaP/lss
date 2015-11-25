@@ -1,15 +1,11 @@
 **/.vagrant/**
 
-**/.project
-**/.pydevproject
-
 **/__pycache__/**
 
 testing/system_tests/input
 testing/system_tests/assignments
 testing/system_tests/logs
 
-.idea
 build
 
 lss
