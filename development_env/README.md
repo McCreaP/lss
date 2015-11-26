@@ -2,7 +2,9 @@
 
 ## Vagrant 
 
-First, you need to install the latest version of Vagrant. Deb and rpm packages are available [here](https://www.vagrantup.com/downloads.html). More information about Vagrant can be found at https://www.vagrantup.com/
+First, you need to install the **latest version** of Vagrant. Deb and rpm packages are available [here](https://www.vagrantup.com/downloads.html). More information about Vagrant can be found at https://www.vagrantup.com/
+
+**Warning:** Ubuntu repository contains older version of Vagrant which doesn't support Docker!
 
 ## Docker
 
