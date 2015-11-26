@@ -29,7 +29,9 @@ RUN apt-get update \
     make \
     cmake \
     tree \
+    python3 \
     git \
+    python3-pip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -39,12 +41,15 @@ RUN git clone https://github.com/paulsapps/gmock-1.7.0.git /home/vagrant/gmock-1
 
 # configure shell
 RUN usermod -s /bin/bash vagrant
-RUN echo "umask 002" >> /home/vagrant/.bashrc
 RUN echo "if [ -f ~/.bashrc ]; then . ~/.bashrc; fi" >> /home/vagrant/.bash_profile
+ADD bashrc /home/vagrant/.bashrc
 RUN chown vagrant /home/vagrant/.bashrc
 
 # allow passwordless sudo
 RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+RUN pip3 install colorlog
+RUN pip3 install bottle
 
 RUN mkdir -p /var/run/sshd
 

@@ -1,3 +1,12 @@
 **/.vagrant/**
-.idea
+
+**/__pycache__/**
+
+testing/system_tests/input
+testing/system_tests/assignments
+testing/system_tests/logs
+
 build
+
+lss
+unit_tests
