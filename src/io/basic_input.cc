@@ -2,6 +2,7 @@
 
 #include <cstring>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include <functional>
 #include <iostream>
@@ -42,9 +43,10 @@ bool FileLock::TryLock() {
 
 void FileLock::Unlock() {
   if (file_descriptor_ != -1) {
-    if (remove(lock_name_.c_str()) == -1) {
+    if (close(file_descriptor_) == -1)
+      std::cerr << "Closing lock file failed: " << strerror(errno) << '\n';
+    if (remove(lock_name_.c_str()) == -1)
       std::cerr << "Removing lock file failed: " << strerror(errno) << '\n';
-    }
     file_descriptor_ = -1;
   }
 }

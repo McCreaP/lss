@@ -24,7 +24,7 @@ struct RawData {
 class FileLock {
  public:
   // Constructs a FileLock that will be represented by file 'lock_name'.
-  // You have to explicitely call TryLock() to acquire it.
+  // You have to explicitly call TryLock() to acquire it.
   explicit FileLock(const std::string& lock_name);
 
   // Calls Unlock().
