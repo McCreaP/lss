@@ -65,12 +65,14 @@ EXIT_CODE=0
 if [ $(echo ${COVERAGE}'>'${TARGET_COVERAGE} | bc -l) -ne 0 ]
 then
     echo -e "\e[32mTest coverage is greater than target coverage\e[0m"
+    echo -e "\e[32mMeasuring unit tests coverage ... DONE\e[0m"
 else
     echo -e "\e[31mTest coverage is less than target coverage\e[0m"
+    echo -e "\e[31mMeasuring unit tests coverage ... DONE\e[0m"
     EXIT_CODE=1
 fi
 
 popd > /dev/null
 
-echo -e "\e[32mMeasuring unit tests coverage ... DONE\e[0m"
+
 exit ${EXIT_CODE}
