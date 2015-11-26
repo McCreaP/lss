@@ -66,7 +66,6 @@ RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 # configure bashrc
 RUN echo "if [ -f ~/.bashrc ]; then . ~/.bashrc; fi" >> /home/vagrant/.bash_profile
 COPY bashrc /home/vagrant/.bashrc
-
 RUN chown -R vagrant:zpp /home/vagrant
 
 RUN mkdir -p /var/run/sshd

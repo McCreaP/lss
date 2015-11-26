@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 namespace lss {
 namespace io {

@@ -10,8 +10,6 @@ vagrant ssh --command "./lss/scripts/build.sh"
 [ $? -ne 0 ] && EXIT_CODE=1
 vagrant ssh --command "./lss/scripts/cpplint.sh"
 [ $? -ne 0 ] && EXIT_CODE=1
-vagrant ssh --command "./lss/scripts/coverage.sh"
-[ $? -ne 0 ] && EXIT_CODE=1
 
 git stash pop -q
 
