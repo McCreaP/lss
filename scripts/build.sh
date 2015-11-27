@@ -1,25 +1,27 @@
 #!/bin/bash
 
+source shared/logging.sh
+
 set -o nounset
 set -o errexit
 
 if [ `whoami` != 'vagrant' ]
 then
-    echo -e "\e[31mPlease run this script from inside of the Docker container\e[0m"
+    log_error "Please run this script from inside of the Docker container"
     exit 1
 fi
 
 BUILD_TYPE="Debug"
 MAKE_VERBOSE_FLAG=""
 
-if [ $# -gt 0 ]
-then
+while [[ $# > 0 ]]
+do
     case "$1" in
         -h|--help)
             echo "Usage: $0 [options]"
             echo
             echo "options:"
-            echo "-h, --help        print this usage and exit"
+            echo "-h, --help        print this message and exit"
             echo "-c, --clean       clean all build files"
             echo "-r, --release     build in the release mode (default: debug)"
             echo "-v, --verbose     show more logs"
@@ -37,14 +39,16 @@ then
             MAKE_VERBOSE_FLAG="VERBOSE=1"
             ;;
         *)
-            break
+            echo "Unrecognized flag: $1"
+            exit 1
             ;;
     esac
-fi
+    shift
+done
 
-echo -e "\e[32mBuilding project ...\e[0m"
+log_info "Building project ..."
 
-pushd `pwd`
+pushd .
 cd /home/vagrant/lss
 
 mkdir -p build && cd build
@@ -54,4 +58,4 @@ make install
 
 popd > /dev/null
 
-echo -e "\e[32mBuilding project ... DONE\e[0m"
+log_info "Building project ... DONE"

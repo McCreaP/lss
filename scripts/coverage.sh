@@ -1,11 +1,13 @@
 #!/bin/bash
 
+source shared/logging.sh
+
 set -o nounset
 set -o errexit
 
 if [ `whoami` != 'vagrant' ]
 then
-    echo -e "\e[31mPlease run this script from inside of the Docker container\e[0m"
+    log_error "Please run this script from inside of the Docker container"
     exit 1
 fi
 
@@ -16,14 +18,14 @@ REPORTS_DIR="coverage"
 # Default quiet
 VERBOSE_FLAG="--quiet"
 
-if [ $# -gt 0 ]
-then
+while [[ $# > 0 ]]
+do
     case "$1" in
         -h|--help)
             echo "Usage: $0 [options]"
             echo
             echo "options:"
-            echo "-h, --help        print this usage and exit"
+            echo "-h, --help        print this message and exit"
             echo "-v, --verbose     show more logs"
             exit 0
             ;;
@@ -31,14 +33,16 @@ then
             VERBOSE_FLAG=""
             ;;
         *)
-            break
+            echo "Unrecognized flag: $1"
+            exit 1
             ;;
     esac
-fi
+    shift
+done
 
-echo -e "\e[32mMeasuring unit tests coverage ... \e[0m"
+log_info "Measuring unit tests coverage ..."
 
-pushd `pwd`
+pushd .
 
 cd /home/vagrant/lss
 
@@ -62,17 +66,18 @@ echo "Target lines coverage: $TARGET_COVERAGE%"
 echo "More detailed information can be found in file:///home/vagrant/lss/${REPORTS_DIR}/html/index.html"
 
 EXIT_CODE=0
-if [ $(echo ${COVERAGE}'>'${TARGET_COVERAGE} | bc -l) -ne 0 ]
+# COVERAGE cannot be simply compared with TARGET_COVERAGE
+# It can be a floating point number
+if [ $(echo ${COVERAGE}'>'${TARGET_COVERAGE} | bc -l) -eq 1 ]
 then
-    echo -e "\e[32mTest coverage is greater than target coverage\e[0m"
-    echo -e "\e[32mMeasuring unit tests coverage ... DONE\e[0m"
+    log_info "Test coverage meets target"
+    log_info "Measuring unit tests coverage ... DONE"
 else
-    echo -e "\e[31mTest coverage is less than target coverage\e[0m"
-    echo -e "\e[31mMeasuring unit tests coverage ... DONE\e[0m"
+    log_error "Test coverage is less than target coverage"
+    log_error "Measuring unit tests coverage ... DONE"
     EXIT_CODE=1
 fi
 
 popd > /dev/null
-
 
 exit ${EXIT_CODE}
