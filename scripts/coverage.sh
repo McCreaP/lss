@@ -1,15 +1,6 @@
 #!/bin/bash
 
-source shared/logging.sh
-
-set -o nounset
-set -o errexit
-
-if [ `whoami` != 'vagrant' ]
-then
-    log_error "Please run this script from inside of the Docker container"
-    exit 1
-fi
+source shared/header.sh
 
 TARGET_COVERAGE=80
 
