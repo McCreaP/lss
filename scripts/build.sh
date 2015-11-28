@@ -19,7 +19,7 @@ do
             exit 0
             ;;
         -c|--clean)
-            rm -rf "/home/vagrant/lss/"{build,bin}
+            echo_cmd rm -rf "/home/vagrant/lss/"{build,bin}
             exit 0
             ;;
         -r|--release)

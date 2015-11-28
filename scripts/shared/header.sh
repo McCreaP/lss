@@ -3,9 +3,14 @@
 set -o nounset
 set -o errexit
 
-log_info() { echo -e "\e[32m${1}\e[0m"; }
+log_info() { echo -e "\e[32m$@\e[0m"; }
 
-log_error() { echo -e "\e[31m${1}\e[0m"; }
+log_error() { echo -e "\e[31m$@\e[0m"; }
+
+echo_cmd() {
+  echo "$@"
+  eval "$@"
+}
 
 if [ `whoami` != 'vagrant' ]
 then
