@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source shared/header.sh
+source "$(dirname "$BASH_SOURCE")/shared/header.sh"
 
 TARGET_COVERAGE=80
 
