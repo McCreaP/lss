@@ -1,9 +1,9 @@
 #include "io/basic_input.h"
 
-#include <cstring>
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <cstring>
 #include <functional>
 #include <iostream>
 #include <sstream>
@@ -34,11 +34,13 @@ bool FileLock::IsLocked() const {
 }
 
 bool FileLock::TryLock() {
-  if (file_descriptor_ == -1) {
-    file_descriptor_ = open(lock_name_.c_str(), O_WRONLY | O_CREAT | O_EXCL);
-    return file_descriptor_ != -1;
-  }
-  return false;
+  if (file_descriptor_ != -1)
+    return false;
+
+  // There is no way to ensure the file is created with standard C++ library
+  // functions so we use POSIX open().
+  file_descriptor_ = open(lock_name_.c_str(), O_WRONLY | O_CREAT | O_EXCL);
+  return file_descriptor_ != -1;
 }
 
 void FileLock::Unlock() {
