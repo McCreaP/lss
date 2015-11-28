@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source shared/header.sh
+source "$(dirname "$BASH_SOURCE")/shared/header.sh"
 
 BUILD_TYPE="Debug"
 MAKE_VERBOSE_FLAG=""
@@ -19,8 +19,7 @@ do
             exit 0
             ;;
         -c|--clean)
-            echo "rm -rf /home/vagrant/lss/build"
-            rm -rf /home/vagrant/lss/build
+            echo_cmd rm -rf "/home/vagrant/lss/"{build,bin}
             exit 0
             ;;
         -r|--release)

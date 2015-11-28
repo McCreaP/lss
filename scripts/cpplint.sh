@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source shared/header.sh
+source "$(dirname "$BASH_SOURCE")/shared/header.sh"
 
 log_info "Running cpplint ..."
 
