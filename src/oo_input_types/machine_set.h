@@ -10,10 +10,10 @@ namespace lss {
 class MachineSet {
  public:
   void AddMachine(const Machine& machine);
-  std::vector<Machine> GetIdleMachines() const;
+  std::vector<Machine> GetMachines() const;
 
  private:
-  std::vector<Machine> idle_machines_;
+  std::vector<Machine> machines_;
 };
 
 }  // namespace lss

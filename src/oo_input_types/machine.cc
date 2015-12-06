@@ -13,7 +13,10 @@ Machine::Machine(const io::Machine& raw_machine) :
     raw_machine_(raw_machine), context_{-1, -1, -1}, job_assigned_(false) { }
 
 void Machine::UpdateState(io::MachineState new_state) {
-  job_assigned_ = false;
+  // FIXME: Now machine must noticed that it has changed its state from kIdle
+  //  otherwise it doesn't work properly
+  if (new_state != io::MachineState::kIdle)
+    job_assigned_ = false;
   raw_machine_.state = new_state;
 }
 
@@ -34,8 +37,8 @@ void Machine::AssignJob(const io::Job& raw_job) {
     context_[i] = raw_job.context[i];
 }
 
-bool Machine::IsIdle() const {
-  return raw_machine_.state == io::MachineState::kIdle;
+bool Machine::IsWaitingForJob() const {
+  return !job_assigned_ && raw_machine_.state == io::MachineState::kIdle;
 }
 
 }  // namespace lss

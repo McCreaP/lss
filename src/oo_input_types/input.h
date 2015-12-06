@@ -21,6 +21,7 @@ class Input {
 
   bool Update();
   std::vector<Batch> GetSortedBatches() const;
+  Machine GetMachine(int id) const;
   MachineSet GetMachineSet(int id) const;
 
  private:

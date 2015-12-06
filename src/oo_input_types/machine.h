@@ -17,7 +17,7 @@ class Machine {
   void UpdateState(io::MachineState new_state);
   double ContextChangeCost(const io::Job& raw_job) const;
   void AssignJob(const io::Job& raw_job);
-  bool IsIdle() const;
+  bool IsWaitingForJob() const;
 
  private:
   static int context_changes_[2][2][2];

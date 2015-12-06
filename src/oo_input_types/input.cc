@@ -37,15 +37,15 @@ void Input::UpdateMachines(const std::vector<io::Machine>& raw_machines,
 
   std::unordered_map<int, Machine> updated_machines;
   for (const io::Machine& raw_machine : raw_machines) {
-    Machine* machine;
     auto machines_iter = machines_.find(raw_machine.id);
     if (machines_iter != machines_.end()) {
       machines_iter->second.UpdateState(raw_machine.state);
-      machine = &machines_iter->second;
+      Machine machine = machines_iter->second;
+      updated_machines.insert(std::make_pair(machine.GetId(), machine));
     } else {
-      machine = new Machine(raw_machine);
+      Machine machine(raw_machine);
+      updated_machines.insert(std::make_pair(machine.GetId(), machine));
     }
-    updated_machines.insert(std::make_pair(machine->GetId(), *machine));
   }
   machines_ = std::move(updated_machines);
 }
@@ -65,6 +65,10 @@ std::vector<Batch> Input::GetSortedBatches() const {
     batches.push_back(batch.second);
   std::sort(std::begin(batches), std::end(batches));
   return batches;
+}
+
+Machine Input::GetMachine(int id) const {
+  return machines_.at(id);
 }
 
 MachineSet Input::GetMachineSet(int id) const {

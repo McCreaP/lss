@@ -5,12 +5,11 @@
 namespace lss {
 
 void MachineSet::AddMachine(const Machine& machine) {
-  if (machine.IsIdle())
-    idle_machines_.push_back(machine);
+  machines_.push_back(machine);
 }
 
-std::vector<Machine> MachineSet::GetIdleMachines() const {
-  return idle_machines_;
+std::vector<Machine> MachineSet::GetMachines() const {
+  return machines_;
 }
 
 }  // namespace lss

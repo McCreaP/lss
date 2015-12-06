@@ -25,25 +25,27 @@ void GreedyScheduler::Schedule() {
 }
 
 
-Machine* FindBestMachine(const io::Job& raw_job, const MachineSet& machine_set) {
+int FindBestMachine(const io::Job& raw_job, const MachineSet& machine_set) {
   double min_context_changed_cost = kMaxContextChangeCost;
-  Machine* best_machine = nullptr;
-  for (Machine& machine : machine_set.GetIdleMachines()) {
+  int best_machine_id = -1;
+  for (Machine& machine : machine_set.GetMachines()) {
+    if (!machine.IsWaitingForJob())
+      continue;
     if (machine.ContextChangeCost(raw_job) < min_context_changed_cost) {
-      best_machine = &machine;
+      best_machine_id = machine.GetId();
       min_context_changed_cost = machine.ContextChangeCost(raw_job);
     }
   }
-  return best_machine;
+  return best_machine_id;
 }
 
 void GreedyScheduler::AssignJobsFromBatch(const Batch& batch) {
   for (const io::Job& job : batch.GetSortedJobs()) {
     auto machine_set = input_.GetMachineSet(job.machineset_id);
-    Machine* best_machine = FindBestMachine(job, machine_set);
-    if (best_machine) {
-      best_machine->AssignJob(job);
-      basic_writer_.Assign(best_machine->GetId(), job.id);
+    int best_machine_id = FindBestMachine(job, machine_set);
+    if (best_machine_id != -1) {
+      input_.GetMachine(best_machine_id).AssignJob(job);
+      basic_writer_.Assign(best_machine_id, job.id);
     }
   }
 }

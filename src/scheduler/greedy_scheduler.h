@@ -4,7 +4,7 @@
 #include <string>
 
 #include "io/basic_output.h"
-#include "io/input.h"
+#include "oo_input_types/input.h"
 
 namespace lss {
 
