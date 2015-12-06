@@ -19,9 +19,19 @@ enum class MachineState {
 struct Job {
   int id;
   int batch_id;
-  int duration;  // Expected duration barring setup time.
+  double duration;  // Expected duration barring setup time.
   int machineset_id;
   int context[kContextN];
+
+  Job& operator=(const Job& rhs) {
+    id = rhs.id;
+    machineset_id = rhs.machineset_id;
+    batch_id = rhs.batch_id;
+    duration = rhs.duration;
+    for (int i = 0; i < kContextN; ++i)
+      context[i] = rhs.context[i];
+    return *this;
+  }
 };
 
 // The following fields are not named in objective function definition:
@@ -31,10 +41,10 @@ struct Job {
 struct Batch {
   int id;
   int account_id;
-  int timely_reward;
-  int reward;
-  int expected_time;
-  int due;
+  double timely_reward;
+  double reward;
+  double expected_time;
+  double due;
 };
 
 struct Machine {
@@ -55,6 +65,16 @@ struct Account {
 struct ContextChange {
   bool changed[kContextN];
   int cost;
+};
+
+struct RawData {
+  std::vector<Machine> machines;
+  std::vector<MachineSet> machine_sets;
+  std::vector<MachineSet> fair_machine_sets;
+  std::vector<Job> jobs;
+  std::vector<Batch> batches;
+  std::vector<Account> accounts;
+  std::vector<ContextChange> context_changes;
 };
 
 }  // namespace io

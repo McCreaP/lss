@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <iostream>
 
 namespace lss {
 namespace io {
@@ -15,6 +16,7 @@ void BasicWriter::SetOutputPath(const std::string& output_path) {
 }
 
 bool BasicWriter::Assign(int machine_id, int job_id) {
+  std::cout << "Assign job: " << job_id << " to the machine: " << machine_id << std::endl;
   const std::string path = output_path_ + std::to_string(machine_id);
   const std::string tmp_path = path + "_tmp";
   const std::string content = std::to_string(job_id);

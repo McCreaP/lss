@@ -4,21 +4,13 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "io/raw_input_types.h"
+#include "io/reader.h"
 
 namespace lss {
 namespace io {
-
-struct RawData {
-  std::vector<Machine> machines;
-  std::vector<MachineSet> machine_sets;
-  std::vector<MachineSet> fair_machine_sets;
-  std::vector<Job> jobs;
-  std::vector<Batch> batches;
-  std::vector<Account> accounts;
-  std::vector<ContextChange> context_changes;
-};
 
 // Represents a simple cooperative file lock.
 class FileLock {
@@ -45,7 +37,7 @@ class FileLock {
   const std::string lock_name_;
 };
 
-class BasicReader {
+class BasicReader: public Reader {
  public:
   explicit BasicReader(const std::string& input_path);
 
@@ -64,8 +56,11 @@ class BasicReader {
   template<class T>
   bool ReadRecords(const std::string& file_name, std::vector<T>* destination) {
     std::ifstream input(input_path_ + '/' + file_name);
-    if (input.fail())
+    if (input.fail()) {
+      std::cerr << "Read records from: '" << file_name << "' failed" << std::endl;
       return false;
+    }
+
 
     T buf;
     while (input >> buf) destination->push_back(buf);
