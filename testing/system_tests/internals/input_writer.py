@@ -5,7 +5,7 @@ from internals import utils
 
 class InputWriter:
     MACHINES_FILE = 'machines'
-    MACHINE_SETS_FILE = 'machine-set'
+    MACHINE_SETS_FILE = 'machine-sets'
     FAIR_MACHINE_SETS_FILE = 'fair-service-machine-sets'
     JOBS_FILE = 'jobs'
     BATCHES_FILE = 'batches'
