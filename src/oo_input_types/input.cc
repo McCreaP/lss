@@ -9,8 +9,7 @@
 
 namespace lss {
 
-Input::Input(std::shared_ptr<io::Reader> reader) :
-    reader_(reader) { }
+Input::Input(std::shared_ptr<io::Reader> reader) : reader_(reader) { }
 
 bool Input::Update() {
   io::RawData raw_data;
@@ -33,18 +32,20 @@ void Input::UpdateBatches(const std::vector<io::Batch>& raw_batches,
 }
 
 void Input::UpdateMachines(const std::vector<io::Machine>& raw_machines,
-    const std::vector<io::ContextChange>& raw_context_changes) {
+                           const std::vector<io::ContextChange>& raw_context_changes) {
   Machine::SetContextChanges(raw_context_changes);
 
   std::unordered_map<int, Machine> updated_machines;
   for (const io::Machine& raw_machine : raw_machines) {
-    auto machine = machines_.find(raw_machine.id);
-    if (machine != machines_.end()) {
-      machine->second.UpdateState(raw_machine.state);
-      updated_machines.insert(std::make_pair(machine->second.GetId(), std::move(machine->second)));
+    Machine* machine;
+    auto machines_iter = machines_.find(raw_machine.id);
+    if (machines_iter != machines_.end()) {
+      machines_iter->second.UpdateState(raw_machine.state);
+      machine = &machines_iter->second;
     } else {
-      updated_machines.insert(std::make_pair(raw_machine.id, Machine(raw_machine)));
+      machine = new Machine(raw_machine);
     }
+    updated_machines.insert(std::make_pair(machine->GetId(), *machine));
   }
   machines_ = std::move(updated_machines);
 }
