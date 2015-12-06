@@ -1,11 +1,13 @@
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
-add_executable(lss main.cc)
+add_executable(lss main.cc scheduler/greedy_scheduler.cc)
 add_executable(unit_tests main_test.cc)
 
 add_subdirectory(io)
+add_subdirectory(oo_input_types)
+add_subdirectory(scheduler)
 
-target_link_libraries(lss io)
+target_link_libraries(lss scheduler)
 
 # Gtest doesn't find tests from separate compilation units.
 # unit_tests contains no references to anything in the library that contains test definitions

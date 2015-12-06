@@ -1,11 +1,7 @@
-#include <io/basic_input.h>
-
-using lss::io::BasicReader;
-using lss::io::RawData;
+#include "scheduler/greedy_scheduler.h"
 
 int main() {
-  RawData rawData;
-  BasicReader basicReader(".");
-  basicReader.Read(&rawData);
+  lss::GreedyScheduler scheduler("/home/vagrant/lss/run/");
+  scheduler.Schedule();
   return 0;
 }
