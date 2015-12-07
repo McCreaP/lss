@@ -16,6 +16,7 @@ class GreedyScheduler {
 
  private:
   void AssignJobsFromBatch(const Batch& batch);
+  std::shared_ptr<Machine> FindBestMachine(const io::Job& raw_job);
 
   Input input_;
   io::BasicWriter basic_writer_;

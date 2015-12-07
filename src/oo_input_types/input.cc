@@ -35,28 +35,26 @@ void Input::UpdateMachines(const std::vector<io::Machine>& raw_machines,
                            const std::vector<io::ContextChange>& raw_context_changes) {
   Machine::SetContextChanges(raw_context_changes);
 
-  std::unordered_map<int, Machine> updated_machines;
+  std::unordered_map<int, std::shared_ptr<Machine>> updated_machines;
   for (const io::Machine& raw_machine : raw_machines) {
+    std::shared_ptr<Machine> machine;
     auto machines_iter = machines_.find(raw_machine.id);
     if (machines_iter != machines_.end()) {
-      machines_iter->second.UpdateState(raw_machine.state);
-      Machine machine = machines_iter->second;
-      updated_machines.insert(std::make_pair(machine.GetId(), machine));
+      machines_iter->second->UpdateState(raw_machine.state);
+      machine = machines_iter->second;
     } else {
-      Machine machine(raw_machine);
-      updated_machines.insert(std::make_pair(machine.GetId(), machine));
+      machine = std::make_shared<Machine>(raw_machine);
     }
+    updated_machines.insert(std::make_pair(machine->GetId(), machine));
   }
   machines_ = std::move(updated_machines);
 }
 
 void Input::UpdateMachineSets(const std::vector<io::MachineSet>& raw_machine_sets) {
-  machine_sets_.clear();
-  for (const io::MachineSet& raw_machine_set : raw_machine_sets) {
-    machine_sets_[raw_machine_set.id] = MachineSet();
-    for (const auto& map_element : machines_)
-      machine_sets_[raw_machine_set.id].AddMachine(map_element.second);
-  }
+  machines_from_set_.clear();
+  for (const io::MachineSet& raw_machine_set : raw_machine_sets)
+    for (const auto& machine : machines_)
+      machines_from_set_[raw_machine_set.id].push_back(machine.second);
 }
 
 std::vector<Batch> Input::GetSortedBatches() const {
@@ -67,12 +65,8 @@ std::vector<Batch> Input::GetSortedBatches() const {
   return batches;
 }
 
-Machine Input::GetMachine(int id) const {
-  return machines_.at(id);
-}
-
-MachineSet Input::GetMachineSet(int id) const {
-  return machine_sets_.at(id);
+std::vector<std::shared_ptr<Machine>> Input::GetMachinesFromSet(int set_id) const {
+  return machines_from_set_.at(set_id);
 }
 
 }  // namespace lss

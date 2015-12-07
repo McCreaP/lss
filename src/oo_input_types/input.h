@@ -11,7 +11,6 @@
 #include "io/reader.h"
 #include "oo_input_types/batch.h"
 #include "oo_input_types/machine.h"
-#include "oo_input_types/machine_set.h"
 
 namespace lss {
 
@@ -21,8 +20,7 @@ class Input {
 
   bool Update();
   std::vector<Batch> GetSortedBatches() const;
-  Machine GetMachine(int id) const;
-  MachineSet GetMachineSet(int id) const;
+  std::vector<std::shared_ptr<Machine>> GetMachinesFromSet(int set_id) const;
 
  private:
   void UpdateBatches(const std::vector<io::Batch>& raw_batches,
@@ -33,8 +31,8 @@ class Input {
 
   std::shared_ptr<io::Reader> reader_;
   std::map<int, Batch> batches_;
-  std::unordered_map<int, Machine> machines_;
-  std::unordered_map<int, MachineSet> machine_sets_;
+  std::unordered_map<int, std::shared_ptr<Machine>> machines_;
+  std::unordered_map<int, std::vector<std::shared_ptr<Machine>>> machines_from_set_;
 };
 
 }  // namespace lss

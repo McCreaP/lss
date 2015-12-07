@@ -1,6 +1,7 @@
 #include "scheduler/greedy_scheduler.h"
 
 #include <iostream>
+#include <memory>
 
 #include "io/basic_input.h"
 #include "oo_input_types/batch.h"
@@ -25,27 +26,28 @@ void GreedyScheduler::Schedule() {
 }
 
 
-int FindBestMachine(const io::Job& raw_job, const MachineSet& machine_set) {
+std::shared_ptr<Machine> GreedyScheduler::FindBestMachine(const io::Job& raw_job) {
   double min_context_changed_cost = kMaxContextChangeCost;
-  int best_machine_id = -1;
-  for (Machine& machine : machine_set.GetMachines()) {
-    if (!machine.IsWaitingForJob())
+  auto machines = input_.GetMachinesFromSet(raw_job.machineset_id);
+  std::shared_ptr<Machine> best_machine;
+  for (std::shared_ptr<Machine> machine : machines) {
+    if (!machine->IsWaitingForJob())
       continue;
-    if (machine.ContextChangeCost(raw_job) < min_context_changed_cost) {
-      best_machine_id = machine.GetId();
-      min_context_changed_cost = machine.ContextChangeCost(raw_job);
+    double context_change_cost = machine->ContextChangeCost(raw_job);
+    if (context_change_cost < min_context_changed_cost) {
+      best_machine = machine;
+      min_context_changed_cost = context_change_cost;
     }
   }
-  return best_machine_id;
+  return best_machine;
 }
 
 void GreedyScheduler::AssignJobsFromBatch(const Batch& batch) {
   for (const io::Job& job : batch.GetSortedJobs()) {
-    auto machine_set = input_.GetMachineSet(job.machineset_id);
-    int best_machine_id = FindBestMachine(job, machine_set);
-    if (best_machine_id != -1) {
-      input_.GetMachine(best_machine_id).AssignJob(job);
-      basic_writer_.Assign(best_machine_id, job.id);
+    std::shared_ptr<Machine> best_machine = FindBestMachine(job);
+    if (best_machine) {
+      best_machine->AssignJob(job);
+      basic_writer_.Assign(best_machine->GetId(), job.id);
     }
   }
 }
