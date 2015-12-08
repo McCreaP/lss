@@ -52,14 +52,16 @@ void Input::UpdateMachines(const std::vector<io::Machine>& raw_machines,
 
 void Input::UpdateMachineSets(const std::vector<io::MachineSet>& raw_machine_sets) {
   machines_from_set_.clear();
-  for (const io::MachineSet& raw_machine_set : raw_machine_sets)
-    for (const auto& machine : machines_)
-      machines_from_set_[raw_machine_set.id].push_back(machine.second);
+  for (const io::MachineSet& raw_machine_set : raw_machine_sets) {
+    machines_from_set_[raw_machine_set.id];  // Machine set can contain no machines
+    for (int machine_id : raw_machine_set.machines)
+      machines_from_set_[raw_machine_set.id].push_back(machines_[machine_id]);
+  }
 }
 
 std::vector<Batch> Input::GetSortedBatches() const {
   std::vector<Batch> batches;
-  for (auto batch : batches_)
+  for (const auto& batch : batches_)
     batches.push_back(batch.second);
   std::sort(std::begin(batches), std::end(batches));
   return batches;

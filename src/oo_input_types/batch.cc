@@ -3,8 +3,11 @@
 #include <algorithm>
 #include <ctime>
 #include <cmath>
+#include <limits>
 
 namespace lss {
+
+static constexpr double kMinValue = std::numeric_limits<double>::lowest();
 
 Batch::Batch(const io::Batch& raw_batch) :
     raw_batch_(raw_batch), time_to_finish_(0) { }
@@ -13,8 +16,14 @@ bool Batch::operator<(const Batch& rhs) const {
   return Evaluate() < rhs.Evaluate();
 }
 
+bool Batch::operator==(const Batch& rhs) const {
+  return raw_batch_.id == rhs.raw_batch_.id;
+}
+
 double Batch::Evaluate() const {
-  auto now = std::time(nullptr);
+  if (!time_to_finish_)
+    return kMinValue;
+  std::time_t now = std::time(nullptr);
   double sigmoid_arg = (now - raw_batch_.due) / raw_batch_.expected_time;
   return Sigmoid(sigmoid_arg) / time_to_finish_;
 }

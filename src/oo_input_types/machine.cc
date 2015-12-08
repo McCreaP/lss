@@ -12,6 +12,16 @@ void Machine::SetContextChanges(const std::vector<io::ContextChange>& raw_change
 Machine::Machine(const io::Machine& raw_machine) :
     raw_machine_(raw_machine), context_{-1, -1, -1}, job_assigned_(false) { }
 
+
+bool Machine::operator==(const Machine& rhs) const {
+  bool eq = true;
+  eq &= raw_machine_.id == rhs.raw_machine_.id;
+  eq &= job_assigned_ == rhs.job_assigned_;
+  for (int i = 0; i < io::kContextN; ++i)
+    eq &= context_[i] == rhs.context_[i];
+  return eq;
+}
+
 void Machine::UpdateState(io::MachineState new_state) {
   // FIXME: Now machine must noticed that it has changed its state from kIdle
   //  otherwise it doesn't work properly

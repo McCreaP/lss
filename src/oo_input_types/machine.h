@@ -13,6 +13,7 @@ class Machine {
 
   explicit Machine(const io::Machine& raw_machine);
 
+  bool operator==(const Machine& rhs) const;
   int GetId() const;
   void UpdateState(io::MachineState new_state);
   double ContextChangeCost(const io::Job& raw_job) const;

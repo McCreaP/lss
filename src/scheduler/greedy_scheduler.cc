@@ -12,7 +12,7 @@ namespace lss {
 static constexpr double kMaxContextChangeCost = 1000 * 1000 * 1000;
 
 GreedyScheduler::GreedyScheduler(const std::string& input_path)
-    : input_(std::shared_ptr<io::Reader>(new io::BasicReader(input_path))),
+    : input_(std::make_shared<io::BasicReader>(input_path)),
       basic_writer_(input_path + "assignments/") { }
 
 void GreedyScheduler::Schedule() {
@@ -20,8 +20,8 @@ void GreedyScheduler::Schedule() {
     if (!input_.Update())
       continue;
     auto sorted_batches = input_.GetSortedBatches();
-    for (const Batch& batch : sorted_batches)
-      AssignJobsFromBatch(batch);
+    for (auto batch_iter = sorted_batches.crbegin(); batch_iter != sorted_batches.crend(); ++batch_iter)
+      AssignJobsFromBatch(*batch_iter);
   }
 }
 
@@ -51,6 +51,5 @@ void GreedyScheduler::AssignJobsFromBatch(const Batch& batch) {
     }
   }
 }
-
 
 }  // namespace lss

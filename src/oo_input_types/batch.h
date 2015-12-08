@@ -18,6 +18,7 @@ class Batch {
   explicit Batch(const io::Batch& raw_batch);
 
   bool operator<(const Batch& rhs) const;
+  bool operator==(const Batch& rhs) const;
   void AddJob(const io::Job& raw_job);
   int GetId() const;
 
