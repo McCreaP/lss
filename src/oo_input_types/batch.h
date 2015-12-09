@@ -15,7 +15,7 @@ struct JobCmp {
 
 class Batch {
  public:
-  explicit Batch(const io::Batch& raw_batch);
+  explicit Batch(io::Batch raw_batch);
 
   bool operator<(const Batch& rhs) const;
   bool operator==(const Batch& rhs) const;

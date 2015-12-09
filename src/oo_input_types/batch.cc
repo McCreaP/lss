@@ -9,8 +9,8 @@ namespace lss {
 
 static constexpr double kMinValue = std::numeric_limits<double>::lowest();
 
-Batch::Batch(const io::Batch& raw_batch) :
-    raw_batch_(raw_batch), time_to_finish_(0) { }
+Batch::Batch(io::Batch raw_batch) :
+    raw_batch_(std::move(raw_batch)), time_to_finish_(0) { }
 
 bool Batch::operator<(const Batch& rhs) const {
   return Evaluate() < rhs.Evaluate();

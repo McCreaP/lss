@@ -11,7 +11,7 @@ class Machine {
  public:
   static void SetContextChanges(const std::vector<io::ContextChange>& raw_changes);
 
-  explicit Machine(const io::Machine& raw_machine);
+  explicit Machine(io::Machine raw_machine);
 
   bool operator==(const Machine& rhs) const;
   int GetId() const;

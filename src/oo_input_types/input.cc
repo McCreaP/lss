@@ -40,8 +40,8 @@ void Input::UpdateMachines(const std::vector<io::Machine>& raw_machines,
     std::shared_ptr<Machine> machine;
     auto machines_iter = machines_.find(raw_machine.id);
     if (machines_iter != machines_.end()) {
-      machines_iter->second->UpdateState(raw_machine.state);
       machine = machines_iter->second;
+      machine->UpdateState(raw_machine.state);
     } else {
       machine = std::make_shared<Machine>(raw_machine);
     }

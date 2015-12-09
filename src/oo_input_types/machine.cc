@@ -9,8 +9,8 @@ void Machine::SetContextChanges(const std::vector<io::ContextChange>& raw_change
     context_changes_[raw_change.changed[0]][raw_change.changed[1]][raw_change.changed[2]] = raw_change.cost;
 }
 
-Machine::Machine(const io::Machine& raw_machine) :
-    raw_machine_(raw_machine), context_{-1, -1, -1}, job_assigned_(false) { }
+Machine::Machine(io::Machine raw_machine) :
+    raw_machine_(std::move(raw_machine)), context_{-1, -1, -1}, job_assigned_(false) { }
 
 
 bool Machine::operator==(const Machine& rhs) const {
@@ -23,8 +23,8 @@ bool Machine::operator==(const Machine& rhs) const {
 }
 
 void Machine::UpdateState(io::MachineState new_state) {
-  // FIXME: Now machine must noticed that it has changed its state from kIdle
-  //  otherwise it doesn't work properly
+  // FIXME: Now machine must noticed that its state has been changed from kIdle
+  // otherwise it doesn't work properly
   if (new_state != io::MachineState::kIdle)
     job_assigned_ = false;
   raw_machine_.state = new_state;
