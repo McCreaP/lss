@@ -2,6 +2,7 @@
 #define LSS_OO_INPUT_TYPES_BATCH_H_
 
 #include <set>
+#include <ctime>
 
 #include "io/raw_input_types.h"
 
@@ -19,14 +20,15 @@ class Batch {
 
   bool operator<(const Batch& rhs) const;
   bool operator==(const Batch& rhs) const;
+
   void AddJob(const io::Job& raw_job);
   int GetId() const;
 
   std::set<io::Job, JobCmp> GetSortedJobs() const;
 
  private:
-  double Evaluate() const;
-  double Sigmoid(double r) const;
+  double Evaluate(std::time_t now) const;
+  double CurrentReward(double r) const;
 
   io::Batch raw_batch_;
   double time_to_finish_;

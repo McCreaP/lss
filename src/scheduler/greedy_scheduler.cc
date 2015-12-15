@@ -20,8 +20,8 @@ void GreedyScheduler::Schedule() {
     if (!input_.Update())
       continue;
     auto sorted_batches = input_.GetSortedBatches();
-    for (auto batch_iter = sorted_batches.crbegin(); batch_iter != sorted_batches.crend(); ++batch_iter)
-      AssignJobsFromBatch(*batch_iter);
+    for (auto batch = sorted_batches.crbegin(); batch != sorted_batches.crend(); ++batch)
+      AssignJobsFromBatch(*batch);
   }
 }
 
@@ -31,7 +31,7 @@ std::shared_ptr<Machine> GreedyScheduler::FindBestMachine(const io::Job& raw_job
   auto machines = input_.GetMachinesFromSet(raw_job.machineset_id);
   std::shared_ptr<Machine> best_machine;
   for (std::shared_ptr<Machine> machine : machines) {
-    if (!machine->IsWaitingForJob())
+    if (!machine->IsWaitingForAJob())
       continue;
     double context_change_cost = machine->ContextChangeCost(raw_job);
     if (context_change_cost < min_context_changed_cost) {

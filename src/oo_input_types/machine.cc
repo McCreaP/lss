@@ -5,8 +5,10 @@ namespace lss {
 int Machine::context_changes_[2][2][2] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 void Machine::SetContextChanges(const std::vector<io::ContextChange>& raw_changes) {
-  for (const auto& raw_change : raw_changes)
-    context_changes_[raw_change.changed[0]][raw_change.changed[1]][raw_change.changed[2]] = raw_change.cost;
+  for (const auto& raw_change : raw_changes) {
+    const bool* changed = raw_change.changed;
+    context_changes_[changed[0]][changed[1]][changed[2]] = raw_change.cost;
+  }
 }
 
 Machine::Machine(io::Machine raw_machine) :
@@ -22,8 +24,8 @@ bool Machine::operator==(const Machine& rhs) const {
   return eq;
 }
 
-void Machine::UpdateState(io::MachineState new_state) {
-  // FIXME: Now machine must noticed that its state has been changed from kIdle
+void Machine::SetState(io::MachineState new_state) {
+  // FIXME: Now machine must noticed that its state was changed from kIdle
   // otherwise it doesn't work properly
   if (new_state != io::MachineState::kIdle)
     job_assigned_ = false;
@@ -47,7 +49,7 @@ void Machine::AssignJob(const io::Job& raw_job) {
     context_[i] = raw_job.context[i];
 }
 
-bool Machine::IsWaitingForJob() const {
+bool Machine::IsWaitingForAJob() const {
   return !job_assigned_ && raw_machine_.state == io::MachineState::kIdle;
 }
 

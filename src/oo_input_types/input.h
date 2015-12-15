@@ -1,5 +1,5 @@
-#ifndef LSS_IO_INPUT_H_
-#define LSS_IO_INPUT_H_
+#ifndef LSS_OO_INPUT_TYPES_INPUT_H_
+#define LSS_OO_INPUT_TYPES_INPUT_H_
 
 #include <string>
 #include <unordered_map>
@@ -26,7 +26,7 @@ class Input {
   void UpdateBatches(const std::vector<io::Batch>& raw_batches,
                      const std::vector<io::Job>& raw_jobs);
   void UpdateMachines(const std::vector<io::Machine>& raw_machines,
-      const std::vector<io::ContextChange>& raw_context_changes);
+                      const std::vector<io::ContextChange>& raw_context_changes);
   void UpdateMachineSets(const std::vector<io::MachineSet>& raw_machine_sets);
 
   std::shared_ptr<io::Reader> reader_;
@@ -37,4 +37,4 @@ class Input {
 
 }  // namespace lss
 
-#endif  // LSS_IO_INPUT_H_
+#endif  // LSS_OO_INPUT_TYPES_INPUT_H_

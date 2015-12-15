@@ -1,9 +1,12 @@
 #include "oo_input_types/batch.h"
 
 #include <algorithm>
+#include <iostream>
 #include <ctime>
 #include <cmath>
 #include <limits>
+
+#include "io/raw_input_types.h"
 
 namespace lss {
 
@@ -13,22 +16,24 @@ Batch::Batch(io::Batch raw_batch) :
     raw_batch_(std::move(raw_batch)), time_to_finish_(0) { }
 
 bool Batch::operator<(const Batch& rhs) const {
-  return Evaluate() < rhs.Evaluate();
+  std::time_t now = std::time(nullptr);
+  return Evaluate(now) < rhs.Evaluate(now);
 }
 
 bool Batch::operator==(const Batch& rhs) const {
-  return raw_batch_.id == rhs.raw_batch_.id;
+  return raw_batch_ == rhs.raw_batch_ &&
+      time_to_finish_ == rhs.time_to_finish_ &&
+      jobs_ == rhs.jobs_;
 }
 
-double Batch::Evaluate() const {
+double Batch::Evaluate(std::time_t now) const {
   if (!time_to_finish_)
     return kMinValue;
-  std::time_t now = std::time(nullptr);
-  double sigmoid_arg = (now - raw_batch_.due) / raw_batch_.expected_time;
-  return Sigmoid(sigmoid_arg) / time_to_finish_;
+  double r = (now - raw_batch_.due) / raw_batch_.expected_time;
+  return CurrentReward(r) / time_to_finish_;
 }
 
-double Batch::Sigmoid(double r) const {
+double Batch::CurrentReward(double r) const {
   return raw_batch_.reward + raw_batch_.timely_reward / (1 + exp(r));
 }
 

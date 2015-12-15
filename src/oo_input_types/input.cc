@@ -1,4 +1,4 @@
-#include "input.h"
+#include "oo_input_types/input.h"
 
 #include <algorithm>
 #include <unordered_map>
@@ -41,7 +41,7 @@ void Input::UpdateMachines(const std::vector<io::Machine>& raw_machines,
     auto machines_iter = machines_.find(raw_machine.id);
     if (machines_iter != machines_.end()) {
       machine = machines_iter->second;
-      machine->UpdateState(raw_machine.state);
+      machine->SetState(raw_machine.state);
     } else {
       machine = std::make_shared<Machine>(raw_machine);
     }
