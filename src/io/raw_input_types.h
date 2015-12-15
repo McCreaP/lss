@@ -4,6 +4,7 @@
 #define LSS_IO_RAW_INPUT_TYPES_H_
 
 #include <vector>
+#include <iostream>
 
 namespace lss {
 namespace io {
@@ -23,15 +24,8 @@ struct Job {
   int machineset_id;
   int context[kContextN];
 
-  Job& operator=(const Job& rhs) {
-    id = rhs.id;
-    machineset_id = rhs.machineset_id;
-    batch_id = rhs.batch_id;
-    duration = rhs.duration;
-    for (int i = 0; i < kContextN; ++i)
-      context[i] = rhs.context[i];
-    return *this;
-  }
+  Job& operator=(const Job& rhs);
+  bool operator==(const Job& rhs) const;
 };
 
 // The following fields are not named in objective function definition:
@@ -45,6 +39,8 @@ struct Batch {
   double reward;
   double expected_time;
   double due;
+
+  bool operator==(const Batch& rhs) const;
 };
 
 struct Machine {
