@@ -7,7 +7,7 @@ log_info "Running cpplint ..."
 pushd .
 cd /home/vagrant/lss
 
-./../cpplint.py --project=lss --root=src --filter=-legal/copyright `find src -name *.cc -o -name *.cpp -o -name *.h`
+cpplint.py --project=lss --root=src --filter=-legal/copyright --linelength=100 `find src -name *.cc -o -name *.cpp -o -name *.h`
 EXIT_CODE=$?
 
 popd > /dev/null
