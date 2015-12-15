@@ -41,8 +41,9 @@ RUN pip3 install colorlog
 RUN pip3 install bottle
 
 # add cpplint
-ADD https://raw.githubusercontent.com/McCreaP/styleguide/gh-pages/cpplint/cpplint.py /home/vagrant/
-RUN chmod +x /home/vagrant/cpplint.py
+ADD https://raw.githubusercontent.com/McCreaP/styleguide/gh-pages/cpplint/cpplint.py /usr/local/bin/
+RUN chown vagrant:zpp /usr/local/bin/cpplint.py
+RUN chmod +x /usr/local/bin/cpplint.py
 
 # install google test
 ADD https://googletest.googlecode.com/files/gtest-1.7.0.zip /home/vagrant/
@@ -51,6 +52,7 @@ RUN cd /home/vagrant/gtest-1.7.0 && mkdir build && cd build && cmake .. && make
 RUN cp -r /home/vagrant/gtest-1.7.0/include/gtest /usr/local/include
 RUN cp /home/vagrant/gtest-1.7.0/build/lib*.a /usr/local/lib
 RUN rm /home/vagrant/gtest-1.7.0.zip
+RUN rm -rf /home/vagrant/gtest-1.7.0
 
 # install google mock
 ADD https://googlemock.googlecode.com/files/gmock-1.7.0.zip /home/vagrant/
@@ -59,6 +61,7 @@ RUN cd /home/vagrant/gmock-1.7.0 && mkdir build && cd build && cmake .. && make
 RUN cp -r /home/vagrant/gmock-1.7.0/include/gmock /usr/local/include
 RUN cp /home/vagrant/gmock-1.7.0/build/lib*.a /usr/local/lib
 RUN rm /home/vagrant/gmock-1.7.0.zip
+RUN rm -rf /home/vagrant/gmock-1.7.0
 
 # allow passwordless sudo
 RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
