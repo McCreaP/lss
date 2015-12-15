@@ -8,6 +8,7 @@
 
 #include "io/raw_input_types.h"
 #include "io/test_utils/builders.h"
+#include "oo_input_types/batch.h"
 
 using ::testing::SetArgPointee;
 using ::testing::DoAll;
@@ -55,13 +56,14 @@ TEST(Input, TwoBatchesOneEmpty) {
       .Build();
   std::shared_ptr<io::ReaderMock> reader = std::make_shared<io::ReaderMock>();
   EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(kRawData), Return(true))));
-  static const Batch kBatch1(kRawBatch1);
-  static const Batch kBatch2(kRawBatch2);
+  Batch batch1(kRawBatch1);
+  Batch batch2(kRawBatch2);
+  batch1.AddJob(kJob);
 
   Input input(reader);
   bool ok = input.Update();
   EXPECT_EQ(true, ok);
-  EXPECT_EQ(std::vector<Batch>({kBatch2, kBatch1}), input.GetSortedBatches());
+  EXPECT_EQ(std::vector<Batch>({batch2, batch1}), input.GetSortedBatches());
 }
 
 TEST(Input, ThreeBatches) {
@@ -77,14 +79,17 @@ TEST(Input, ThreeBatches) {
       .Build();
   std::shared_ptr<io::ReaderMock> reader = std::make_shared<io::ReaderMock>();
   EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(kRawData), Return(true))));
-  static const Batch kBatch1(kRawBatch1);
-  static const Batch kBatch2(kRawBatch2);
-  static const Batch kBatch3(kRawBatch3);
+  Batch batch1(kRawBatch1);
+  Batch batch2(kRawBatch2);
+  Batch batch3(kRawBatch3);
+  batch1.AddJob(kJob1);
+  batch2.AddJob(kJob2);
+  batch3.AddJob(kJob3);
 
   Input input(reader);
   bool ok = input.Update();
   EXPECT_EQ(true, ok);
-  EXPECT_EQ(std::vector<Batch>({kBatch3, kBatch1, kBatch2}), input.GetSortedBatches());
+  EXPECT_EQ(std::vector<Batch>({batch3, batch1, batch2}), input.GetSortedBatches());
 }
 
 TEST(Input, EmptyMachineSet) {

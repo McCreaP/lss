@@ -1,6 +1,9 @@
 #ifndef LSS_IO_TEST_UTILS_BUILDERS_H_
 #define LSS_IO_TEST_UTILS_BUILDERS_H_
 
+#include <cassert>
+#include <vector>
+
 #include "io/raw_input_types.h"
 
 namespace lss {
@@ -105,6 +108,11 @@ class JobBuilder {
     job_ = {1, 1, 1.0, 1, 1, 1, 1};
   }
 
+  JobBuilder& WithId(int id) {
+    job_.id = id;
+    return *this;
+  }
+
   JobBuilder& WithBatchId(int batch_id) {
     job_.batch_id = batch_id;
     return *this;
@@ -112,6 +120,13 @@ class JobBuilder {
 
   JobBuilder& WithDuration(double duration) {
     job_.duration = duration;
+    return *this;
+  }
+
+  JobBuilder& WithContext(const std::vector<int>& context) {
+    assert(context.size() == kContextN);
+    for (int i = 0; i < kContextN; ++i)
+      job_.context[i] = context[i];
     return *this;
   }
 
