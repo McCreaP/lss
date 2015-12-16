@@ -12,13 +12,53 @@ namespace lss {
 namespace io {
 namespace {
 
-const char kMachinesFile[] = "machines";
-const char kMachineSetsFile[] = "machine-sets";
-const char kFairMachineSetsFile[] = "fair-service-machine-sets";
-const char kJobsFile[] = "jobs";
-const char kBatchesFile[] = "batches";
-const char kAccountsFile[] = "accounts";
-const char kContextChangesFile[] = "context-changes";
+template<class T, std::vector<T> RawData::* VEC>
+void ReadOne(std::istream& input, RawData* destination) {
+  (destination->*VEC).push_back(T());
+  input >> (destination->*VEC).back();
+}
+
+using Reader = void(*)(std::istream&, RawData*);
+using HeaderReaderPair = std::tuple<const char*, Reader>;
+
+constexpr std::array<HeaderReaderPair, 7> kReaders{
+  HeaderReaderPair{
+    "machines",
+    &ReadOne<Machine, &RawData::machines>
+  },
+  HeaderReaderPair{
+    "machine-sets",
+    &ReadOne<MachineSet, &RawData::machine_sets>
+  },
+  HeaderReaderPair{
+    "fair-service-machine-sets",
+    &ReadOne<MachineSet, &RawData::fair_machine_sets>
+  },
+  HeaderReaderPair{
+    "jobs",
+    &ReadOne<Job, &RawData::jobs>
+  },
+  HeaderReaderPair{
+    "batches",
+    &ReadOne<Batch, &RawData::batches>
+  },
+  HeaderReaderPair{
+    "accounts",
+    &ReadOne<Account, &RawData::accounts>
+  },
+  HeaderReaderPair{
+    "context-changes",
+    &ReadOne<ContextChange, &RawData::context_changes>
+  },
+};
+
+Reader GetReader(const std::string& header) {
+  for (size_t i = 0; i < kReaders.size(); ++i) {
+    if (header == std::get<0>(kReaders[i]))
+      return std::get<1>(kReaders[i]);
+  }
+  return nullptr;
+}
 
 }  // namespace
 
@@ -30,15 +70,25 @@ void BasicReader::SetInputPath(const std::string& input_path) {
 }
 
 bool BasicReader::Read(RawData* destination) {
-  bool ok = true;
-  ok &= ReadRecords(kMachinesFile, &destination->machines);
-  ok &= ReadRecords(kMachineSetsFile, &destination->machine_sets);
-  ok &= ReadRecords(kFairMachineSetsFile, &destination->fair_machine_sets);
-  ok &= ReadRecords(kJobsFile, &destination->jobs);
-  ok &= ReadRecords(kBatchesFile, &destination->batches);
-  ok &= ReadRecords(kAccountsFile, &destination->accounts);
-  ok &= ReadRecords(kContextChangesFile, &destination->context_changes);
-  return ok;
+  // TODO: Rename file first.
+  std::ifstream input(input_path_);
+  if (input.fail())
+    return false;
+
+  Reader reader = nullptr;
+  std::string line_buf;
+  std::istringstream line;
+  while (getline(input, line_buf)) {
+    if (Reader new_reader = GetReader(line_buf)) {
+      reader = new_reader;
+    } else {
+      // TODO: Check for (reader != nullptr).
+      line.str(line_buf);
+      reader(line, destination);
+    }
+  }
+
+  return true;
 }
 
 std::istream& operator>>(std::istream& input, Job& job) {

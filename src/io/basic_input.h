@@ -22,6 +22,7 @@ struct RawData {
 
 class BasicReader {
  public:
+  // Constructs BasicReader that will read data from 'input_path' file.
   explicit BasicReader(const std::string& input_path);
 
   void SetInputPath(const std::string& input_path);
@@ -29,19 +30,6 @@ class BasicReader {
   // The contents of the files are not validated and reading malformed
   // records will quietly result in corrupted data.
   bool Read(RawData* destination);
-
- private:
-  // Returns true iff opening the file succeeds.
-  template<class T>
-  bool ReadRecords(const std::string& file_name, std::vector<T>* destination) {
-    std::ifstream input(input_path_ + '/' + file_name);
-    if (input.fail())
-      return false;
-
-    T buf;
-    while (input >> buf) destination->push_back(buf);
-    return true;
-  }
 
   std::string input_path_;
 };
