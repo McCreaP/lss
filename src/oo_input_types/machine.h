@@ -25,7 +25,7 @@ class Machine {
 
   io::Machine raw_machine_;
   int context_[3];
-  bool job_assigned_;
+  bool has_assigned_job_;
 };
 
 }  // namespace lss

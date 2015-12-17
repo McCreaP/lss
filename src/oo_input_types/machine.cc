@@ -12,13 +12,13 @@ void Machine::SetContextChanges(const std::vector<io::ContextChange>& raw_change
 }
 
 Machine::Machine(io::Machine raw_machine) :
-    raw_machine_(std::move(raw_machine)), context_{-1, -1, -1}, job_assigned_(false) { }
+    raw_machine_(std::move(raw_machine)), context_{-1, -1, -1}, has_assigned_job_(false) { }
 
 
 bool Machine::operator==(const Machine& rhs) const {
   bool eq = true;
   eq &= raw_machine_.id == rhs.raw_machine_.id;
-  eq &= job_assigned_ == rhs.job_assigned_;
+  eq &= has_assigned_job_ == rhs.has_assigned_job_;
   for (int i = 0; i < io::kContextN; ++i)
     eq &= context_[i] == rhs.context_[i];
   return eq;
@@ -28,7 +28,7 @@ void Machine::SetState(io::MachineState new_state) {
   // FIXME: Now machine must noticed that its state was changed from kIdle
   // otherwise it doesn't work properly
   if (new_state != io::MachineState::kIdle)
-    job_assigned_ = false;
+    has_assigned_job_ = false;
   raw_machine_.state = new_state;
 }
 
@@ -44,13 +44,13 @@ int Machine::GetId() const {
 }
 
 void Machine::AssignJob(const io::Job& raw_job) {
-  job_assigned_ = true;
+  has_assigned_job_ = true;
   for (int i = 0; i < io::kContextN; ++i)
     context_[i] = raw_job.context[i];
 }
 
 bool Machine::IsWaitingForAJob() const {
-  return !job_assigned_ && raw_machine_.state == io::MachineState::kIdle;
+  return !has_assigned_job_ && raw_machine_.state == io::MachineState::kIdle;
 }
 
 }  // namespace lss

@@ -25,7 +25,6 @@ void GreedyScheduler::Schedule() {
   }
 }
 
-
 std::shared_ptr<Machine> GreedyScheduler::FindBestMachine(const io::Job& raw_job) {
   double min_context_changed_cost = kMaxContextChangeCost;
   auto machines = input_.GetMachinesFromSet(raw_job.machineset_id);
@@ -44,9 +43,11 @@ std::shared_ptr<Machine> GreedyScheduler::FindBestMachine(const io::Job& raw_job
 
 void GreedyScheduler::AssignJobsFromBatch(const Batch& batch) {
   for (const io::Job& job : batch.GetSortedJobs()) {
+    if (input_.IsJobAssigned(job.id))
+      continue;
     std::shared_ptr<Machine> best_machine = FindBestMachine(job);
     if (best_machine) {
-      best_machine->AssignJob(job);
+      input_.Assign(best_machine, job);
       basic_writer_.Assign(best_machine->GetId(), job.id);
     }
   }

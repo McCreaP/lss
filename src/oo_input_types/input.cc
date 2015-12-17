@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include <memory>
-#include <set>
+#include <unordered_set>
 
 #include "io/basic_input.h"
 
@@ -17,9 +17,19 @@ bool Input::Update() {
     return false;
 
   UpdateBatches(raw_data.batches, raw_data.jobs);
+  UpdateAssignedJobs(raw_data.jobs);
   UpdateMachines(raw_data.machines, raw_data.context_changes);
   UpdateMachineSets(raw_data.machine_sets);
   return true;
+}
+
+void Input::Assign(const std::shared_ptr<Machine>& machine, const io::Job& raw_job) {
+  machine->AssignJob(raw_job);
+  assigned_jobs_ids_.insert(raw_job.id);
+}
+
+bool Input::IsJobAssigned(int job_id) const {
+  return assigned_jobs_ids_.find(job_id) != assigned_jobs_ids_.end();
 }
 
 void Input::UpdateBatches(const std::vector<io::Batch>& raw_batches,
@@ -29,6 +39,17 @@ void Input::UpdateBatches(const std::vector<io::Batch>& raw_batches,
     batches_.insert(std::make_pair(raw_batch.id, Batch(raw_batch)));
   for (const io::Job& raw_job : raw_jobs)
     batches_.at(raw_job.batch_id).AddJob(raw_job);
+}
+
+
+// We do not want to 'assigned_jobs_ids_' just growing with a time
+// If job is not in input anymore, we do not need to keep it in the 'assigned_jobs_ids_' set
+void Input::UpdateAssignedJobs(const std::vector<io::Job>& raw_jobs) {
+  std::unordered_set<int> updated_assigned_jobs_ids;
+  for (const io::Job& raw_job : raw_jobs)
+    if (IsJobAssigned(raw_job.id))
+      updated_assigned_jobs_ids.insert(raw_job.id);
+  assigned_jobs_ids_ = std::move(updated_assigned_jobs_ids);
 }
 
 void Input::UpdateMachines(const std::vector<io::Machine>& raw_machines,
