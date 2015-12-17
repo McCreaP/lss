@@ -85,10 +85,11 @@ bool BasicReader::Read(RawData* destination) {
   while (getline(input, line_buf)) {
     if (Reader new_reader = GetReader(line_buf)) {
       reader = new_reader;
-    } else {
-      // TODO: Check for (reader != nullptr).
+    } else if (reader) {
       line.str(line_buf);
       reader(line, destination);
+    } else {
+      std::cerr << "Expected header in input line: '" << line_buf << "'\n";
     }
   }
 
