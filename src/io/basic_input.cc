@@ -8,18 +8,19 @@
 #include <functional>
 #include <iostream>
 #include <sstream>
+#include <tuple>
 
 namespace lss {
 namespace io {
 namespace {
 
 template<class T, std::vector<T> RawData::* VEC>
-void ReadOne(std::istream& input, RawData* destination) {
+void ReadOne(std::istream* input, RawData* destination) {
   (destination->*VEC).push_back(T());
-  input >> (destination->*VEC).back();
+  *input >> (destination->*VEC).back();
 }
 
-using Reader = void(*)(std::istream&, RawData*);
+using Reader = void(*)(std::istream*, RawData*);
 using HeaderReaderPair = std::tuple<const char*, Reader>;
 
 constexpr std::array<HeaderReaderPair, 7> kReaders{
@@ -87,7 +88,7 @@ bool BasicReader::Read(RawData* destination) {
       reader = new_reader;
     } else if (reader) {
       line.str(line_buf);
-      reader(line, destination);
+      reader(&line, destination);
     } else {
       std::cerr << "Expected header in input line: '" << line_buf << "'\n";
     }
