@@ -22,7 +22,7 @@ struct RawData {
 
 class BasicReader {
  public:
-  // Constructs BasicReader that will read data from 'input_path' file.
+  // 'input_path' should name a file (not directory) with input data.
   explicit BasicReader(const std::string& input_path);
 
   void SetInputPath(const std::string& input_path);
