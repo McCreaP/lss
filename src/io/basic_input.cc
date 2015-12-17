@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include <cstring>
+#include <cstdio>
 #include <functional>
 #include <iostream>
 #include <sstream>
@@ -70,8 +71,11 @@ void BasicReader::SetInputPath(const std::string& input_path) {
 }
 
 bool BasicReader::Read(RawData* destination) {
-  // TODO: Rename file first.
-  std::ifstream input(input_path_);
+  std::string new_path = input_path_ + ".read";
+  if (std::rename(input_path_.c_str(), new_path.c_str()))
+    return false;
+
+  std::ifstream input(new_path);
   if (input.fail())
     return false;
 
@@ -86,6 +90,11 @@ bool BasicReader::Read(RawData* destination) {
       line.str(line_buf);
       reader(line, destination);
     }
+  }
+
+  input.close();
+  if (std::remove(new_path.c_str())) {
+    std::cerr << "Failed to remove input file: " << strerror(errno) << '\n';
   }
 
   return true;
