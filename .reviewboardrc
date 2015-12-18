@@ -1,2 +1,2 @@
-REVIEWBOARD_URL = 'http://52.59.247.80:8000/'
+REVIEWBOARD_URL = 'http://reviewboard.zppteam.pl'
 REPOSITORY = 'lss'
