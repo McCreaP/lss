@@ -55,7 +55,7 @@ class UseIdleMachines(Event):
         self.__state = state
 
     def __str__(self):
-        return "Use idle machines"
+        return "Looking for jobs assigned to idle machines"
 
     def _execute_impl(self):
         finish_jobs_args = self.__state.use_idle_machines()
