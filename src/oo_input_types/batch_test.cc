@@ -49,6 +49,54 @@ TEST(Batch, GetId) {
 }
 
 TEST(Batch, BatchCompareOperator) {
+  static const std::time_t kTime = 1450000000;
+  static const io::Batch kRawBatch1 = io::BatchBuilder()
+      .WithId(1)
+      .WithDue(kTime + 350)
+      .WithExpectedTime(1800)
+      .WithReward(1)
+      .WithTimelyReward(10)
+      .Build();
+  static const io::Batch kRawBatch2 = io::BatchBuilder()
+      .WithId(2)
+      .WithDue(kTime + 500)
+      .WithExpectedTime(1300)
+      .WithReward(3)
+      .WithTimelyReward(7)
+      .Build();
+  static const io::Batch kRawBatch3 = io::BatchBuilder()
+      .WithId(3)
+      .WithDue(kTime + 10000)
+      .WithExpectedTime(15000)
+      .WithReward(3)
+      .WithTimelyReward(100)
+      .Build();
+  static const io::Batch kRawBatch4 = io::BatchBuilder()
+      .WithId(4)
+      .WithDue(kTime - 700)
+      .WithExpectedTime(1800)
+      .WithReward(3)
+      .WithTimelyReward(10)
+      .Build();
+  static const io::Batch kRawBatch5 = io::BatchBuilder()
+      .WithId(5)
+      .WithDue(kTime + 1000000000)
+      .WithExpectedTime(1)
+      .WithReward(1000000000)
+      .WithTimelyReward(1000000000)
+      .Build();
+
+  Batch batch1(kRawBatch1);
+  Batch batch2(kRawBatch2);
+  Batch batch3(kRawBatch3);
+  Batch batch4(kRawBatch4);
+  Batch batch5(kRawBatch5);
+  static const double kPrecision = 0.0001;
+  EXPECT_NEAR(6.48459, batch1.CurrentReward(kTime), kPrecision);
+  EXPECT_NEAR(7.16490, batch2.CurrentReward(kTime), kPrecision);
+  EXPECT_NEAR(69.07564, batch3.CurrentReward(kTime), kPrecision);
+  EXPECT_NEAR(7.03985, batch4.CurrentReward(kTime), kPrecision);
+  EXPECT_NEAR(2000000000, batch5.CurrentReward(kTime), kPrecision);
 }
 
 }  // namespace lss

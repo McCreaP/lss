@@ -26,14 +26,14 @@ bool Batch::operator==(const Batch& rhs) const {
       jobs_ == rhs.jobs_;
 }
 
-double Batch::Evaluate(std::time_t now) const {
+double Batch::Evaluate(std::time_t time) const {
   if (!time_to_finish_)
     return kMinValue;
-  double r = (now - raw_batch_.due) / raw_batch_.expected_time;
-  return CurrentReward(r) / time_to_finish_;
+  return CurrentReward(time) / time_to_finish_;
 }
 
-double Batch::CurrentReward(double r) const {
+double Batch::CurrentReward(double time) const {
+  double r = (time - raw_batch_.due) / raw_batch_.expected_time;
   return raw_batch_.reward + raw_batch_.timely_reward / (1 + exp(r));
 }
 

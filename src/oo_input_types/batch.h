@@ -21,15 +21,14 @@ class Batch {
   bool operator<(const Batch& rhs) const;
   bool operator==(const Batch& rhs) const;
 
+  double Evaluate(std::time_t now) const;
+  double CurrentReward(double r) const;
   void AddJob(const io::Job& raw_job);
   int GetId() const;
 
   std::set<io::Job, JobCmp> GetSortedJobs() const;
 
  private:
-  double Evaluate(std::time_t now) const;
-  double CurrentReward(double r) const;
-
   io::Batch raw_batch_;
   double time_to_finish_;
   std::set<io::Job, JobCmp> jobs_;
