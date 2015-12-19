@@ -26,9 +26,8 @@ class Input {
   std::vector<std::shared_ptr<Machine>> GetMachinesFromSet(int set_id) const;
 
  private:
-  void UpdateBatches(const std::vector<io::Batch>& raw_batches,
-                     const std::vector<io::Job>& raw_jobs);
-  void UpdateAssignedJobs(const std::vector<io::Job>& raw_jobs);
+  void UpdateBatches(const std::vector<io::Batch>& raw_batches);
+  void UpdateJobs(const std::vector<io::Job>& raw_jobs);
   void UpdateMachines(const std::vector<io::Machine>& raw_machines,
                       const std::vector<io::ContextChange>& raw_context_changes);
   void UpdateMachineSets(const std::vector<io::MachineSet>& raw_machine_sets);

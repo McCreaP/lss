@@ -179,4 +179,47 @@ TEST(Input, KeepsOldMachine) {
   EXPECT_EQ(old_machine, machines[0]);
 }
 
+TEST(Input, AssignOneJob) {
+  static const int kAssignedJobId = 42;
+  static const io::Job kRawJob = io::JobBuilder().WithId(kAssignedJobId).Build();
+  static const io::Machine kRawMachine1 = {10, io::MachineState::kIdle};
+  std::shared_ptr<Machine> machine = std::make_shared<Machine>(kRawMachine1);
+  std::shared_ptr<io::ReaderMock> reader = std::make_shared<io::ReaderMock>();
+
+  Input input(reader);
+  EXPECT_EQ(false, input.IsJobAssigned(kAssignedJobId));
+  input.Assign(machine, kRawJob);
+  EXPECT_EQ(true, input.IsJobAssigned(kAssignedJobId));
+  EXPECT_EQ(false, input.IsJobAssigned(10));
+}
+
+TEST(Input, AssignedJobsAfterUpdate) {
+  static const int kFirstJobId = 10;
+  static const int kSecondJobId = 20;
+  static const io::Batch kRawBatch = io::BatchBuilder().Build();
+  static const io::Job kRawJob1 = io::JobBuilder().WithId(kFirstJobId).Build();
+  static const io::Job kRawJob2 = io::JobBuilder().WithId(kSecondJobId).Build();
+  static const io::RawData kRawData = io::RawDataBuilder()
+      .WithJob(kRawJob2)
+      .WithBatch(kRawBatch)
+      .Build();
+  static const io::Machine kRawMachine1 = {10, io::MachineState::kIdle};
+  static const io::Machine kRawMachine2 = {20, io::MachineState::kIdle};
+  std::shared_ptr<Machine> machine1 = std::make_shared<Machine>(kRawMachine1);
+  std::shared_ptr<Machine> machine2 = std::make_shared<Machine>(kRawMachine2);
+  std::shared_ptr<io::ReaderMock> reader = std::make_shared<io::ReaderMock>();
+  EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(kRawData), Return(true))));
+
+  Input input(reader);
+  EXPECT_EQ(false, input.IsJobAssigned(kFirstJobId));
+  EXPECT_EQ(false, input.IsJobAssigned(kSecondJobId));
+  input.Assign(machine1, kRawJob1);
+  input.Assign(machine2, kRawJob2);
+  EXPECT_EQ(true, input.IsJobAssigned(kFirstJobId));
+  EXPECT_EQ(true, input.IsJobAssigned(kSecondJobId));
+  input.Update();
+  EXPECT_EQ(false, input.IsJobAssigned(kFirstJobId));
+  EXPECT_EQ(true, input.IsJobAssigned(kSecondJobId));
+}
+
 }  // namespace lss

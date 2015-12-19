@@ -16,8 +16,8 @@ bool Input::Update() {
   if (!reader_->Read(&raw_data))
     return false;
 
-  UpdateBatches(raw_data.batches, raw_data.jobs);
-  UpdateAssignedJobs(raw_data.jobs);
+  UpdateBatches(raw_data.batches);
+  UpdateJobs(raw_data.jobs);
   UpdateMachines(raw_data.machines, raw_data.context_changes);
   UpdateMachineSets(raw_data.machine_sets);
   return true;
@@ -32,19 +32,18 @@ bool Input::IsJobAssigned(int job_id) const {
   return assigned_jobs_ids_.find(job_id) != assigned_jobs_ids_.end();
 }
 
-void Input::UpdateBatches(const std::vector<io::Batch>& raw_batches,
-                          const std::vector<io::Job>& raw_jobs) {
+void Input::UpdateBatches(const std::vector<io::Batch>& raw_batches) {
   batches_.clear();
   for (const io::Batch& raw_batch : raw_batches)
     batches_.insert(std::make_pair(raw_batch.id, Batch(raw_batch)));
-  for (const io::Job& raw_job : raw_jobs)
-    batches_.at(raw_job.batch_id).AddJob(raw_job);
 }
 
+void Input::UpdateJobs(const std::vector<io::Job>& raw_jobs) {
+  for (const io::Job& raw_job : raw_jobs)
+    batches_.at(raw_job.batch_id).AddJob(raw_job);
 
-// We do not want to 'assigned_jobs_ids_' just growing with a time
-// If job is not in input anymore, we do not need to keep it in the 'assigned_jobs_ids_' set
-void Input::UpdateAssignedJobs(const std::vector<io::Job>& raw_jobs) {
+  // We do not want to 'assigned_jobs_ids_' just growing with a time
+  // If job is not in input anymore, we do not need to keep it in the 'assigned_jobs_ids_' set
   std::unordered_set<int> updated_assigned_jobs_ids;
   for (const io::Job& raw_job : raw_jobs)
     if (IsJobAssigned(raw_job.id))
