@@ -84,6 +84,9 @@ bool BasicReader::Read(RawData* destination) {
   std::string line_buf;
   std::istringstream line;
   while (getline(input, line_buf)) {
+    if (line_buf.empty())
+      continue;
+
     if (Reader new_reader = GetReader(line_buf)) {
       reader = new_reader;
     } else if (reader) {
