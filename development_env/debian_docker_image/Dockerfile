@@ -34,6 +34,7 @@ RUN apt-get update \
     unzip \
     lcov \
     bc \
+    libpstreams-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
