@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <memory>
-
+#include <pstreams/pstream.h>
 #include "io/basic_input.h"
 #include "oo_input_types/batch.h"
 #include "oo_input_types/machine.h"
@@ -17,8 +17,10 @@ GreedyScheduler::GreedyScheduler(const std::string& input_path)
 
 void GreedyScheduler::Schedule() {
   while (true) {
-    if (!input_.Update())
+    if (!input_.Update()) {
+      redi::ipstream proc("curl localhost:8000 > /dev/null", redi::pstreams::pstderr);
       continue;
+    }
     auto sorted_batches = input_.GetSortedBatches();
     for (auto batch = sorted_batches.crbegin(); batch != sorted_batches.crend(); ++batch)
       AssignJobsFromBatch(*batch);
