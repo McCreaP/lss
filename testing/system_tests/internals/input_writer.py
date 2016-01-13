@@ -4,56 +4,38 @@ from internals import utils
 
 
 class InputWriter:
-    MACHINES_FILE = 'machines'
-    MACHINE_SETS_FILE = 'machine-set'
-    FAIR_MACHINE_SETS_FILE = 'fair-service-machine-sets'
-    JOBS_FILE = 'jobs'
-    BATCHES_FILE = 'batches'
-    ACCOUNTS_FILE = 'accounts'
-    CONTEXT_CHANGES_FILE = 'context-changes'
+    INPUT_FILE = 'input'
 
     def __init__(self, lss_input_dir, story):
-        self.__lss_input_dir = lss_input_dir
+        self.__lss_input_path = os.path.join(lss_input_dir, InputWriter.INPUT_FILE)
         self.__story = story
         self.__clean_input_dir()
 
     def write(self, machines, ready_jobs):
-        self.__write_to_files([
-            (self.MACHINES_FILE, show_machines(machines)),
-            (self.MACHINE_SETS_FILE, show_machine_sets(self.__story.get_raw('machine_sets'))),
-            (self.FAIR_MACHINE_SETS_FILE, show_machine_sets(self.__story.get_raw('fair_service_machine_sets'))),
-            (self.JOBS_FILE, show_jobs(ready_jobs)),
-            (self.BATCHES_FILE, show_batches(self.__story.get_raw('batches'))),
-            (self.ACCOUNTS_FILE, show_accounts(self.__story.get_raw('accounts'))),
-            (self.CONTEXT_CHANGES_FILE, show_context_changes(self.__story.get_raw('context_changes')))
-        ])
+        pieces = [
+            ('machines', show_machines(machines)),
+            ('machine-sets', show_machine_sets(self.__story.get_raw('machine_sets'))),
+            ('fair-service-machine-sets', show_machine_sets(self.__story.get_raw('fair_service_machine_sets'))),
+            ('jobs', show_jobs(ready_jobs)),
+            ('batches', show_batches(self.__story.get_raw('batches'))),
+            ('accounts', show_accounts(self.__story.get_raw('accounts'))),
+            ('context-changes', show_context_changes(self.__story.get_raw('context_changes')))
+        ]
+
+        def glue(title, data):
+            return [title] + data + ['']
+
+        self.__write_input_file(utils.flatten(glue(*p) for p in pieces))
 
     def __clean_input_dir(self):
-        self.__rm_files_from_input_dir([
-            self.MACHINES_FILE,
-            self.MACHINE_SETS_FILE,
-            self.FAIR_MACHINE_SETS_FILE,
-            self.JOBS_FILE,
-            self.BATCHES_FILE,
-            self.ACCOUNTS_FILE,
-            self.CONTEXT_CHANGES_FILE
-        ])
+        utils.remove_file(self.__lss_input_path)
 
-    def __rm_files_from_input_dir(self, file_names):
-        for file_name in file_names:
-            utils.remove_file(os.path.join(self.__lss_input_dir, file_name))
-
-    def __write_to_files(self, data):
-        for file_name, lines in data:
-            self.__write_to_file(file_name, lines)
-
-    def __write_to_file(self, file_name, lines):
-        file_path = os.path.join(self.__lss_input_dir, file_name)
-        tmp_path = file_path + '-new'
+    def __write_input_file(self, lines):
+        tmp_path = self.__lss_input_path + '-new'
         with open(tmp_path, 'wt') as f:
             for line in lines:
                 f.write(line + '\n')
-        os.rename(tmp_path, file_path)
+        os.rename(tmp_path, self.__lss_input_path)
 
 
 def show_fields(fields):
