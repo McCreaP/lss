@@ -39,6 +39,7 @@ RUN apt-get update \
 
 RUN pip3 install colorlog
 RUN pip3 install bottle
+RUN pip3 install typing
 
 # add cpplint
 ADD https://raw.githubusercontent.com/McCreaP/styleguide/gh-pages/cpplint/cpplint.py /home/vagrant/
