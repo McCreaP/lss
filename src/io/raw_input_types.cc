@@ -5,16 +5,6 @@
 namespace lss {
 namespace io {
 
-Job& Job::operator=(const Job& rhs) {
-  id = rhs.id;
-  machineset_id = rhs.machineset_id;
-  batch_id = rhs.batch_id;
-  duration = rhs.duration;
-  for (int i = 0; i < kContextN; ++i)
-    context[i] = rhs.context[i];
-  return *this;
-}
-
 bool Job::operator==(const Job& rhs) const {
   bool ok = true;
   ok &= (id == rhs.id);

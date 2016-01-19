@@ -1,13 +1,20 @@
 #include "scheduler/greedy_scheduler.h"
 
+#include <pstreams/pstream.h>
 #include <iostream>
 #include <memory>
-#include <pstreams/pstream.h>
 #include "io/basic_input.h"
 #include "oo_input_types/batch.h"
 #include "oo_input_types/machine.h"
 
 namespace lss {
+namespace {
+
+  void NotifyDriverIFinishedCompute() {
+    redi::ipstream proc("curl localhost:8000 > /dev/null", redi::pstreams::pstderr);
+  }
+
+}  // namespace
 
 static constexpr double kMaxContextChangeCost = 1000 * 1000 * 1000;
 
@@ -17,13 +24,12 @@ GreedyScheduler::GreedyScheduler(const std::string& input_path)
 
 void GreedyScheduler::Schedule() {
   while (true) {
-    if (!input_.Update()) {
-      redi::ipstream proc("curl localhost:8000 > /dev/null", redi::pstreams::pstderr);
+    if (!input_.Update())
       continue;
-    }
     auto sorted_batches = input_.GetSortedBatches();
     for (auto batch = sorted_batches.crbegin(); batch != sorted_batches.crend(); ++batch)
       AssignJobsFromBatch(*batch);
+    NotifyDriverIFinishedCompute();
   }
 }
 
@@ -49,8 +55,13 @@ void GreedyScheduler::AssignJobsFromBatch(const Batch& batch) {
       continue;
     std::shared_ptr<Machine> best_machine = FindBestMachine(job);
     if (best_machine) {
-      input_.Assign(best_machine, job);
-      basic_writer_.Assign(best_machine->GetId(), job.id);
+      std::cerr << "Attempting to assign job" << std::endl;
+      if (basic_writer_.Assign(best_machine->GetId(), job.id)) {
+        input_.Assign(job, best_machine.get());
+        std::cerr << "Assigning job succeded" << std::endl;
+      } else {
+        std::cerr << "Assigning job failed" << std::endl;
+      }
     }
   }
 }

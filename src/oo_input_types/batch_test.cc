@@ -10,14 +10,14 @@ TEST(Batch, JobCmpRetrunsTrue) {
   static const io::Job kRawJob1 = io::JobBuilder().WithId(1).WithDuration(1.5).Build();
   static const io::Job kRawJob2 = io::JobBuilder().WithId(2).WithDuration(2.0).Build();
 
-  EXPECT_EQ(true, JobCmp()(kRawJob1, kRawJob2));
+  EXPECT_TRUE(JobCmp()(kRawJob1, kRawJob2));
 }
 
 TEST(Batch, JobCmpRetrunsFalse) {
   static const io::Job kRawJob1 = io::JobBuilder().WithId(1).WithDuration(1.99).Build();
   static const io::Job kRawJob2 = io::JobBuilder().WithId(2).WithDuration(1.98).Build();
 
-  EXPECT_EQ(false, JobCmp()(kRawJob1, kRawJob2));
+  EXPECT_FALSE(JobCmp()(kRawJob1, kRawJob2));
 }
 
 TEST(Batch, WithNoJobs) {
@@ -92,11 +92,11 @@ TEST(Batch, BatchCompareOperator) {
   Batch batch4(kRawBatch4);
   Batch batch5(kRawBatch5);
   static const double kPrecision = 0.0001;
-  EXPECT_NEAR(6.48459, batch1.CurrentReward(kTime), kPrecision);
-  EXPECT_NEAR(7.16490, batch2.CurrentReward(kTime), kPrecision);
-  EXPECT_NEAR(69.07564, batch3.CurrentReward(kTime), kPrecision);
-  EXPECT_NEAR(7.03985, batch4.CurrentReward(kTime), kPrecision);
-  EXPECT_NEAR(2000000000, batch5.CurrentReward(kTime), kPrecision);
+  EXPECT_NEAR(6.48459, batch1.RewardAt(kTime), kPrecision);
+  EXPECT_NEAR(7.16490, batch2.RewardAt(kTime), kPrecision);
+  EXPECT_NEAR(69.07564, batch3.RewardAt(kTime), kPrecision);
+  EXPECT_NEAR(7.03985, batch4.RewardAt(kTime), kPrecision);
+  EXPECT_NEAR(2000000000, batch5.RewardAt(kTime), kPrecision);
 }
 
 }  // namespace lss

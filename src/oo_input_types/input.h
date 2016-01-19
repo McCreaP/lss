@@ -20,7 +20,7 @@ class Input {
   explicit Input(std::shared_ptr<io::Reader> reader);
 
   bool Update();
-  void Assign(const std::shared_ptr<Machine>& machine, const io::Job& raw_job);
+  void Assign(const io::Job& raw_job, Machine* machine);
   bool IsJobAssigned(int job_id) const;
   std::vector<Batch> GetSortedBatches() const;
   std::vector<std::shared_ptr<Machine>> GetMachinesFromSet(int set_id) const;

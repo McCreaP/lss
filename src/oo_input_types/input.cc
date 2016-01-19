@@ -23,7 +23,7 @@ bool Input::Update() {
   return true;
 }
 
-void Input::Assign(const std::shared_ptr<Machine>& machine, const io::Job& raw_job) {
+void Input::Assign(const io::Job& raw_job, Machine* machine) {
   machine->AssignJob(raw_job);
   assigned_jobs_ids_.insert(raw_job.id);
 }
@@ -42,8 +42,9 @@ void Input::UpdateJobs(const std::vector<io::Job>& raw_jobs) {
   for (const io::Job& raw_job : raw_jobs)
     batches_.at(raw_job.batch_id).AddJob(raw_job);
 
-  // We do not want to 'assigned_jobs_ids_' just growing with a time
-  // If job is not in input anymore, we do not need to keep it in the 'assigned_jobs_ids_' set
+  // We do not want to 'assigned_jobs_ids_' just growing with a time.
+  // If a job is not in the input anymore,
+  // we do not need to keep it in the 'assigned_jobs_ids_' set.
   std::unordered_set<int> updated_assigned_jobs_ids;
   for (const io::Job& raw_job : raw_jobs)
     if (IsJobAssigned(raw_job.id))

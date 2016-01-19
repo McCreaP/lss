@@ -31,8 +31,7 @@ TEST(Input, UpdateSucceed) {
   EXPECT_CALL(*reader, Read(_)).WillOnce(Return(true));
 
   Input input(reader);
-  bool ok = input.Update();
-  EXPECT_EQ(true, ok);
+  EXPECT_TRUE(input.Update());
   EXPECT_EQ(std::vector<Batch>(), input.GetSortedBatches());
 }
 
@@ -41,8 +40,7 @@ TEST(Input, UpdateFailed) {
   EXPECT_CALL(*reader, Read(_)).WillOnce(Return(false));
 
   Input input(reader);
-  bool ok = input.Update();
-  EXPECT_EQ(false, ok);
+  EXPECT_FALSE(input.Update());
   EXPECT_EQ(std::vector<Batch>(), input.GetSortedBatches());
 }
 
@@ -61,8 +59,7 @@ TEST(Input, TwoBatchesOneEmpty) {
   batch1.AddJob(kJob);
 
   Input input(reader);
-  bool ok = input.Update();
-  EXPECT_EQ(true, ok);
+  EXPECT_TRUE(input.Update());
   EXPECT_EQ(std::vector<Batch>({batch2, batch1}), input.GetSortedBatches());
 }
 
@@ -87,8 +84,7 @@ TEST(Input, ThreeBatches) {
   batch3.AddJob(kJob3);
 
   Input input(reader);
-  bool ok = input.Update();
-  EXPECT_EQ(true, ok);
+  EXPECT_TRUE(input.Update());
   EXPECT_EQ(std::vector<Batch>({batch3, batch1, batch2}), input.GetSortedBatches());
 }
 
@@ -101,8 +97,7 @@ TEST(Input, EmptyMachineSet) {
   EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(kRawData), Return(true))));
 
   Input input(reader);
-  bool ok = input.Update();
-  EXPECT_EQ(true, ok);
+  EXPECT_TRUE(input.Update());
   EXPECT_EQ(std::vector<std::shared_ptr<Machine>>(), input.GetMachinesFromSet(1));
 }
 
@@ -118,8 +113,7 @@ TEST(Input, SingleMachineSet) {
   static const Machine kMachine(kRawMachine);
 
   Input input(reader);
-  bool ok = input.Update();
-  EXPECT_EQ(true, ok);
+  EXPECT_TRUE(input.Update());
   auto machines = input.GetMachinesFromSet(1);
   EXPECT_EQ(1, machines.size());
   EXPECT_EQ(kMachine, *machines[0]);
@@ -142,8 +136,7 @@ TEST(Input, MultipleMachineSets) {
   static const Machine kMachine3(kRawMachine3);
 
   Input input(reader);
-  bool ok = input.Update();
-  EXPECT_EQ(true, ok);
+  EXPECT_TRUE(input.Update());
   auto machines = input.GetMachinesFromSet(1);
   EXPECT_EQ(2, machines.size());
   EXPECT_EQ(kMachine1, *machines[0]);
@@ -165,15 +158,13 @@ TEST(Input, KeepsOldMachine) {
   static const Machine kMachine(kRawMachine);
 
   Input input(reader);
-  bool ok = input.Update();
-  EXPECT_EQ(true, ok);
+  EXPECT_TRUE(input.Update());
   auto machines = input.GetMachinesFromSet(1);
   EXPECT_EQ(1, machines.size());
   std::shared_ptr<Machine> old_machine = machines[0];
   EXPECT_EQ(kMachine, *old_machine);
 
-  ok = input.Update();
-  EXPECT_EQ(true, ok);
+  EXPECT_TRUE(input.Update());
   machines = input.GetMachinesFromSet(1);
   EXPECT_EQ(1, machines.size());
   EXPECT_EQ(old_machine, machines[0]);
@@ -183,14 +174,14 @@ TEST(Input, AssignOneJob) {
   static const int kAssignedJobId = 42;
   static const io::Job kRawJob = io::JobBuilder().WithId(kAssignedJobId).Build();
   static const io::Machine kRawMachine1 = {10, io::MachineState::kIdle};
-  std::shared_ptr<Machine> machine = std::make_shared<Machine>(kRawMachine1);
+  Machine machine = Machine(kRawMachine1);
   std::shared_ptr<io::ReaderMock> reader = std::make_shared<io::ReaderMock>();
 
   Input input(reader);
-  EXPECT_EQ(false, input.IsJobAssigned(kAssignedJobId));
-  input.Assign(machine, kRawJob);
-  EXPECT_EQ(true, input.IsJobAssigned(kAssignedJobId));
-  EXPECT_EQ(false, input.IsJobAssigned(10));
+  EXPECT_FALSE(input.IsJobAssigned(kAssignedJobId));
+  input.Assign(kRawJob, &machine);
+  EXPECT_TRUE(input.IsJobAssigned(kAssignedJobId));
+  EXPECT_FALSE(input.IsJobAssigned(10));
 }
 
 TEST(Input, AssignedJobsAfterUpdate) {
@@ -205,21 +196,21 @@ TEST(Input, AssignedJobsAfterUpdate) {
       .Build();
   static const io::Machine kRawMachine1 = {10, io::MachineState::kIdle};
   static const io::Machine kRawMachine2 = {20, io::MachineState::kIdle};
-  std::shared_ptr<Machine> machine1 = std::make_shared<Machine>(kRawMachine1);
-  std::shared_ptr<Machine> machine2 = std::make_shared<Machine>(kRawMachine2);
+  Machine machine1 = Machine(kRawMachine1);
+  Machine machine2 = Machine(kRawMachine2);
   std::shared_ptr<io::ReaderMock> reader = std::make_shared<io::ReaderMock>();
   EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(kRawData), Return(true))));
 
   Input input(reader);
-  EXPECT_EQ(false, input.IsJobAssigned(kFirstJobId));
-  EXPECT_EQ(false, input.IsJobAssigned(kSecondJobId));
-  input.Assign(machine1, kRawJob1);
-  input.Assign(machine2, kRawJob2);
-  EXPECT_EQ(true, input.IsJobAssigned(kFirstJobId));
-  EXPECT_EQ(true, input.IsJobAssigned(kSecondJobId));
+  EXPECT_FALSE(input.IsJobAssigned(kFirstJobId));
+  EXPECT_FALSE(input.IsJobAssigned(kSecondJobId));
+  input.Assign(kRawJob1, &machine1);
+  input.Assign(kRawJob2, &machine2);
+  EXPECT_TRUE(input.IsJobAssigned(kFirstJobId));
+  EXPECT_TRUE(input.IsJobAssigned(kSecondJobId));
   input.Update();
-  EXPECT_EQ(false, input.IsJobAssigned(kFirstJobId));
-  EXPECT_EQ(true, input.IsJobAssigned(kSecondJobId));
+  EXPECT_FALSE(input.IsJobAssigned(kFirstJobId));
+  EXPECT_TRUE(input.IsJobAssigned(kSecondJobId));
 }
 
 }  // namespace lss

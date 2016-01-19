@@ -24,7 +24,6 @@ struct Job {
   int machineset_id;
   int context[kContextN];
 
-  Job& operator=(const Job& rhs);
   bool operator==(const Job& rhs) const;
 };
 

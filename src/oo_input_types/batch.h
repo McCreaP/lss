@@ -9,7 +9,7 @@
 namespace lss {
 
 struct JobCmp {
-  bool operator()(const io::Job& job1, const io::Job& job2) {
+  bool operator()(const io::Job& job1, const io::Job& job2) const {
     return job1.duration < job2.duration;
   }
 };
@@ -22,7 +22,7 @@ class Batch {
   bool operator==(const Batch& rhs) const;
 
   double Evaluate(std::time_t now) const;
-  double CurrentReward(double r) const;
+  double RewardAt(double time) const;
   void AddJob(const io::Job& raw_job);
   int GetId() const;
 

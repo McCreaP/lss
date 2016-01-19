@@ -30,9 +30,9 @@ TEST(Machine, AssignJob) {
   Machine::SetContextChanges(std::vector<io::ContextChange>({kRawContextChange}));
 
   Machine machine(kRawMachine);
-  EXPECT_EQ(true, machine.IsWaitingForAJob());
+  EXPECT_TRUE(machine.IsWaitingForAJob());
   machine.AssignJob(kRawJob1);
-  EXPECT_EQ(false, machine.IsWaitingForAJob());
+  EXPECT_FALSE(machine.IsWaitingForAJob());
   EXPECT_EQ(kContextChangeCost, machine.ContextChangeCost(kRawJob2));
 }
 
@@ -40,23 +40,23 @@ TEST(Machine, WorkingMachineIsNotWaitingForAJob) {
   static const io::Machine kRawMachine = {1, io::MachineState::kWorking};
 
   Machine machine(kRawMachine);
-  EXPECT_EQ(false, machine.IsWaitingForAJob());
+  EXPECT_FALSE(machine.IsWaitingForAJob());
 }
 
 TEST(Machine, DeadMachineIsNotWaitingForAJob) {
   static const io::Machine kRawMachine = {1, io::MachineState::kDead};
 
   Machine machine(kRawMachine);
-  EXPECT_EQ(false, machine.IsWaitingForAJob());
+  EXPECT_FALSE(machine.IsWaitingForAJob());
 }
 
 TEST(Machine, SetStateFromWorkingToIdle) {
   static const io::Machine kRawMachine = {1, io::MachineState::kWorking};
 
   Machine machine(kRawMachine);
-  EXPECT_EQ(false, machine.IsWaitingForAJob());
+  EXPECT_FALSE(machine.IsWaitingForAJob());
   machine.SetState(io::MachineState::kIdle);
-  EXPECT_EQ(true, machine.IsWaitingForAJob());
+  EXPECT_TRUE(machine.IsWaitingForAJob());
 }
 
 TEST(Machine, SetStateFromIdleToIdleWithAssignedJob) {
@@ -64,11 +64,11 @@ TEST(Machine, SetStateFromIdleToIdleWithAssignedJob) {
   static const io::Job kRawJob = io::JobBuilder().Build();
 
   Machine machine(kRawMachine);
-  EXPECT_EQ(true, machine.IsWaitingForAJob());
+  EXPECT_TRUE(machine.IsWaitingForAJob());
   machine.AssignJob(kRawJob);
-  EXPECT_EQ(false, machine.IsWaitingForAJob());
+  EXPECT_FALSE(machine.IsWaitingForAJob());
   machine.SetState(io::MachineState::kIdle);
-  EXPECT_EQ(false, machine.IsWaitingForAJob());
+  EXPECT_FALSE(machine.IsWaitingForAJob());
 }
 
 }  // namespace lss

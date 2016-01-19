@@ -41,7 +41,7 @@ class BasicReader: public Reader {
  public:
   explicit BasicReader(const std::string& input_path);
 
-  void SetInputPath(const std::string& input_path);
+  void SetInputPath(const std::string& input_path) override;
 
   // Returns true iff file 'lock' is successfully created in 'input_dir'
   // and subsequently all input files are opened. File 'lock' is deleted
@@ -49,7 +49,7 @@ class BasicReader: public Reader {
   //
   // The contents of the files are not validated and reading malformed
   // records will quietly result in corrupted data.
-  bool Read(RawData* destination);
+  bool Read(RawData* destination) override;
 
  private:
   // Returns true iff opening the file succeeds.
@@ -57,7 +57,7 @@ class BasicReader: public Reader {
   bool ReadRecords(const std::string& file_name, std::vector<T>* destination) {
     std::ifstream input(input_path_ + '/' + file_name);
     if (input.fail()) {
-      std::cerr << "Read records from: '" << file_name << "' failed" << std::endl;
+      std::cerr << "Opening file: '" << file_name << "' failed in ReadRecords." << std::endl;
       return false;
     }
 
