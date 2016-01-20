@@ -1,5 +1,6 @@
 #include "io/basic_input.h"
 
+#include <glog/logging.h>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -93,13 +94,13 @@ bool BasicReader::Read(RawData* destination) {
       line.str(line_buf);
       reader(&line, destination);
     } else {
-      std::cerr << "Expected header in input line: '" << line_buf << "'\n";
+      LOG(ERROR) << "Expected header in input line: '" << line_buf;
     }
   }
 
   input.close();
   if (std::remove(new_path.c_str())) {
-    std::cerr << "Failed to remove input file: " << strerror(errno) << '\n';
+    LOG(ERROR) << "Failed to remove input file: " << strerror(errno);
   }
 
   return true;
