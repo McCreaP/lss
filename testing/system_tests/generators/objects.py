@@ -74,10 +74,11 @@ class Job(Base):
         self.context = Context(upper_bound=5)
 
     def dump(self):
-        result = self.__dict__
+        result = self.__dict__.copy()
         result["batch"] = self.batch.id
         result["machine_set"] = self.machine_set.id
-        result["context"] = self.context.dump()
+        del result["context"]
+        result["context1"], result["context2"], result["context3"] = self.context.dump()
         return result
 
 
