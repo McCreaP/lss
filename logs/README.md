@@ -11,6 +11,7 @@ We use [**GLog**](https://github.com/google/glog) library for application level 
 ```
 ## Severity levels
 You can specify one of the following severity levels:
+
 * `INFO`
 Messages intended to show what's going on in the system, at a broad-brush level. `INFO` messages do not indicate any problems and the system should be able to run at full speed in production with `INFO` level logging.
 * `WARNING`
