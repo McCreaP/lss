@@ -1,6 +1,6 @@
 # Logging
 
-We use [**GLog**](https://github.com/google/glog) library for application level logging
+We use [**GLog**](https://github.com/google/glog) library for application level logging.
 
 ## Quick start example:
 ```c++
@@ -23,7 +23,7 @@ An unrecoverable error occurred or one that it is not safe to attempt to recover
 
 Logging a `FATAL` message **terminates** the program.
 
-You can't define your own severity levels, but you can make use of verbose logging
+You can't define your own severity levels, but you can make use of verbose logging.
 
 ## Verbose logging
 
@@ -42,9 +42,10 @@ Verbose logging can be controlled from the command line on a per-module basis:
    `--vmodule=greedy=2,*test=3 --v=0`
 
 will:
+
 * Print `VLOG(2)` and lower messages from `greedy.{h,cc}`
 * Print `VLOG(3)` and lower messages from files prefixed with `"test"`
 * Print `VLOG(0)` and lower messages from elsewhere
 
 ## Advanced usage
-The exaples of more advanced usage can be found in [GLog documentation](http://google-glog.googlecode.com/svn/trunk/doc/glog.html)
+The exaples of more advanced usage can be found in [GLog documentation](http://google-glog.googlecode.com/svn/trunk/doc/glog.html).

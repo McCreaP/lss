@@ -11,7 +11,7 @@ void configLogger(char *argv[]) {
   google::InitGoogleLogging(argv[0]);
 }
 
-int main(int __attribute__ ((unused)) argc, char *argv[]) {
+int main(int __attribute__((unused)) argc, char *argv[]) {
   configLogger(argv);
   LOG(INFO) << "Scheduler start";
   RawData rawData;
