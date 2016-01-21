@@ -5,7 +5,7 @@ add_executable(unit_tests main_test.cc)
 
 add_subdirectory(io)
 
-target_link_libraries(lss io)
+target_link_libraries(lss io glog)
 
 # Gtest doesn't find tests from separate compilation units.
 # unit_tests contains no references to anything in the library that contains test definitions
@@ -18,7 +18,7 @@ target_link_libraries(unit_tests -Wl,--no-whole-archive)
 
 find_library(gtest gmock)
 find_package(Threads REQUIRED)
-target_link_libraries(unit_tests gtest pthread ${CXX_COVERAGE_LINK_FLAGS})
+target_link_libraries(unit_tests gtest glog pthread ${CXX_COVERAGE_LINK_FLAGS})
 
 install(TARGETS unit_tests DESTINATION ${CMAKE_SOURCE_DIR}/bin)
 install(TARGETS lss DESTINATION ${CMAKE_SOURCE_DIR}/bin)
