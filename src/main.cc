@@ -11,13 +11,12 @@ void configLogger(char *argv[]) {
   google::InitGoogleLogging(argv[0]);
 }
 
-int main(int argc, char *argv[]) {
-  (void) argc;
+int main(int __attribute__ ((unused)) argc, char *argv[]) {
   configLogger(argv);
-  LOG(INFO) << "Aplication start";
+  LOG(INFO) << "Scheduler start";
   RawData rawData;
   BasicReader basicReader(".");
   basicReader.Read(&rawData);
-  LOG(INFO) << "Aplication stop";
+  LOG(INFO) << "Scheduler stop";
   return 0;
 }

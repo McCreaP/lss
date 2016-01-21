@@ -94,13 +94,13 @@ bool BasicReader::Read(RawData* destination) {
       line.str(line_buf);
       reader(&line, destination);
     } else {
-      LOG(ERROR) << "Expected header in input line: '" << line_buf;
+      LOG(WARNING) << "Expected header in input line: '" << line_buf;
     }
   }
 
   input.close();
   if (std::remove(new_path.c_str())) {
-    LOG(ERROR) << "Failed to remove input file: " << strerror(errno);
+    LOG(WARNING) << "Failed to remove input file: " << strerror(errno);
   }
 
   return true;
