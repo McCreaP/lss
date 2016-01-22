@@ -21,12 +21,18 @@ class Batch {
   bool operator<(const Batch& rhs) const;
   bool operator==(const Batch& rhs) const;
 
+  // Returns an evaluation of a batch at given time.
+  // It is used to compare two batches by greedy scheduler
+  // which favors batches with higher evaluation.
   double Evaluate(std::time_t now) const;
   double RewardAt(double time) const;
   void AddJob(const io::Job& raw_job);
   int GetId() const;
 
-  std::set<io::Job, JobCmp> GetSortedJobs() const;
+  // Returns const reference to the member variable.
+  // This reference is valid as long as object exists
+  // and non-const method hasn't been called.
+  const std::set<io::Job, JobCmp>& GetSortedJobs() const;
 
  private:
   io::Batch raw_batch_;

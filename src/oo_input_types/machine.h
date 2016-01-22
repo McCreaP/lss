@@ -2,16 +2,24 @@
 #define LSS_OO_INPUT_TYPES_MACHINE_H_
 
 #include <vector>
+#include <memory>
 
 #include "io/raw_input_types.h"
 
 namespace lss {
 
+class ContextChanges {
+ public:
+  void SetContextChanges(const std::vector<io::ContextChange> raw_changes);
+  int GetContextChangeCost(bool changed0, bool changed1, bool changed2) const;
+
+ private:
+  int context_changes_[2][2][2];
+};
+
 class Machine {
  public:
-  static void SetContextChanges(const std::vector<io::ContextChange>& raw_changes);
-
-  explicit Machine(io::Machine raw_machine);
+  explicit Machine(io::Machine raw_machine, std::shared_ptr<ContextChanges> context_changes);
 
   bool operator==(const Machine& rhs) const;
   int GetId() const;
@@ -21,10 +29,9 @@ class Machine {
   bool IsWaitingForAJob() const;
 
  private:
-  static int context_changes_[2][2][2];
-
   io::Machine raw_machine_;
   int context_[3];
+  std::shared_ptr<ContextChanges> context_changes_;
   bool has_assigned_job_;
 };
 

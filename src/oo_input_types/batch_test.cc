@@ -1,96 +1,105 @@
 #include "oo_input_types/batch.h"
 
 #include <io/raw_input_types.h>
-#include <io/test_utils/builders.h>
 #include "gtest/gtest.h"
 
 namespace lss {
 
 TEST(Batch, JobCmpRetrunsTrue) {
-  static const io::Job kRawJob1 = io::JobBuilder().WithId(1).WithDuration(1.5).Build();
-  static const io::Job kRawJob2 = io::JobBuilder().WithId(2).WithDuration(2.0).Build();
+  io::Job raw_job_1 = io::Job();
+  raw_job_1.id = 1;
+  raw_job_1.duration = 1.5;
+  io::Job raw_job_2 = io::Job();
+  raw_job_2.id = 2;
+  raw_job_2.duration = 2.0;
 
-  EXPECT_TRUE(JobCmp()(kRawJob1, kRawJob2));
+  EXPECT_TRUE(JobCmp()(raw_job_1, raw_job_2));
 }
 
 TEST(Batch, JobCmpRetrunsFalse) {
-  static const io::Job kRawJob1 = io::JobBuilder().WithId(1).WithDuration(1.99).Build();
-  static const io::Job kRawJob2 = io::JobBuilder().WithId(2).WithDuration(1.98).Build();
+  io::Job raw_job_1 = io::Job();
+  raw_job_1.id = 1;
+  raw_job_1.duration = 1.99;
+  io::Job raw_job_2 = io::Job();
+  raw_job_2.id = 2;
+  raw_job_2.duration = 1.98;
 
-  EXPECT_FALSE(JobCmp()(kRawJob1, kRawJob2));
+  EXPECT_FALSE(JobCmp()(raw_job_1, raw_job_2));
 }
 
 TEST(Batch, WithNoJobs) {
-  static const io::Batch kRawBatch = io::BatchBuilder().Build();
+  static const io::Batch kRawBatch = io::Batch();
   Batch batch(kRawBatch);
   EXPECT_EQ(0, batch.GetSortedJobs().size());
 }
 
 TEST(Batch, GetMultipleJobs) {
-  static const io::Batch kRawBatch = io::BatchBuilder().Build();
-  static const io::Job kRawJob1 = io::JobBuilder().WithId(1).WithDuration(2.2).Build();
-  static const io::Job kRawJob2 = io::JobBuilder().WithId(2).WithDuration(1.1).Build();
-  static const io::Job kRawJob3 = io::JobBuilder().WithId(3).WithDuration(3.3).Build();
+  io::Job raw_job_1 = io::Job();
+  raw_job_1.id = 1;
+  raw_job_1.duration = 2.2;
+  io::Job raw_job_2 = io::Job();
+  raw_job_2.id = 2;
+  raw_job_2.duration = 1.1;
+  io::Job raw_job_3 = io::Job();
+  raw_job_3.id = 3;
+  raw_job_3.duration = 3.3;
+  static const io::Batch kRawBatch = io::Batch();
   Batch batch(kRawBatch);
-  batch.AddJob(kRawJob1);
-  batch.AddJob(kRawJob2);
-  batch.AddJob(kRawJob3);
+  batch.AddJob(raw_job_1);
+  batch.AddJob(raw_job_2);
+  batch.AddJob(raw_job_3);
 
-  static const std::set<io::Job, JobCmp> kExpectedJobs{kRawJob2, kRawJob1, kRawJob3};
+  static const std::set<io::Job, JobCmp> kExpectedJobs{raw_job_2, raw_job_1, raw_job_3};
   auto sorted_jobs = batch.GetSortedJobs();
   EXPECT_EQ(kExpectedJobs, sorted_jobs);
 }
 
 TEST(Batch, GetId) {
   static const int kBatchId = 42;
-  static const io::Batch kRawBatch = io::BatchBuilder().WithId(kBatchId).Build();
-  Batch batch(kRawBatch);
+  io::Batch raw_batch = io::Batch();
+  raw_batch.id = 42;
+  Batch batch(raw_batch);
   EXPECT_EQ(kBatchId, batch.GetId());
 }
 
 TEST(Batch, BatchCompareOperator) {
   static const std::time_t kTime = 1450000000;
-  static const io::Batch kRawBatch1 = io::BatchBuilder()
-      .WithId(1)
-      .WithDue(kTime + 350)
-      .WithExpectedTime(1800)
-      .WithReward(1)
-      .WithTimelyReward(10)
-      .Build();
-  static const io::Batch kRawBatch2 = io::BatchBuilder()
-      .WithId(2)
-      .WithDue(kTime + 500)
-      .WithExpectedTime(1300)
-      .WithReward(3)
-      .WithTimelyReward(7)
-      .Build();
-  static const io::Batch kRawBatch3 = io::BatchBuilder()
-      .WithId(3)
-      .WithDue(kTime + 10000)
-      .WithExpectedTime(15000)
-      .WithReward(3)
-      .WithTimelyReward(100)
-      .Build();
-  static const io::Batch kRawBatch4 = io::BatchBuilder()
-      .WithId(4)
-      .WithDue(kTime - 700)
-      .WithExpectedTime(1800)
-      .WithReward(3)
-      .WithTimelyReward(10)
-      .Build();
-  static const io::Batch kRawBatch5 = io::BatchBuilder()
-      .WithId(5)
-      .WithDue(kTime + 1000000000)
-      .WithExpectedTime(1)
-      .WithReward(1000000000)
-      .WithTimelyReward(1000000000)
-      .Build();
+  io::Batch raw_batch_1 = io::Batch();
+  raw_batch_1.id = 1;
+  raw_batch_1.due = kTime + 350;
+  raw_batch_1.expected_time = 1800;
+  raw_batch_1.reward = 1;
+  raw_batch_1.timely_reward = 10;
+  io::Batch raw_batch_2 = io::Batch();
+  raw_batch_2.id = 2;
+  raw_batch_2.due = kTime + 500;
+  raw_batch_2.expected_time = 1300;
+  raw_batch_2.reward = 3;
+  raw_batch_2.timely_reward = 7;
+  io::Batch raw_batch_3 = io::Batch();
+  raw_batch_3.id = 3;
+  raw_batch_3.due = kTime + 10000;
+  raw_batch_3.expected_time = 15000;
+  raw_batch_3.reward = 3;
+  raw_batch_3.timely_reward = 100;
+  io::Batch raw_batch_4 = io::Batch();
+  raw_batch_4.id = 4;
+  raw_batch_4.due = kTime - 700;
+  raw_batch_4.expected_time = 1800;
+  raw_batch_4.reward = 3;
+  raw_batch_4.timely_reward = 10;
+  io::Batch raw_batch_5 = io::Batch();
+  raw_batch_5.id = 5;
+  raw_batch_5.due = kTime + 1000000000;
+  raw_batch_5.expected_time = 1;
+  raw_batch_5.reward = 1000000000;
+  raw_batch_5.timely_reward = 1000000000;
 
-  Batch batch1(kRawBatch1);
-  Batch batch2(kRawBatch2);
-  Batch batch3(kRawBatch3);
-  Batch batch4(kRawBatch4);
-  Batch batch5(kRawBatch5);
+  Batch batch1(raw_batch_1);
+  Batch batch2(raw_batch_2);
+  Batch batch3(raw_batch_3);
+  Batch batch4(raw_batch_4);
+  Batch batch5(raw_batch_5);
   static const double kPrecision = 0.0001;
   EXPECT_NEAR(6.48459, batch1.RewardAt(kTime), kPrecision);
   EXPECT_NEAR(7.16490, batch2.RewardAt(kTime), kPrecision);

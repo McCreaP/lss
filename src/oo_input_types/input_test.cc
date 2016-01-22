@@ -7,7 +7,6 @@
 #include "gmock/gmock.h"
 
 #include "io/raw_input_types.h"
-#include "io/test_utils/builders.h"
 #include "oo_input_types/batch.h"
 
 using ::testing::SetArgPointee;
@@ -45,18 +44,22 @@ TEST(Input, UpdateFailed) {
 }
 
 TEST(Input, TwoBatchesOneEmpty) {
-  static const io::Batch kRawBatch1 = io::BatchBuilder().WithId(1).Build();
-  static const io::Batch kRawBatch2 = io::BatchBuilder().WithId(2).Build();
-  static const io::Job kJob = io::JobBuilder().WithBatchId(1).Build();
-  static io::RawData kRawData = io::RawDataBuilder()
-      .WithBatches(std::vector<io::Batch>({kRawBatch1, kRawBatch2}))
-      .WithJob(kJob)
-      .Build();
+  io::Batch raw_batch_1 = io::Batch();
+  raw_batch_1.id = 1;
+  io::Batch raw_batch_2 = io::Batch();
+  raw_batch_2.id = 2;
+  io::Job raw_job = io::Job();
+  raw_job.batch_id = 1;
+  raw_job.duration = 1;
+  io::RawData raw_data = io::RawData();
+  raw_data.batches = {raw_batch_1, raw_batch_2};
+  raw_data.jobs = {raw_job};
+
   std::shared_ptr<io::ReaderMock> reader = std::make_shared<io::ReaderMock>();
-  EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(kRawData), Return(true))));
-  Batch batch1(kRawBatch1);
-  Batch batch2(kRawBatch2);
-  batch1.AddJob(kJob);
+  EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(raw_data), Return(true))));
+  Batch batch1(raw_batch_1);
+  Batch batch2(raw_batch_2);
+  batch1.AddJob(raw_job);
 
   Input input(reader);
   EXPECT_TRUE(input.Update());
@@ -64,24 +67,36 @@ TEST(Input, TwoBatchesOneEmpty) {
 }
 
 TEST(Input, ThreeBatches) {
-  static const io::Batch kRawBatch1 = io::BatchBuilder().WithId(1).WithReward(2.0).Build();
-  static const io::Batch kRawBatch2 = io::BatchBuilder().WithId(2).WithReward(3.0).Build();
-  static const io::Batch kRawBatch3 = io::BatchBuilder().WithId(3).WithReward(1.0).Build();
-  static const io::Job kJob1 = io::JobBuilder().WithBatchId(1).Build();
-  static const io::Job kJob2 = io::JobBuilder().WithBatchId(2).Build();
-  static const io::Job kJob3 = io::JobBuilder().WithBatchId(3).Build();
-  static io::RawData kRawData = io::RawDataBuilder()
-      .WithBatches(std::vector<io::Batch>({kRawBatch1, kRawBatch2, kRawBatch3}))
-      .WithJobs(std::vector<io::Job>({kJob1, kJob2, kJob3}))
-      .Build();
+  io::Batch raw_batch_1 = io::Batch();
+  raw_batch_1.id = 1;
+  raw_batch_1.reward = 2.0;
+  io::Batch raw_batch_2 = io::Batch();
+  raw_batch_2.id = 2;
+  raw_batch_2.reward = 3.0;
+  io::Batch raw_batch_3 = io::Batch();
+  raw_batch_3.id = 3;
+  raw_batch_3.reward = 1.0;
+  io::Job raw_job_1 = io::Job();
+  raw_job_1.batch_id = 1;
+  raw_job_1.duration = 1;
+  io::Job raw_job_2 = io::Job();
+  raw_job_2.batch_id = 2;
+  raw_job_2.duration = 1;
+  io::Job raw_job_3 = io::Job();
+  raw_job_3.batch_id = 3;
+  raw_job_3.duration = 1;
+  io::RawData raw_data = io::RawData();
+  raw_data.batches = {raw_batch_1, raw_batch_2, raw_batch_3};
+  raw_data.jobs = {raw_job_1, raw_job_2, raw_job_3};
+
   std::shared_ptr<io::ReaderMock> reader = std::make_shared<io::ReaderMock>();
-  EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(kRawData), Return(true))));
-  Batch batch1(kRawBatch1);
-  Batch batch2(kRawBatch2);
-  Batch batch3(kRawBatch3);
-  batch1.AddJob(kJob1);
-  batch2.AddJob(kJob2);
-  batch3.AddJob(kJob3);
+  EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(raw_data), Return(true))));
+  Batch batch1(raw_batch_1);
+  Batch batch2(raw_batch_2);
+  Batch batch3(raw_batch_3);
+  batch1.AddJob(raw_job_1);
+  batch2.AddJob(raw_job_2);
+  batch3.AddJob(raw_job_3);
 
   Input input(reader);
   EXPECT_TRUE(input.Update());
@@ -90,11 +105,10 @@ TEST(Input, ThreeBatches) {
 
 TEST(Input, EmptyMachineSet) {
   static const io::MachineSet kRawMachineSet = {1, std::vector<int>()};
-  static io::RawData kRawData = io::RawDataBuilder()
-      .WithMachineSet(kRawMachineSet)
-      .Build();
+  io::RawData raw_data = io::RawData();
+  raw_data.machine_sets = {kRawMachineSet};
   std::shared_ptr<io::ReaderMock> reader = std::make_shared<io::ReaderMock>();
-  EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(kRawData), Return(true))));
+  EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(raw_data), Return(true))));
 
   Input input(reader);
   EXPECT_TRUE(input.Update());
@@ -104,13 +118,12 @@ TEST(Input, EmptyMachineSet) {
 TEST(Input, SingleMachineSet) {
   static const io::Machine kRawMachine = {1, io::MachineState::kIdle};
   static const io::MachineSet kRawMachineSet = {1, std::vector<int>({1})};
-  static io::RawData kRawData = io::RawDataBuilder()
-      .WithMachine(kRawMachine)
-      .WithMachineSet(kRawMachineSet)
-      .Build();
+  io::RawData raw_data = io::RawData();
+  raw_data.machines = {kRawMachine};
+  raw_data.machine_sets = {kRawMachineSet};
   std::shared_ptr<io::ReaderMock> reader = std::make_shared<io::ReaderMock>();
-  EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(kRawData), Return(true))));
-  static const Machine kMachine(kRawMachine);
+  EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(raw_data), Return(true))));
+  static const Machine kMachine(kRawMachine, std::make_shared<ContextChanges>());
 
   Input input(reader);
   EXPECT_TRUE(input.Update());
@@ -125,15 +138,14 @@ TEST(Input, MultipleMachineSets) {
   static const io::Machine kRawMachine3 = {3, io::MachineState::kDead};
   static const io::MachineSet kRawMachineSet1 = {1, std::vector<int>({1, 2})};
   static const io::MachineSet kRawMachineSet2 = {2, std::vector<int>({3})};
-  static io::RawData kRawData = io::RawDataBuilder()
-      .WithMachines(std::vector<io::Machine>({kRawMachine1, kRawMachine2, kRawMachine3}))
-      .WithMachineSets(std::vector<io::MachineSet>({kRawMachineSet1, kRawMachineSet2}))
-      .Build();
+  io::RawData raw_data = io::RawData();
+  raw_data.machines = {kRawMachine1, kRawMachine2, kRawMachine3};
+  raw_data.machine_sets = {kRawMachineSet1, kRawMachineSet2};
   std::shared_ptr<io::ReaderMock> reader = std::make_shared<io::ReaderMock>();
-  EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(kRawData), Return(true))));
-  static const Machine kMachine1(kRawMachine1);
-  static const Machine kMachine2(kRawMachine2);
-  static const Machine kMachine3(kRawMachine3);
+  EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(raw_data), Return(true))));
+  static const Machine kMachine1(kRawMachine1, std::make_shared<ContextChanges>());
+  static const Machine kMachine2(kRawMachine2, std::make_shared<ContextChanges>());
+  static const Machine kMachine3(kRawMachine3, std::make_shared<ContextChanges>());
 
   Input input(reader);
   EXPECT_TRUE(input.Update());
@@ -149,13 +161,12 @@ TEST(Input, MultipleMachineSets) {
 TEST(Input, KeepsOldMachine) {
   static const io::Machine kRawMachine = {1, io::MachineState::kIdle};
   static const io::MachineSet kRawMachineSet = {1, std::vector<int>({1})};
-  static io::RawData kRawData = io::RawDataBuilder()
-      .WithMachine(kRawMachine)
-      .WithMachineSet(kRawMachineSet)
-      .Build();
+  io::RawData raw_data = io::RawData();
+  raw_data.machines = {kRawMachine};
+  raw_data.machine_sets = {kRawMachineSet};
   std::shared_ptr<io::ReaderMock> reader = std::make_shared<io::ReaderMock>();
-  EXPECT_CALL(*reader, Read(_)).WillRepeatedly((DoAll(SetArgPointee<0>(kRawData), Return(true))));
-  static const Machine kMachine(kRawMachine);
+  EXPECT_CALL(*reader, Read(_)).WillRepeatedly((DoAll(SetArgPointee<0>(raw_data), Return(true))));
+  static const Machine kMachine(kRawMachine, std::make_shared<ContextChanges>());
 
   Input input(reader);
   EXPECT_TRUE(input.Update());
@@ -172,9 +183,10 @@ TEST(Input, KeepsOldMachine) {
 
 TEST(Input, AssignOneJob) {
   static const int kAssignedJobId = 42;
-  static const io::Job kRawJob = io::JobBuilder().WithId(kAssignedJobId).Build();
+  io::Job kRawJob = io::Job();
+  kRawJob.id = kAssignedJobId;
   static const io::Machine kRawMachine1 = {10, io::MachineState::kIdle};
-  Machine machine = Machine(kRawMachine1);
+  Machine machine = Machine(kRawMachine1, std::make_shared<ContextChanges>());
   std::shared_ptr<io::ReaderMock> reader = std::make_shared<io::ReaderMock>();
 
   Input input(reader);
@@ -187,25 +199,26 @@ TEST(Input, AssignOneJob) {
 TEST(Input, AssignedJobsAfterUpdate) {
   static const int kFirstJobId = 10;
   static const int kSecondJobId = 20;
-  static const io::Batch kRawBatch = io::BatchBuilder().Build();
-  static const io::Job kRawJob1 = io::JobBuilder().WithId(kFirstJobId).Build();
-  static const io::Job kRawJob2 = io::JobBuilder().WithId(kSecondJobId).Build();
-  static const io::RawData kRawData = io::RawDataBuilder()
-      .WithJob(kRawJob2)
-      .WithBatch(kRawBatch)
-      .Build();
+  static const io::Batch kRawBatch = io::Batch();
+  io::Job raw_job_1 = io::Job();
+  raw_job_1.id = kFirstJobId;
+  io::Job raw_job_2 = io::Job();
+  raw_job_2.id = kSecondJobId;
+  io::RawData raw_data = io::RawData();
+  raw_data.jobs = {raw_job_2};
+  raw_data.batches = {kRawBatch};
   static const io::Machine kRawMachine1 = {10, io::MachineState::kIdle};
   static const io::Machine kRawMachine2 = {20, io::MachineState::kIdle};
-  Machine machine1 = Machine(kRawMachine1);
-  Machine machine2 = Machine(kRawMachine2);
+  Machine machine1 = Machine(kRawMachine1, std::make_shared<ContextChanges>());
+  Machine machine2 = Machine(kRawMachine2, std::make_shared<ContextChanges>());
   std::shared_ptr<io::ReaderMock> reader = std::make_shared<io::ReaderMock>();
-  EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(kRawData), Return(true))));
+  EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(raw_data), Return(true))));
 
   Input input(reader);
   EXPECT_FALSE(input.IsJobAssigned(kFirstJobId));
   EXPECT_FALSE(input.IsJobAssigned(kSecondJobId));
-  input.Assign(kRawJob1, &machine1);
-  input.Assign(kRawJob2, &machine2);
+  input.Assign(raw_job_1, &machine1);
+  input.Assign(raw_job_2, &machine2);
   EXPECT_TRUE(input.IsJobAssigned(kFirstJobId));
   EXPECT_TRUE(input.IsJobAssigned(kSecondJobId));
   input.Update();

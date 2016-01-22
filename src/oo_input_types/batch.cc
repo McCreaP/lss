@@ -46,7 +46,7 @@ int Batch::GetId() const {
   return raw_batch_.id;
 }
 
-std::set<io::Job, JobCmp> Batch::GetSortedJobs() const {
+const std::set<io::Job, JobCmp>& Batch::GetSortedJobs() const {
   return jobs_;
 }
 

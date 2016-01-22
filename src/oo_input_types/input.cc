@@ -9,16 +9,18 @@
 
 namespace lss {
 
-Input::Input(std::shared_ptr<io::Reader> reader) : reader_(reader) { }
+Input::Input(std::shared_ptr<io::Reader> reader) :
+    reader_(reader), context_changes_(std::make_shared<ContextChanges>()) { }
 
 bool Input::Update() {
   io::RawData raw_data;
   if (!reader_->Read(&raw_data))
     return false;
 
+  context_changes_->SetContextChanges(raw_data.context_changes);
   UpdateBatches(raw_data.batches);
   UpdateJobs(raw_data.jobs);
-  UpdateMachines(raw_data.machines, raw_data.context_changes);
+  UpdateMachines(raw_data.machines);
   UpdateMachineSets(raw_data.machine_sets);
   return true;
 }
@@ -52,10 +54,7 @@ void Input::UpdateJobs(const std::vector<io::Job>& raw_jobs) {
   assigned_jobs_ids_ = std::move(updated_assigned_jobs_ids);
 }
 
-void Input::UpdateMachines(const std::vector<io::Machine>& raw_machines,
-                           const std::vector<io::ContextChange>& raw_context_changes) {
-  Machine::SetContextChanges(raw_context_changes);
-
+void Input::UpdateMachines(const std::vector<io::Machine>& raw_machines) {
   std::unordered_map<int, std::shared_ptr<Machine>> updated_machines;
   for (const io::Machine& raw_machine : raw_machines) {
     std::shared_ptr<Machine> machine;
@@ -64,7 +63,7 @@ void Input::UpdateMachines(const std::vector<io::Machine>& raw_machines,
       machine = machines_iter->second;
       machine->SetState(raw_machine.state);
     } else {
-      machine = std::make_shared<Machine>(raw_machine);
+      machine = std::make_shared<Machine>(raw_machine, context_changes_);
     }
     updated_machines.insert(std::make_pair(machine->GetId(), machine));
   }
@@ -88,7 +87,7 @@ std::vector<Batch> Input::GetSortedBatches() const {
   return batches;
 }
 
-std::vector<std::shared_ptr<Machine>> Input::GetMachinesFromSet(int set_id) const {
+const std::vector<std::shared_ptr<Machine>>& Input::GetMachinesFromSet(int set_id) const {
   return machines_from_set_.at(set_id);
 }
 
