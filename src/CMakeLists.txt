@@ -7,7 +7,7 @@ add_subdirectory(io)
 add_subdirectory(oo_input_types)
 add_subdirectory(scheduler)
 
-target_link_libraries(lss scheduler)
+target_link_libraries(lss scheduler glog)
 
 # Gtest doesn't find tests from separate compilation units.
 # unit_tests contains no references to anything in the library that contains test definitions
@@ -20,7 +20,7 @@ target_link_libraries(unit_tests -Wl,--no-whole-archive)
 
 find_library(gtest gmock)
 find_package(Threads REQUIRED)
-target_link_libraries(unit_tests gtest gmock pthread ${CXX_COVERAGE_LINK_FLAGS})
+target_link_libraries(unit_tests gtest gmock glog pthread ${CXX_COVERAGE_LINK_FLAGS})
 
 install(TARGETS unit_tests DESTINATION ${CMAKE_SOURCE_DIR}/bin)
 install(TARGETS lss DESTINATION ${CMAKE_SOURCE_DIR}/bin)

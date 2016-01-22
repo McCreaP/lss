@@ -35,6 +35,7 @@ RUN apt-get update \
     lcov \
     bc \
     libpstreams-dev \
+    libgoogle-glog-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -52,8 +53,7 @@ RUN unzip /home/vagrant/gtest-1.7.0.zip -d /home/vagrant
 RUN cd /home/vagrant/gtest-1.7.0 && mkdir build && cd build && cmake .. && make
 RUN cp -r /home/vagrant/gtest-1.7.0/include/gtest /usr/local/include
 RUN cp /home/vagrant/gtest-1.7.0/build/lib*.a /usr/local/lib
-RUN rm /home/vagrant/gtest-1.7.0.zip
-RUN rm -rf /home/vagrant/gtest-1.7.0
+RUN rm -rf /home/vagrant/gtest-1.7.0 && rm /home/vagrant/gtest-1.7.0.zip
 
 # install google mock
 ADD https://googlemock.googlecode.com/files/gmock-1.7.0.zip /home/vagrant/
@@ -61,8 +61,7 @@ RUN unzip /home/vagrant/gmock-1.7.0.zip -d /home/vagrant
 RUN cd /home/vagrant/gmock-1.7.0 && mkdir build && cd build && cmake .. && make
 RUN cp -r /home/vagrant/gmock-1.7.0/include/gmock /usr/local/include
 RUN cp /home/vagrant/gmock-1.7.0/build/lib*.a /usr/local/lib
-RUN rm /home/vagrant/gmock-1.7.0.zip
-RUN rm -rf /home/vagrant/gmock-1.7.0
+RUN rm -rf /home/vagrant/gmock-1.7.0 && rm /home/vagrant/gmock-1.7.0.zip
 
 # allow passwordless sudo
 RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
