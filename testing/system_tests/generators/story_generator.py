@@ -16,8 +16,8 @@ class StoryGenerator(Base):
                  machine_count: int = None, machine_set_count: int = None, fair_service_machine_set_count: int = None,
                  job_count: int = None, batch_count: int = None, account_count: int = None, seed: int = None):
         if seed:
-            random.seed = seed
-        assert maxt or duration
+            random.seed(seed)
+        assert (maxt is None) ^ (duration is None)
         self.mint = mint or time()
         self.maxt = maxt or self.mint + duration
         self._generate_machines(machine_count)
@@ -46,6 +46,7 @@ class StoryGenerator(Base):
         self.fair_service_machine_sets = self._generate_machine_sets_base(count, FairServiceMachineSet)
 
     def _generate_machine_sets_base(self, count, cls):
+        assert self.machines
         machine_sets = [cls(id) for id in range(count)]
         for m in self.machines:
             machine_sets[randrange(count)] += m
@@ -63,8 +64,6 @@ class StoryGenerator(Base):
     def _generate_accounts(self, count):
         assert self.jobs
         self.accounts = [Account(id) for id in range(count)]
-        for j in self.jobs:
-            self.accounts[randrange(count)] += j
         for b in self.batches:
             b.account = self.accounts[randrange(count)]
 
