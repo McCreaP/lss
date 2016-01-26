@@ -12,6 +12,8 @@ class Reader {
  public:
   virtual void SetInputPath(const std::string& input_path) = 0;
   virtual bool Read(RawData* destination) = 0;
+
+  virtual ~Reader() = default;
 };
 
 }  // namespace io
