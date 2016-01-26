@@ -11,8 +11,6 @@ bool Machine::operator==(const Machine& rhs) const {
 }
 
 void Machine::SetState(io::MachineState new_state) {
-  // FIXME: Now machine must noticed that its state was changed from kIdle
-  // otherwise it doesn't work properly
   if (new_state != io::MachineState::kIdle)
     has_assigned_job_ = false;
   raw_machine_.state = new_state;

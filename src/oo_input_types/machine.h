@@ -26,6 +26,10 @@ class Machine {
   void SetState(io::MachineState new_state);
   double ContextChangeCost(const io::Job& raw_job) const;
   void AssignJob(const io::Job& raw_job);
+  // Now 'has_assigned_job_' is set back to false
+  // when Input::Update() detects the machine has changed its state from kIdle.
+  // It causes potentially a race condition - if the machine processes
+  // an assigned job very quick Input::Update() won't notice it.
   bool IsWaitingForAJob() const;
 
  private:

@@ -34,7 +34,7 @@ TEST(Input, UpdateSucceed) {
   EXPECT_EQ(std::vector<Batch>(), input.GetBatches());
 }
 
-TEST(Input, UpdateFailed) {
+TEST(Input, UpdateReturnsFalseOnReaderFailure) {
   std::unique_ptr<io::ReaderMock> reader = std::make_unique<io::ReaderMock>();
   EXPECT_CALL(*reader, Read(_)).WillOnce(Return(false));
 
