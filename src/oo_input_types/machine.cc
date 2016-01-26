@@ -7,12 +7,7 @@ Machine::Machine(io::Machine raw_machine, std::shared_ptr<ContextChanges> contex
     context_changes_(context_changes), has_assigned_job_(false) { }
 
 bool Machine::operator==(const Machine& rhs) const {
-  bool eq = true;
-  eq &= raw_machine_.id == rhs.raw_machine_.id;
-  eq &= has_assigned_job_ == rhs.has_assigned_job_;
-  for (int i = 0; i < io::kContextN; ++i)
-    eq &= context_[i] == rhs.context_[i];
-  return eq;
+  return raw_machine_.id == rhs.raw_machine_.id;
 }
 
 void Machine::SetState(io::MachineState new_state) {

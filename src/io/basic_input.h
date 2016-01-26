@@ -2,9 +2,9 @@
 #define LSS_IO_BASIC_INPUT_H_
 
 #include <fstream>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
 #include "io/raw_input_types.h"
 #include "io/reader.h"

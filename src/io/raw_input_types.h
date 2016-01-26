@@ -3,8 +3,8 @@
 #ifndef LSS_IO_RAW_INPUT_TYPES_H_
 #define LSS_IO_RAW_INPUT_TYPES_H_
 
-#include <vector>
 #include <iostream>
+#include <vector>
 
 namespace lss {
 namespace io {

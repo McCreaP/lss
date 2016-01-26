@@ -1,16 +1,16 @@
 #include "oo_input_types/input.h"
 
 #include <algorithm>
-#include <unordered_map>
 #include <memory>
+#include <unordered_map>
 #include <unordered_set>
 
 #include "io/basic_input.h"
 
 namespace lss {
 
-Input::Input(std::shared_ptr<io::Reader> reader) :
-    reader_(reader), context_changes_(std::make_shared<ContextChanges>()) { }
+Input::Input(std::unique_ptr<io::Reader> reader) :
+    reader_(std::move(reader)), context_changes_(std::make_shared<ContextChanges>()) { }
 
 bool Input::Update() {
   io::RawData raw_data;
@@ -79,11 +79,10 @@ void Input::UpdateMachineSets(const std::vector<io::MachineSet>& raw_machine_set
   }
 }
 
-std::vector<Batch> Input::GetSortedBatches() const {
+std::vector<Batch> Input::GetBatches() const {
   std::vector<Batch> batches;
   for (const auto& batch : batches_)
     batches.push_back(batch.second);
-  std::sort(std::begin(batches), std::end(batches));
   return batches;
 }
 

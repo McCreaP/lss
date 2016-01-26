@@ -11,7 +11,8 @@ void configLogger(char *argv[]) {
 int main(int __attribute__((unused)) argc, char *argv[]) {
   configLogger(argv);
   LOG(INFO) << "Scheduler start";
-  lss::GreedyScheduler scheduler("/home/vagrant/lss/run/");
+  const std::string kRunPath = "/home/vagrant/lss/run/";
+  lss::GreedyScheduler scheduler(kRunPath + "input", kRunPath + "assignments/");
   scheduler.Schedule();
   LOG(INFO) << "Scheduler stop";
   return 0;

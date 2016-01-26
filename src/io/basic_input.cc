@@ -1,11 +1,11 @@
 #include "io/basic_input.h"
 
-#include <glog/logging.h>
 #include <fcntl.h>
+#include <glog/logging.h>
 #include <unistd.h>
 
-#include <cstring>
 #include <cstdio>
+#include <cstring>
 #include <functional>
 #include <iostream>
 #include <sstream>

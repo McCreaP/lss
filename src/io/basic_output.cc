@@ -1,8 +1,10 @@
 #include "io/basic_output.h"
 
 #include <fcntl.h>
+#include <glog/logging.h>
 #include <stdio.h>
 #include <unistd.h>
+
 #include <iostream>
 
 namespace lss {
@@ -16,7 +18,8 @@ void BasicWriter::SetOutputPath(const std::string& output_path) {
 }
 
 bool BasicWriter::Assign(int machine_id, int job_id) {
-  std::cout << "Assign job: " << job_id << " to the machine: " << machine_id << std::endl;
+  LOG(INFO) << "An attempt to assign job: " << job_id
+      << " to the machine: " << machine_id << " is being made" << std::endl;
   const std::string path = output_path_ + std::to_string(machine_id);
   const std::string tmp_path = path + "_tmp";
   const std::string content = std::to_string(job_id);

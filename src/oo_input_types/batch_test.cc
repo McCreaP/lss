@@ -1,7 +1,11 @@
 #include "oo_input_types/batch.h"
 
-#include <io/raw_input_types.h>
+#include <algorithm>
+#include <vector>
+
 #include "gtest/gtest.h"
+
+#include "io/raw_input_types.h"
 
 namespace lss {
 
@@ -13,7 +17,7 @@ TEST(Batch, JobCmpRetrunsTrue) {
   raw_job_2.id = 2;
   raw_job_2.duration = 2.0;
 
-  EXPECT_TRUE(JobCmp()(raw_job_1, raw_job_2));
+  EXPECT_TRUE(JobDurationCmp()(raw_job_1, raw_job_2));
 }
 
 TEST(Batch, JobCmpRetrunsFalse) {
@@ -24,7 +28,7 @@ TEST(Batch, JobCmpRetrunsFalse) {
   raw_job_2.id = 2;
   raw_job_2.duration = 1.98;
 
-  EXPECT_FALSE(JobCmp()(raw_job_1, raw_job_2));
+  EXPECT_FALSE(JobDurationCmp()(raw_job_1, raw_job_2));
 }
 
 TEST(Batch, WithNoJobs) {
@@ -49,7 +53,7 @@ TEST(Batch, GetMultipleJobs) {
   batch.AddJob(raw_job_2);
   batch.AddJob(raw_job_3);
 
-  static const std::set<io::Job, JobCmp> kExpectedJobs{raw_job_2, raw_job_1, raw_job_3};
+  static const std::set<io::Job, JobDurationCmp> kExpectedJobs{raw_job_2, raw_job_1, raw_job_3};
   auto sorted_jobs = batch.GetSortedJobs();
   EXPECT_EQ(kExpectedJobs, sorted_jobs);
 }
@@ -106,6 +110,62 @@ TEST(Batch, BatchCompareOperator) {
   EXPECT_NEAR(69.07564, batch3.RewardAt(kTime), kPrecision);
   EXPECT_NEAR(7.03985, batch4.RewardAt(kTime), kPrecision);
   EXPECT_NEAR(2000000000, batch5.RewardAt(kTime), kPrecision);
+}
+
+TEST(Batch, SortTwoBatchesOneEmpty) {
+  io::Batch raw_batch_1 = io::Batch();
+  raw_batch_1.id = 1;
+  io::Batch raw_batch_2 = io::Batch();
+  raw_batch_2.id = 2;
+  io::Job raw_job = io::Job();
+  raw_job.batch_id = 1;
+  raw_job.duration = 1;
+  io::RawData raw_data = io::RawData();
+  raw_data.batches = {raw_batch_1, raw_batch_2};
+  raw_data.jobs = {raw_job};
+
+  Batch batch1(raw_batch_1);
+  Batch batch2(raw_batch_2);
+  batch1.AddJob(raw_job);
+
+  std::vector<Batch> batches = {batch1, batch2};
+  std::sort(std::begin(batches), std::end(batches), BatchRewardCmp());
+  EXPECT_EQ(std::vector<Batch>({batch2, batch1}), batches);
+}
+
+TEST(Input, SortThreeBatches) {
+  io::Batch raw_batch_1 = io::Batch();
+  raw_batch_1.id = 1;
+  raw_batch_1.reward = 2.0;
+  io::Batch raw_batch_2 = io::Batch();
+  raw_batch_2.id = 2;
+  raw_batch_2.reward = 3.0;
+  io::Batch raw_batch_3 = io::Batch();
+  raw_batch_3.id = 3;
+  raw_batch_3.reward = 1.0;
+  io::Job raw_job_1 = io::Job();
+  raw_job_1.batch_id = 1;
+  raw_job_1.duration = 1;
+  io::Job raw_job_2 = io::Job();
+  raw_job_2.batch_id = 2;
+  raw_job_2.duration = 1;
+  io::Job raw_job_3 = io::Job();
+  raw_job_3.batch_id = 3;
+  raw_job_3.duration = 1;
+  io::RawData raw_data = io::RawData();
+  raw_data.batches = {raw_batch_1, raw_batch_2, raw_batch_3};
+  raw_data.jobs = {raw_job_1, raw_job_2, raw_job_3};
+
+  Batch batch1(raw_batch_1);
+  Batch batch2(raw_batch_2);
+  Batch batch3(raw_batch_3);
+  batch1.AddJob(raw_job_1);
+  batch2.AddJob(raw_job_2);
+  batch3.AddJob(raw_job_3);
+
+  std::vector<Batch> batches = {batch1, batch2, batch3};
+  std::sort(std::begin(batches), std::end(batches), BatchRewardCmp());
+  EXPECT_EQ(std::vector<Batch>({batch3, batch1, batch2}), batches);
 }
 
 }  // namespace lss

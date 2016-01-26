@@ -1,8 +1,8 @@
 #ifndef LSS_OO_INPUT_TYPES_MACHINE_H_
 #define LSS_OO_INPUT_TYPES_MACHINE_H_
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include "io/raw_input_types.h"
 

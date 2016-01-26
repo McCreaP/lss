@@ -1,8 +1,13 @@
 #include "scheduler/greedy_scheduler.h"
 
+#include <glog/logging.h>
 #include <pstreams/pstream.h>
+
+#include <algorithm>
 #include <iostream>
+#include <limits>
 #include <memory>
+
 #include "io/basic_input.h"
 #include "oo_input_types/batch.h"
 #include "oo_input_types/machine.h"
@@ -16,18 +21,20 @@ namespace {
 
 }  // namespace
 
-static constexpr double kMaxContextChangeCost = 1000 * 1000 * 1000;
+static constexpr double kMaxContextChangeCost = std::numeric_limits<double>::infinity();
 
-GreedyScheduler::GreedyScheduler(const std::string& input_path)
-    : input_(std::make_shared<io::BasicReader>(input_path)),
-      basic_writer_(input_path + "assignments/") { }
+GreedyScheduler::GreedyScheduler(const std::string& input_path,
+                                 const std::string& assignments_path)
+    : input_(std::make_unique<io::BasicReader>(input_path)),
+      basic_writer_(assignments_path) { }
 
 void GreedyScheduler::Schedule() {
   while (true) {
     if (!input_.Update())
       continue;
-    auto sorted_batches = input_.GetSortedBatches();
-    for (auto batch = sorted_batches.crbegin(); batch != sorted_batches.crend(); ++batch)
+    auto batches = input_.GetBatches();
+    std::sort(std::begin(batches), std::end(batches), BatchRewardCmp());
+    for (auto batch = batches.crbegin(); batch != batches.crend(); ++batch)
       AssignJobsFromBatch(*batch);
     NotifyDriverIFinishedCompute();
   }
@@ -55,13 +62,10 @@ void GreedyScheduler::AssignJobsFromBatch(const Batch& batch) {
       continue;
     std::shared_ptr<Machine> best_machine = FindBestMachine(job);
     if (best_machine) {
-      std::cerr << "Attempting to assign job" << std::endl;
-      if (basic_writer_.Assign(best_machine->GetId(), job.id)) {
+      if (basic_writer_.Assign(best_machine->GetId(), job.id))
         input_.Assign(job, best_machine.get());
-        std::cerr << "Assigning job succeded" << std::endl;
-      } else {
-        std::cerr << "Assigning job failed" << std::endl;
-      }
+      else
+        LOG(ERROR) << "Assigning job failed" << std::endl;
     }
   }
 }

@@ -15,15 +15,8 @@ static constexpr double kMinValue = std::numeric_limits<double>::lowest();
 Batch::Batch(io::Batch raw_batch) :
     raw_batch_(std::move(raw_batch)), time_to_finish_(0) { }
 
-bool Batch::operator<(const Batch& rhs) const {
-  std::time_t now = std::time(nullptr);
-  return Evaluate(now) < rhs.Evaluate(now);
-}
-
 bool Batch::operator==(const Batch& rhs) const {
-  return raw_batch_ == rhs.raw_batch_ &&
-      time_to_finish_ == rhs.time_to_finish_ &&
-      jobs_ == rhs.jobs_;
+  return raw_batch_.id == rhs.raw_batch_.id;
 }
 
 double Batch::Evaluate(std::time_t time) const {
@@ -32,7 +25,7 @@ double Batch::Evaluate(std::time_t time) const {
   return RewardAt(time) / time_to_finish_;
 }
 
-double Batch::RewardAt(double time) const {
+double Batch::RewardAt(std::time_t time) const {
   double r = (time - raw_batch_.due) / raw_batch_.expected_time;
   return raw_batch_.reward + raw_batch_.timely_reward / (1 + exp(r));
 }
@@ -46,7 +39,7 @@ int Batch::GetId() const {
   return raw_batch_.id;
 }
 
-const std::set<io::Job, JobCmp>& Batch::GetSortedJobs() const {
+const std::set<io::Job, JobDurationCmp>& Batch::GetSortedJobs() const {
   return jobs_;
 }
 

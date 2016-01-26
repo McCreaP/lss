@@ -10,7 +10,10 @@ namespace lss {
 
 class GreedyScheduler {
  public:
-  explicit GreedyScheduler(const std::string& input_path);
+  // 'input_path' should name a file (not directory) with input data.
+  // 'assignments_path' should name a directory
+  // with files representing assigning jobs to machines.
+  explicit GreedyScheduler(const std::string& input_path, const std::string& assignments_path);
 
   void Schedule();
 
