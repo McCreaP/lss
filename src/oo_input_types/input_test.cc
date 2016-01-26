@@ -40,17 +40,66 @@ TEST(Input, UpdateReturnsFalseOnReaderFailure) {
 
   Input input(std::move(reader));
   EXPECT_FALSE(input.Update());
-  EXPECT_EQ(std::vector<Batch>(), input.GetBatches());
 }
 
-// Test GetBatches
+TEST(Input, GetBatches) {
+  io::Batch raw_batch_1 = io::Batch();
+  raw_batch_1.id = 1;
+  io::Batch raw_batch_2 = io::Batch();
+  raw_batch_2.id = 2;
+  static const Batch kBatch1 = Batch(raw_batch_1);
+  static const Batch kBatch2 = Batch(raw_batch_2);
+  io::RawData raw_data = io::RawData();
+  raw_data.batches = {raw_batch_1, raw_batch_2};
+  std::unique_ptr<io::ReaderMock> reader = std::make_unique<io::ReaderMock>();
+  EXPECT_CALL(*reader, Read(_)).WillOnce(DoAll(SetArgPointee<0>(raw_data), Return(true)));
+
+  Input input(std::move(reader));
+  EXPECT_TRUE(input.Update());
+  std::vector<Batch> batches = input.GetBatches();
+  EXPECT_EQ(2, batches.size());
+  EXPECT_TRUE(kBatch1 == batches[0] || kBatch1 == batches[1]);
+  EXPECT_TRUE(kBatch2 == batches[0] || kBatch2 == batches[1]);
+}
+
+TEST(Input, GetBatchesAfterUpdate) {
+  io::Batch raw_batch_1 = io::Batch();
+  raw_batch_1.id = 1;
+  io::Batch raw_batch_2 = io::Batch();
+  raw_batch_2.id = 2;
+  io::Batch raw_batch_3 = io::Batch();
+  raw_batch_3.id = 3;
+  static const Batch kBatch1 = Batch(raw_batch_1);
+  static const Batch kBatch2 = Batch(raw_batch_2);
+  static const Batch kBatch3 = Batch(raw_batch_3);
+  io::RawData raw_data_1 = io::RawData();
+  raw_data_1.batches = {raw_batch_1, raw_batch_2};
+  io::RawData raw_data_2 = io::RawData();
+  raw_data_2.batches = {raw_batch_2, raw_batch_3};
+  std::unique_ptr<io::ReaderMock> reader = std::make_unique<io::ReaderMock>();
+  EXPECT_CALL(*reader, Read(_)).WillOnce(DoAll(SetArgPointee<0>(raw_data_1), Return(true)))
+      .WillOnce(DoAll(SetArgPointee<0>(raw_data_2), Return(true)));
+
+  Input input(std::move(reader));
+  EXPECT_TRUE(input.Update());
+  std::vector<Batch> batches = input.GetBatches();
+  EXPECT_EQ(2, batches.size());
+  EXPECT_TRUE(kBatch1 == batches[0] || kBatch1 == batches[1]);
+  EXPECT_TRUE(kBatch2 == batches[0] || kBatch2 == batches[1]);
+
+  EXPECT_TRUE(input.Update());
+  batches = input.GetBatches();
+  EXPECT_EQ(2, batches.size());
+  EXPECT_TRUE(kBatch2 == batches[0] || kBatch2 == batches[1]);
+  EXPECT_TRUE(kBatch3 == batches[0] || kBatch3 == batches[1]);
+}
 
 TEST(Input, EmptyMachineSet) {
   static const io::MachineSet kRawMachineSet = {1, std::vector<int>()};
   io::RawData raw_data = io::RawData();
   raw_data.machine_sets = {kRawMachineSet};
   std::unique_ptr<io::ReaderMock> reader = std::make_unique<io::ReaderMock>();
-  EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(raw_data), Return(true))));
+  EXPECT_CALL(*reader, Read(_)).WillOnce(DoAll(SetArgPointee<0>(raw_data), Return(true)));
 
   Input input(std::move(reader));
   EXPECT_TRUE(input.Update());
@@ -64,7 +113,7 @@ TEST(Input, SingleMachineSet) {
   raw_data.machines = {kRawMachine};
   raw_data.machine_sets = {kRawMachineSet};
   std::unique_ptr<io::ReaderMock> reader = std::make_unique<io::ReaderMock>();
-  EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(raw_data), Return(true))));
+  EXPECT_CALL(*reader, Read(_)).WillOnce(DoAll(SetArgPointee<0>(raw_data), Return(true)));
   static const Machine kMachine(kRawMachine, std::make_shared<ContextChanges>());
 
   Input input(std::move(reader));
@@ -84,7 +133,7 @@ TEST(Input, MultipleMachineSets) {
   raw_data.machines = {kRawMachine1, kRawMachine2, kRawMachine3};
   raw_data.machine_sets = {kRawMachineSet1, kRawMachineSet2};
   std::unique_ptr<io::ReaderMock> reader = std::make_unique<io::ReaderMock>();
-  EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(raw_data), Return(true))));
+  EXPECT_CALL(*reader, Read(_)).WillOnce(DoAll(SetArgPointee<0>(raw_data), Return(true)));
   static const Machine kMachine1(kRawMachine1, std::make_shared<ContextChanges>());
   static const Machine kMachine2(kRawMachine2, std::make_shared<ContextChanges>());
   static const Machine kMachine3(kRawMachine3, std::make_shared<ContextChanges>());
@@ -107,7 +156,7 @@ TEST(Input, KeepsOldMachine) {
   raw_data.machines = {kRawMachine};
   raw_data.machine_sets = {kRawMachineSet};
   std::unique_ptr<io::ReaderMock> reader = std::make_unique<io::ReaderMock>();
-  EXPECT_CALL(*reader, Read(_)).WillRepeatedly((DoAll(SetArgPointee<0>(raw_data), Return(true))));
+  EXPECT_CALL(*reader, Read(_)).WillRepeatedly(DoAll(SetArgPointee<0>(raw_data), Return(true)));
   static const Machine kMachine(kRawMachine, std::make_shared<ContextChanges>());
 
   Input input(std::move(reader));
@@ -154,7 +203,7 @@ TEST(Input, AssignedJobsAfterUpdate) {
   Machine machine1 = Machine(kRawMachine1, std::make_shared<ContextChanges>());
   Machine machine2 = Machine(kRawMachine2, std::make_shared<ContextChanges>());
   std::unique_ptr<io::ReaderMock> reader = std::make_unique<io::ReaderMock>();
-  EXPECT_CALL(*reader, Read(_)).WillOnce((DoAll(SetArgPointee<0>(raw_data), Return(true))));
+  EXPECT_CALL(*reader, Read(_)).WillOnce(DoAll(SetArgPointee<0>(raw_data), Return(true)));
 
   Input input(std::move(reader));
   EXPECT_FALSE(input.IsJobAssigned(kFirstJobId));
