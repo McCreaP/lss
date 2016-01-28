@@ -14,6 +14,7 @@ RUN mkdir -p /home/vagrant/.ssh
 COPY vagrant_id_rsa.pub /home/vagrant/.ssh/authorized_keys
 
 # fix permision
+RUN chown -R vagrant:zpp /home/vagrant/.ssh
 RUN chmod 0700 /home/vagrant/.ssh
 RUN chmod 0600 /home/vagrant/.ssh/authorized_keys
 
