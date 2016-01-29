@@ -15,14 +15,12 @@ LOGGER = logging.getLogger('test_runner')
 
 class Test:
 
-    def __init__(self, test_data_dir, test_name, lss_input_dir, lss_executable_path, log_dir):
-        self.__test_name = test_name
+    def __init__(self, test_data_path, lss_input_dir, lss_executable_path, log_dir):
         self.__has_failed = False
         self.__lss_input_dir = lss_input_dir
         self.__lss_executable_path = lss_executable_path
         self.__log_dir = log_dir
         self.__state = None
-        test_data_path = os.path.join(test_data_dir, test_name)
         with open(test_data_path, 'rb') as f:
             self.__story = Story(pickle.load(f))
 
