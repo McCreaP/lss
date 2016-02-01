@@ -1,6 +1,12 @@
+#include <boost/program_options.hpp>
+#include <glog/logging.h>
+#include <iostream>
+#include <string>
 #include "scheduler/greedy_scheduler.h"
 
-#include <glog/logging.h>
+namespace po = boost::program_options;
+using std::string;
+using std::cout;
 
 void configLogger(char *argv[]) {
   FLAGS_log_dir = "logs";
@@ -8,11 +14,35 @@ void configLogger(char *argv[]) {
   google::InitGoogleLogging(argv[0]);
 }
 
-int main(int __attribute__((unused)) argc, char *argv[]) {
+po::variables_map process_command_line(int argc, char **argv) {
+  po::variables_map vm;
+  po::options_description desc("Scheduler options");
+  desc.add_options()
+      ("help", "produce help message")
+      ("input", po::value<string>()->required(), "set input path")
+      ("assignments", po::value<string>()->required(), "set assignments path");
+  po::store(po::parse_command_line(argc, argv, desc), vm);
+  if (vm.count("help")) {
+    cout << desc << "\n";
+    exit(1);
+  }
+  try {
+    po::notify(vm);
+  } catch (boost::exception_detail::clone_impl <
+           boost::exception_detail::error_info_injector<
+               boost::program_options::required_option>> exception) {
+    cout << exception.what() << "\n";
+    exit(1);
+  }
+  return vm;
+}
+
+int main(int argc, char **argv) {
+  po::variables_map config = process_command_line(argc, argv);
   configLogger(argv);
   LOG(INFO) << "Scheduler start";
-  const std::string kRunPath = "/home/vagrant/lss/run/";
-  lss::GreedyScheduler scheduler(kRunPath + "input", kRunPath + "assignments/");
+  lss::GreedyScheduler scheduler(config["input"].as<string>(),
+                                 config["assignments"].as<string>());
   scheduler.Schedule();
   LOG(INFO) << "Scheduler stop";
   return 0;
