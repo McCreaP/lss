@@ -1,0 +1,75 @@
+{
+  "exclude": [
+    "(^build/)"
+  ],
+  "linters": {
+    "chmod": {
+      "type": "chmod"
+    },
+    "filename": {
+      "type": "filename"
+    },
+    "generated": {
+      "type": "generated"
+    },
+    "json": {
+      "type": "json",
+      "include": [
+        "(^\\.arcconfig$)",
+        "(^\\.arclint$)",
+        "(^\\.arcrc$)",
+        "(\\.json$)"
+      ]
+    },
+    "spelling": {
+      "type": "spelling"
+    },
+    "text": {
+      "type": "text",
+      "severity": {
+        "3": "disabled",
+        "5": "advice"
+      }
+    },
+    "xml": {
+      "type": "xml",
+      "include": [
+        "(\\.xml$)"
+      ]
+    },
+    "ccpcheck": {
+      "type": "cppcheck",
+      "include": [
+        "(\\.cc$)",
+        "(\\.cpp$)",
+        "(\\.h$)",
+        "(\\.hpp$)"
+      ]
+    },
+    "ccplint": {
+      "type": "cpplint",
+      "severity": {
+         "build/include_order": "warning",
+         "legal/copyright": "disabled"
+      },
+      "include": [
+        "(\\.cc$)",
+        "(\\.cpp$)",
+        "(\\.h$)",
+        "(\\.hpp$)"
+      ]
+    },
+    "pylint" : {
+      "type" : "pylint",
+      "include" : "(\\.py$)",
+      "severity" : {
+        "C0111":"disabled"
+      }
+    },
+    "flake8" : {
+      "type" : "flake8",
+      "flags": ["--max-line-length=120"],
+      "include" : "(\\.py$)"
+    }
+  }
+}

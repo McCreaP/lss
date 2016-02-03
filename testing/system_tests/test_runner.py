@@ -40,8 +40,7 @@ def run_single_test(test_name, lss_input_dir, scheduler_path):
     with LoggerConfig.test_file_handler(test_name) as test_log_dir:
         LOGGER.info("Test: %s ... ", test_name)
         test = Test(
-            TESTS_DATA_PATH,
-            test_name,
+            os.path.join(TESTS_DATA_PATH, test_name),
             lss_input_dir,
             scheduler_path,
             test_log_dir

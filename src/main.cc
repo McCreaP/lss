@@ -30,7 +30,7 @@ po::variables_map process_command_line(int argc, char **argv) {
     po::notify(vm);
   } catch (boost::exception_detail::clone_impl <
            boost::exception_detail::error_info_injector<
-               boost::program_options::required_option>> exception) {
+               boost::program_options::required_option>> &exception) {
     cout << exception.what() << "\n";
     exit(1);
   }

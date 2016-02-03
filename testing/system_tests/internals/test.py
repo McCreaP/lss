@@ -17,15 +17,13 @@ LSS_INPUT_NAME = 'input'
 
 
 class Test:
-    def __init__(self, test_data_dir, test_name, lss_input_dir, lss_executable_path, log_dir):
-        self.__test_name = test_name
+    def __init__(self, test_data_path, lss_input_dir, lss_executable_path, log_dir):
         self.__has_failed = False
         self.__lss_input_path = os.path.join(lss_input_dir, LSS_INPUT_NAME)
         self.__lss_assignments_dir = os.path.join(lss_input_dir, LSS_ASSIGNMENTS_DIR)
         self.__lss_executable_path = lss_executable_path
         self.__log_dir = log_dir
         self.__state = None
-        test_data_path = os.path.join(test_data_dir, test_name)
         with open(test_data_path, 'rb') as f:
             self.__story = Story(pickle.load(f))
 

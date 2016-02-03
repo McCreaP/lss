@@ -18,7 +18,7 @@ target_link_libraries(lss scheduler glog ${Boost_LIBRARIES})
 # Put your test libraries between "-Wl,--whole-archive" and "-Wl,--no-whole-archive"
 # to prevent linker optimization
 target_link_libraries(unit_tests -Wl,--whole-archive)
-target_link_libraries(unit_tests io_test oo_input_types_test)
+target_link_libraries(unit_tests io_test oo_input_types_test ${CXX_COVERAGE_LINK_FLAGS})
 target_link_libraries(unit_tests -Wl,--no-whole-archive)
 
 find_library(gtest gmock)
