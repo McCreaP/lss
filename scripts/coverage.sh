@@ -2,7 +2,7 @@
 
 source "$(dirname "$BASH_SOURCE")/shared/header.sh"
 
-TARGET_COVERAGE=80
+TARGET_COVERAGE=79
 
 REPORTS_DIR="coverage"
 

@@ -28,7 +28,7 @@
       "type": "text",
       "severity": {
         "3": "disabled",
-        "5": "advice"
+        "5": "disabled"
       }
     },
     "xml": {
@@ -48,6 +48,7 @@
     },
     "ccplint": {
       "type": "cpplint",
+      "flags": ["--linelength=120", "--project=lss", "--root=src"],
       "severity": {
          "build/include_order": "warning",
          "legal/copyright": "disabled"
@@ -62,14 +63,22 @@
     "pylint" : {
       "type" : "pylint",
       "include" : "(\\.py$)",
+      "exclude" : "(^testing\\/system_tests\\/internals\\/story_stuct\\.py)",
+      "flags" : ["--max-line-length=120"],
       "severity" : {
-        "C0111":"disabled"
+        "C0111": "disabled",
+        "C0103": "disabled",
+        "E0401": "disabled"
       }
     },
     "flake8" : {
       "type" : "flake8",
       "flags": ["--max-line-length=120"],
-      "include" : "(\\.py$)"
+      "include" : "(\\.py$)",
+      "exclude" : "(^testing\\/system_tests\\/internals\\/story_stuct\\.py)",
+      "severity" : {
+        "C0103": "disabled"
+      }
     }
   }
 }
