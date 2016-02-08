@@ -1,0 +1,9 @@
+description: 5 machines and 5 jobs
+duration: 20
+machine_count: 5
+machine_set_count: 3
+fair_service_machine_set_count: 2
+job_count: 5
+batch_count: 3
+account_count: 3
+seed: 42
