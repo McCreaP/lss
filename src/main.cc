@@ -8,13 +8,13 @@ namespace po = boost::program_options;
 using std::string;
 using std::cout;
 
-void configLogger(char *argv[]) {
+void ConfigLogger(char *argv[]) {
   FLAGS_log_dir = "logs";
   FLAGS_stderrthreshold = 0;
   google::InitGoogleLogging(argv[0]);
 }
 
-po::variables_map process_command_line(int argc, char **argv) {
+po::variables_map ProcessCommandLine(int argc, char **argv) {
   po::variables_map vm;
   po::options_description desc("Scheduler options");
   desc.add_options()
@@ -38,8 +38,8 @@ po::variables_map process_command_line(int argc, char **argv) {
 }
 
 int main(int argc, char **argv) {
-  po::variables_map config = process_command_line(argc, argv);
-  configLogger(argv);
+  po::variables_map config = ProcessCommandLine(argc, argv);
+  ConfigLogger(argv);
   LOG(INFO) << "Scheduler start";
   lss::GreedyScheduler scheduler(config["input"].as<string>(),
                                  config["assignments"].as<string>());
