@@ -15,6 +15,7 @@ def clean_dir(dir_path):
     if os.path.exists(dir_path):
         shutil.rmtree(dir_path)
         LOGGER.debug("Removed %s", dir_path)
+    os.makedirs(dir_path)
 
 
 def remove_file(filename):
