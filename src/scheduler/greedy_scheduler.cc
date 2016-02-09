@@ -44,7 +44,7 @@ void GreedyScheduler::Schedule() {
 }
 
 std::shared_ptr<Machine> GreedyScheduler::FindBestMachine(const io::Job &raw_job) {
-  VLOG(1) << "FindNestMachine for Job: " << raw_job.id;
+  VLOG(1) << "FindBestMachine for Job: " << raw_job.id;
   double min_context_changed_cost = kMaxContextChangeCost;
   auto machines = input_.GetMachinesFromSet(raw_job.machineset_id);
   VLOG(1) << "Got " << machines.size() << " machines from machine_set";
@@ -53,7 +53,7 @@ std::shared_ptr<Machine> GreedyScheduler::FindBestMachine(const io::Job &raw_job
     if (!machine->IsWaitingForAJob())
       VLOG(1) << "Trying machine: " << machine->GetId();
     if (!machine->IsWaitingForAJob()) {
-      VLOG(1) << "Machine is busy or dead";
+      VLOG(1) << "Machine is not waiting for a job;
       continue;
     }
     double context_change_cost = machine->ContextChangeCost(raw_job);
@@ -79,8 +79,7 @@ void GreedyScheduler::AssignJobsFromBatch(const Batch &batch) {
     VLOG(1) << "Trying to assign job";
     std::shared_ptr<Machine> best_machine = FindBestMachine(job);
     if (best_machine) {
-      if (basic_writer_.Assign(best_machine->GetId(), job.id))
-        VLOG(1) << "Best machine found: " << best_machine->GetId();
+      VLOG(1) << "Best machine found: " << best_machine->GetId();
       if (basic_writer_.Assign(best_machine->GetId(), job.id)) {
         LOG(INFO) << "Assigning job succeed";
         input_.Assign(job, best_machine.get());
