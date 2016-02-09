@@ -91,6 +91,7 @@ bool BasicReader::Read(RawData* destination) {
     if (SectionReader new_reader = GetSectionReader(line_buf)) {
       reader = new_reader;
     } else if (reader) {
+      line.clear();  // Clear eof flag.
       line.str(line_buf);
       reader(&line, destination);
     } else {
