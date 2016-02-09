@@ -15,18 +15,18 @@
 namespace lss {
 namespace {
 
-  void NotifyDriverIFinishedCompute() {
-    redi::ipstream proc("curl localhost:8000 > /dev/null", redi::pstreams::pstderr);
-  }
+void NotifyDriverIFinishedCompute() {
+  redi::ipstream proc("curl localhost:8000 > /dev/null", redi::pstreams::pstderr);
+}
 
 }  // namespace
 
 static constexpr double kMaxContextChangeCost = std::numeric_limits<double>::infinity();
 
-GreedyScheduler::GreedyScheduler(const std::string& input_path,
-                                 const std::string& assignments_path)
-    : input_(std::make_unique<io::BasicReader>(input_path)),
-      basic_writer_(assignments_path) { }
+GreedyScheduler::GreedyScheduler(const std::string &input_path,
+                                 const std::string &assignments_path)
+  : input_(std::make_unique<io::BasicReader>(input_path)),
+    basic_writer_(assignments_path) { }
 
 void GreedyScheduler::Schedule() {
   while (true) {
@@ -40,7 +40,7 @@ void GreedyScheduler::Schedule() {
   }
 }
 
-std::shared_ptr<Machine> GreedyScheduler::FindBestMachine(const io::Job& raw_job) {
+std::shared_ptr<Machine> GreedyScheduler::FindBestMachine(const io::Job &raw_job) {
   double min_context_changed_cost = kMaxContextChangeCost;
   auto machines = input_.GetMachinesFromSet(raw_job.machineset_id);
   std::shared_ptr<Machine> best_machine;
@@ -56,16 +56,25 @@ std::shared_ptr<Machine> GreedyScheduler::FindBestMachine(const io::Job& raw_job
   return best_machine;
 }
 
-void GreedyScheduler::AssignJobsFromBatch(const Batch& batch) {
-  for (const io::Job& job : batch.GetSortedJobs()) {
-    if (input_.IsJobAssigned(job.id))
+void GreedyScheduler::AssignJobsFromBatch(const Batch &batch) {
+  VLOG(1) << "Assign jobs from batch: " << batch.GetId();
+  for (const io::Job &job : batch.GetSortedJobs()) {
+    VLOG(1) << "Job: " << job.id;
+    if (input_.IsJobAssigned(job.id)) {
+      VLOG(1) << "Already assigned";
       continue;
+    }
+    VLOG(1) << "Trying to assign job";
     std::shared_ptr<Machine> best_machine = FindBestMachine(job);
     if (best_machine) {
       if (basic_writer_.Assign(best_machine->GetId(), job.id))
+        VLOG(1) << "Best machine found: " << best_machine->GetId();
+      if (basic_writer_.Assign(best_machine->GetId(), job.id)) {
+        LOG(INFO) << "Assigning job succeed";
         input_.Assign(job, best_machine.get());
-      else
+      } else {
         LOG(ERROR) << "Assigning job failed" << std::endl;
+      }
     }
   }
 }
