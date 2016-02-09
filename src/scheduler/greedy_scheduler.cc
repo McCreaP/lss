@@ -32,10 +32,13 @@ void GreedyScheduler::Schedule() {
   while (true) {
     if (!input_.Update())
       continue;
+    LOG(INFO) << "Read new input. Starting scheduling iteration";
     auto batches = input_.GetBatches();
     std::sort(std::begin(batches), std::end(batches), BatchRewardCmp());
-    for (auto batch = batches.crbegin(); batch != batches.crend(); ++batch)
+    for (auto batch = batches.crbegin(); batch != batches.crend(); ++batch) {
       AssignJobsFromBatch(*batch);
+    }
+    LOG(INFO) << "Finished scheduling iteration";
     NotifyDriverIFinishedCompute();
   }
 }
