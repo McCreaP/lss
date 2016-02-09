@@ -41,18 +41,27 @@ void GreedyScheduler::Schedule() {
 }
 
 std::shared_ptr<Machine> GreedyScheduler::FindBestMachine(const io::Job &raw_job) {
+  VLOG(1) << "FindNestMachine for Job: " << raw_job.id;
   double min_context_changed_cost = kMaxContextChangeCost;
   auto machines = input_.GetMachinesFromSet(raw_job.machineset_id);
+  VLOG(1) << "Got " << machines.size() << " machines from machine_set";
   std::shared_ptr<Machine> best_machine;
   for (std::shared_ptr<Machine> machine : machines) {
     if (!machine->IsWaitingForAJob())
+      VLOG(1) << "Trying machine: " << machine->GetId();
+    if (!machine->IsWaitingForAJob()) {
+      VLOG(1) << "Machine is busy or dead";
       continue;
+    }
     double context_change_cost = machine->ContextChangeCost(raw_job);
+    VLOG(1) << "Context change cost: " << context_change_cost;
     if (context_change_cost < min_context_changed_cost) {
+      VLOG(1) << "Found new best machine: " << machine->GetId();
       best_machine = machine;
       min_context_changed_cost = context_change_cost;
     }
   }
+  VLOG(1) << "Best machine: " << best_machine->GetId();
   return best_machine;
 }
 
