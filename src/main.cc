@@ -4,7 +4,7 @@
 #include <string>
 #include "scheduler/greedy_scheduler.h"
 
-namespace po = boost::program_options;
+namespace program_opt = boost::program_options;
 using std::string;
 using std::cout;
 
@@ -14,31 +14,25 @@ void ConfigLogger(char *argv[]) {
   google::InitGoogleLogging(argv[0]);
 }
 
-po::variables_map ProcessCommandLine(int argc, char **argv) {
-  po::variables_map vm;
-  po::options_description desc("Scheduler options");
+program_opt::variables_map ProcessCommandLine(int argc, char **argv) {
+  program_opt::variables_map variables_map;
+  program_opt::options_description desc("Scheduler options");
   desc.add_options()
-      ("help", "produce help message")
-      ("input", po::value<string>()->required(), "set input path")
-      ("assignments", po::value<string>()->required(), "set assignments path");
-  po::store(po::parse_command_line(argc, argv, desc), vm);
-  if (vm.count("help")) {
+    ("help", "produce help message")
+    ("input", program_opt::value<string>()->required(), "set input path")
+    ("assignments", program_opt::value<string>()->required(), "set assignments path");
+  program_opt::store(program_opt::parse_command_line(argc, argv, desc), variables_map);
+
+  if (variables_map.count("help")) {
     cout << desc << "\n";
-    exit(1);
+    exit(0);
   }
-  try {
-    po::notify(vm);
-  } catch (boost::exception_detail::clone_impl <
-           boost::exception_detail::error_info_injector<
-               boost::program_options::required_option>> exception) {
-    cout << exception.what() << "\n";
-    exit(1);
-  }
-  return vm;
+  program_opt::notify(variables_map);
+  return variables_map;
 }
 
 int main(int argc, char **argv) {
-  po::variables_map config = ProcessCommandLine(argc, argv);
+  program_opt::variables_map config = ProcessCommandLine(argc, argv);
   ConfigLogger(argv);
   LOG(INFO) << "Scheduler start";
   lss::GreedyScheduler scheduler(config["input"].as<string>(),

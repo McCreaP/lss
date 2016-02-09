@@ -36,7 +36,6 @@ class Test:
             "input": os.path.abspath(self.__lss_input_path),
             "assignments": os.path.abspath(self.__lss_assignments_dir)
         })
-        print(run_lss_command)
         scheduler = subprocess.Popen(run_lss_command, shell=True)
         try:
             EventLoop(self.__story, self.__state).run()
