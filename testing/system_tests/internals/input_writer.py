@@ -4,10 +4,8 @@ from internals import utils
 
 
 class InputWriter:
-    INPUT_FILE = 'input'
-
-    def __init__(self, lss_input_dir, story):
-        self.__lss_input_path = os.path.join(lss_input_dir, InputWriter.INPUT_FILE)
+    def __init__(self, lss_input_path, story):
+        self.__lss_input_path = lss_input_path
         self.__story = story
         self.__clean_input_dir()
 
@@ -98,6 +96,6 @@ def show_account(account):
 
 def show_context_changes(x):
     def one(difference, expected_setup_time):
-        return show_fields(difference + (expected_setup_time, ))
+        return show_fields(difference + (expected_setup_time,))
 
     return [one(*args) for args in x.items()]

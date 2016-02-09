@@ -9,19 +9,16 @@ from internals.input_writer import InputWriter
 from internals.machine import Machine, MachineState
 from internals.exceptions import InvalidJobException
 
-LSS_ASSIGNMENTS_DIR = 'assignments'
-
 LOGGER = logging.getLogger('test_runner')
 
 
 class State:
 
-    def __init__(self, story, lss_input_dir):
-        lss_assignments_dir = os.path.join(lss_input_dir, LSS_ASSIGNMENTS_DIR)
+    def __init__(self, story, lss_input_path, lss_assignments_dir):
         utils.clean_dir(lss_assignments_dir)
 
         self.__story = story
-        self.__input_writer = InputWriter(lss_input_dir, story)
+        self.__input_writer = InputWriter(lss_input_path, story)
 
         self.__machines = {
             m['id']: Machine(m['id'], lss_assignments_dir, story.get_raw('context_changes'))
