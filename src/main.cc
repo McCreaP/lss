@@ -18,9 +18,9 @@ program_opt::variables_map ProcessCommandLine(int argc, char **argv) {
   program_opt::variables_map variables_map;
   program_opt::options_description desc("Scheduler options");
   desc.add_options()
-    ("help", "produce help message")
-    ("input", program_opt::value<string>()->required(), "set input path")
-    ("assignments", program_opt::value<string>()->required(), "set assignments path");
+    ("help,h", "produce help message")
+    ("input,i", program_opt::value<string>()->required(), "set input path")
+    ("assignments,a", program_opt::value<string>()->required(), "set assignments path");
   program_opt::store(program_opt::parse_command_line(argc, argv, desc), variables_map);
 
   if (variables_map.count("help")) {
