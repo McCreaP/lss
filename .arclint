@@ -1,0 +1,83 @@
+{
+  "exclude": [
+    "(^build/)"
+  ],
+  "linters": {
+    "chmod": {
+      "type": "chmod"
+    },
+    "filename": {
+      "type": "filename"
+    },
+    "generated": {
+      "type": "generated"
+    },
+    "json": {
+      "type": "json",
+      "include": [
+        "(^\\.arcconfig$)",
+        "(^\\.arclint$)",
+        "(^\\.arcrc$)",
+        "(\\.json$)"
+      ]
+    },
+    "spelling": {
+      "type": "spelling"
+    },
+    "text": {
+      "type": "text",
+      "severity": {
+        "3": "disabled",
+        "5": "disabled"
+      }
+    },
+    "xml": {
+      "type": "xml",
+      "include": [
+        "(\\.xml$)"
+      ]
+    },
+    "ccpcheck": {
+      "type": "cppcheck",
+      "include": [
+        "(\\.cc$)",
+        "(\\.cpp$)",
+        "(\\.h$)",
+        "(\\.hpp$)"
+      ]
+    },
+    "ccplint": {
+      "type": "cpplint",
+      "flags": ["--linelength=120", "--project=lss", "--root=src"],
+      "severity": {
+         "legal/copyright": "disabled"
+      },
+      "include": [
+        "(\\.cc$)",
+        "(\\.cpp$)",
+        "(\\.h$)",
+        "(\\.hpp$)"
+      ]
+    },
+    "pylint" : {
+      "type" : "pylint",
+      "include" : "(\\.py$)",
+      "exclude" : "(^testing\\/system_tests\\/internals\\/story_stuct\\.py)",
+      "flags" : ["--max-line-length=120"],
+      "severity" : {
+        "C0111": "disabled",
+        "C0103": "disabled",
+        "E0401": "disabled"
+      }
+    },
+    "flake8" : {
+      "type" : "flake8",
+      "flags": ["--max-line-length=120"],
+      "include" : "(\\.py$)",
+      "exclude" : "(^testing\\/system_tests\\/internals\\/story_stuct\\.py)",
+      "severity" : {
+        "C0103": "disabled"
+      }
+    }
+  }
+}

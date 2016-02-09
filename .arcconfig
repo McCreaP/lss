@@ -1,0 +1,4 @@
+{
+    "phabricator.uri" : "http://phabricator.zppteam.pl",
+    "load" : ["arcanist_library/src"]
+}

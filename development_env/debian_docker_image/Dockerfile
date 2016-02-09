@@ -13,10 +13,11 @@ RUN usermod -aG sudo vagrant
 RUN mkdir -p /home/vagrant/.ssh
 COPY vagrant_id_rsa.pub /home/vagrant/.ssh/authorized_keys
 
-# fix permision
+# fix permissions
 RUN chown -R vagrant:zpp /home/vagrant/.ssh
 RUN chmod 0700 /home/vagrant/.ssh
 RUN chmod 0600 /home/vagrant/.ssh/authorized_keys
+
 
 # install apps
 RUN apt-get update \
@@ -38,6 +39,12 @@ RUN apt-get update \
     libpstreams-dev \
     libgoogle-glog-dev \
     libboost-all-dev \
+    vim \
+    less \
+    git \
+    php5-cli \
+    php5-curl \
+    cppcheck \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -45,6 +52,8 @@ RUN pip3 install colorlog
 RUN pip3 install bottle
 RUN pip3 install typing
 RUN pip3 install pyyaml
+RUN pip3 install pylint
+RUN pip3 install flake8
 
 # add cpplint
 ADD https://raw.githubusercontent.com/McCreaP/styleguide/gh-pages/cpplint/cpplint.py /usr/local/bin/
@@ -67,12 +76,18 @@ RUN cp -r /home/vagrant/gmock-1.7.0/include/gmock /usr/local/include
 RUN cp /home/vagrant/gmock-1.7.0/build/lib*.a /usr/local/lib
 RUN rm -rf /home/vagrant/gmock-1.7.0 && rm /home/vagrant/gmock-1.7.0.zip
 
+# install arcanist
+RUN mkdir /home/vagrant/arcanist
+RUN git clone https://github.com/phacility/libphutil.git /opt/arcanist/libphutil
+RUN git clone https://github.com/phacility/arcanist.git /opt/vagrant/arcanist/arcanist
+
 # allow passwordless sudo
 RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # configure bashrc
 RUN echo "if [ -f ~/.bashrc ]; then . ~/.bashrc; fi" >> /home/vagrant/.bash_profile
 COPY bashrc /home/vagrant/.bashrc
+RUN cat /opt/arcanist/arcanist/resources/shell/bash-completion >> /home/vagrant/.bashrc
 RUN chown -R vagrant:zpp /home/vagrant
 
 RUN mkdir -p /var/run/sshd
