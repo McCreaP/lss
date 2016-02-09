@@ -18,8 +18,6 @@ RUN chown -R vagrant:zpp /home/vagrant/.ssh
 RUN chmod 0700 /home/vagrant/.ssh
 RUN chmod 0600 /home/vagrant/.ssh/authorized_keys
 
-# fix bash default interpreter
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
 # install apps
 RUN apt-get update \
@@ -78,21 +76,16 @@ RUN rm -rf /home/vagrant/gmock-1.7.0 && rm /home/vagrant/gmock-1.7.0.zip
 
 # install arcanist
 RUN mkdir /home/vagrant/arcanist
-RUN git clone https://github.com/phacility/libphutil.git /home/vagrant/arcanist/libphutil
-RUN git clone https://github.com/phacility/arcanist.git /home/vagrant/arcanist/arcanist
-ENV PATH "/home/vagrant/arcanist/arcanist/bin:$PATH"
+RUN git clone https://github.com/phacility/libphutil.git /opt/arcanist/libphutil
+RUN git clone https://github.com/phacility/arcanist.git /opt/vagrant/arcanist/arcanist
 
 # allow passwordless sudo
 RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-# add binaries and scripts to PATH
-ENV PATH "/home/vagrant/lss/bin:/home/vagrant/lss/scripts:$PATH"
-
 # configure bashrc
 RUN echo "if [ -f ~/.bashrc ]; then . ~/.bashrc; fi" >> /home/vagrant/.bash_profile
 COPY bashrc /home/vagrant/.bashrc
-RUN echo export PATH=$PATH >> /home/vagrant/.bashrc
-RUN cat /home/vagrant/arcanist/arcanist/resources/shell/bash-completion >> /home/vagrant/.bashrc
+RUN cat /opt/arcanist/arcanist/resources/shell/bash-completion >> /home/vagrant/.bashrc
 RUN chown -R vagrant:zpp /home/vagrant
 
 RUN mkdir -p /var/run/sshd

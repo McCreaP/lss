@@ -50,7 +50,6 @@
       "type": "cpplint",
       "flags": ["--linelength=120", "--project=lss", "--root=src"],
       "severity": {
-         "build/include_order": "warning",
          "legal/copyright": "disabled"
       },
       "include": [
