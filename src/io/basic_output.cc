@@ -10,7 +10,7 @@ namespace lss {
 namespace io {
 
 BasicWriter::BasicWriter(const std::string &output_path)
-  : output_path_(output_path) { }
+  : output_path_(output_path + "/") { }
 
 void BasicWriter::SetOutputPath(const std::string &output_path) {
   output_path_ = output_path;
@@ -20,7 +20,9 @@ bool BasicWriter::Assign(int machine_id, int job_id) {
   LOG(INFO) << "An attempt to assign job: " << job_id
     << " to the machine: " << machine_id << " is being made" << std::endl;
   const std::string path = output_path_ + std::to_string(machine_id);
+  LOG(INFO) << path;
   const std::string tmp_path = path + "_tmp";
+  LOG(INFO) << tmp_path;
   const std::string content = std::to_string(job_id);
 
   // Use open with O_CREAT | O_EXCL to ensure the file is actually created.

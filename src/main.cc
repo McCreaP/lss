@@ -12,6 +12,7 @@ void ConfigLogger(char *argv[]) {
   FLAGS_log_dir = "logs";
   FLAGS_stderrthreshold = 0;
   FLAGS_logbufsecs = 0;
+  FLAGS_colorlogtostderr = true;
   google::InitGoogleLogging(argv[0]);
 }
 
