@@ -79,7 +79,7 @@ RUN rm -rf /home/vagrant/gmock-1.7.0 && rm /home/vagrant/gmock-1.7.0.zip
 # install arcanist
 RUN mkdir /home/vagrant/arcanist
 RUN git clone https://github.com/phacility/libphutil.git /opt/arcanist/libphutil
-RUN git clone https://github.com/phacility/arcanist.git /opt/vagrant/arcanist/arcanist
+RUN git clone https://github.com/phacility/arcanist.git /opt/arcanist/arcanist
 
 # allow passwordless sudo
 RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
