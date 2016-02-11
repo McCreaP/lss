@@ -90,8 +90,6 @@ COPY bashrc /home/vagrant/.bashrc
 RUN cat /opt/arcanist/arcanist/resources/shell/bash-completion >> /home/vagrant/.bashrc
 RUN chown -R vagrant:zpp /home/vagrant
 
-RUN mkdir -p /home/vagrant/lss/run/assignments
-
 RUN mkdir -p /var/run/sshd
 
 EXPOSE 22

@@ -13,6 +13,7 @@ void ConfigLogger(char *argv[]) {
   FLAGS_stderrthreshold = 0;
   FLAGS_logbufsecs = 0;
   FLAGS_colorlogtostderr = true;
+  FLAGS_v = 10;
   google::InitGoogleLogging(argv[0]);
 }
 
@@ -21,8 +22,8 @@ program_opt::variables_map ProcessCommandLine(int argc, char **argv) {
   program_opt::options_description desc("Scheduler options");
   desc.add_options()
     ("help,h", "produce help message")
-    ("input,i", program_opt::value<string>()->required(), "set input path")
-    ("assignments,a", program_opt::value<string>()->required(), "set assignments path");
+    ("input,i", program_opt::value<string>()->required(), "Set input file path")
+    ("assignments,a", program_opt::value<string>()->required(), "Set assignments directory path");
   program_opt::store(program_opt::parse_command_line(argc, argv, desc), variables_map);
 
   if (variables_map.count("help")) {

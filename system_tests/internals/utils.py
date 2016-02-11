@@ -11,17 +11,11 @@ def flatten(lst):
     return list(itertools.chain(*lst))
 
 
-def clean_dir(dir_path):
+def make_empty_dir(dir_path):
+    LOGGER.debug("Make empty dir: %s", dir_path)
     if os.path.exists(dir_path):
         shutil.rmtree(dir_path)
-        LOGGER.debug("Removed %s", dir_path)
-    os.makedirs(dir_path)
-
-
-def remove_file(filename):
-    if os.path.exists(filename):
-        os.remove(filename)
-        LOGGER.debug("Removed %s", filename)
+    make_dir(dir_path)
 
 
 def make_dir(dir_path):

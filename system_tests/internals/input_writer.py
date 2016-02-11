@@ -4,10 +4,11 @@ from internals import utils
 
 
 class InputWriter:
+    LSS_INPUT_NAME = 'input'
+
     def __init__(self, lss_input_path, story):
         self.__lss_input_path = lss_input_path
         self.__story = story
-        self.__clean_input_dir()
 
     def write(self, machines, ready_jobs):
         pieces = [
@@ -24,9 +25,6 @@ class InputWriter:
             return [title] + data + ['']
 
         self.__write_input_file(utils.flatten(glue(*p) for p in pieces))
-
-    def __clean_input_dir(self):
-        utils.remove_file(self.__lss_input_path)
 
     def __write_input_file(self, lines):
         tmp_path = self.__lss_input_path + '-new'

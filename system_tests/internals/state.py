@@ -8,6 +8,8 @@ from internals import timer
 from internals.input_writer import InputWriter
 from internals.machine import Machine, MachineState
 from internals.exceptions import InvalidJobException
+from internals.objective_function.objective_function import ObjectiveFunction
+from internals.objective_function.history import History
 
 LOGGER = logging.getLogger('test_runner')
 
@@ -15,8 +17,6 @@ LOGGER = logging.getLogger('test_runner')
 class State:
 
     def __init__(self, story, lss_input_path, lss_assignments_dir):
-        utils.clean_dir(lss_assignments_dir)
-
         self.__story = story
         self.__input_writer = InputWriter(lss_input_path, story)
 
@@ -56,15 +56,7 @@ class State:
         assert machine.get_state() == MachineState.MACHINE_WORKING
         machine.free()
 
-    def write_history(self, log_dir):
-        log_file = os.path.join(log_dir, 'history')
-        history = self.__prepare_history_to_write()
-        with open(log_file, 'wb') as f:
-            pickle.dump(history, f)
-        with open(log_file + '.json', 'wt') as f:
-            json.dump(history, f, indent=2)
-
-    def __prepare_history_to_write(self):
+    def gather_history(self):
 
         def for_one(k, v):
             if k == 'jobs':
