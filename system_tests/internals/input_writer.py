@@ -4,7 +4,6 @@ from internals import utils
 
 
 class InputWriter:
-    LSS_INPUT_NAME = 'input'
 
     def __init__(self, lss_input_path, story):
         self.__lss_input_path = lss_input_path
