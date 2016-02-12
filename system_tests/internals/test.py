@@ -23,23 +23,26 @@ LSS_INPUT_NAME = 'input'
 
 
 class Test:
-    def __init__(self, test_data_path, run_dir, lss_executable_path, log_dir):
+    def __init__(self, test_data_path, run_dir, lss_executable_path, log_dir, verbose):
         self.has_failed = False
         self.__lss_input_dir = os.path.join(run_dir, LSS_INPUT_DIR)
         self.__lss_input_path = os.path.join(self.__lss_input_dir, LSS_INPUT_NAME)
         self.__lss_assignments_dir = os.path.join(run_dir, LSS_ASSIGNMENTS_DIR)
         self.__lss_executable_path = lss_executable_path
         self.__log_dir = log_dir
+        self.__verbose = verbose
         self.__state = None
         with open(test_data_path, 'rb') as f:
             self.__story = Story(pickle.load(f))
 
     def run(self):
         self.__prepare_for_running()
-        run_lss_command = "{executable} --input={input} --assignments={assignments}".format(**{
+        run_lss_command = "{executable} --input={input} --assignments={assignments} --verbose={verbose}".format(**{
             "executable": self.__lss_executable_path,
             "input": os.path.abspath(self.__lss_input_path),
-            "assignments": os.path.abspath(self.__lss_assignments_dir)})
+            "assignments": os.path.abspath(self.__lss_assignments_dir),
+            "verbose": self.__verbose})
+        LOGGER.info("Run scheduler with the command: %s", run_lss_command)
         scheduler = subprocess.Popen(run_lss_command, shell=True)
         try:
             EventLoop(self.__story, self.__state).run()
