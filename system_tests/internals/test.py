@@ -3,9 +3,7 @@ import pickle
 import traceback
 import logging
 import subprocess
-import signal
 import json
-from contextlib import contextmanager
 
 from internals import timer
 from internals import utils
@@ -55,7 +53,7 @@ class Test:
             if scheduler.poll():  # Scheduler has stopped
                 self.has_failed = True
             else:
-                scheduler.send_signal(signal.SIGINT)
+                scheduler.terminate()
 
     def __prepare_for_running(self):
         utils.make_empty_dir(self.__lss_assignments_dir)
