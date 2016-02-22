@@ -30,7 +30,7 @@ class State:
 
     def add_ready_job(self, job):
         self.__ready_jobs[job['id']] = job
-        self.__input_writer.write(self.__machines, self.__ready_jobs.values())
+        self.__update_input()
 
     def use_idle_machines(self):
         finish_job_events_args = [
@@ -38,6 +38,7 @@ class State:
             for m in self.__machines.values()
             if m.get_state() == MachineState.MACHINE_IDLE
         ]
+        self.__update_input()
         return utils.flatten(finish_job_events_args)
 
     def finish_job(self, job):
@@ -55,6 +56,7 @@ class State:
         machine = self.__machines[machine_id]
         assert machine.get_state() == MachineState.MACHINE_WORKING
         machine.free()
+        self.__update_input()
 
     def gather_history(self):
 
@@ -68,6 +70,9 @@ class State:
 
         story = {k: for_one(k, v) for k, v in self.__story.get_items()}
         return story
+
+    def __update_input(self):
+        self.__input_writer.write(self.__machines, self.__ready_jobs.values())
 
 #     def try_to_take_job(self, machine_id):
 # return self.__machines[machine_id].try_to_take_job(timer.now(),

@@ -32,13 +32,13 @@ void GreedyScheduler::Schedule() {
   while (true) {
     if (!input_.Update())
       continue;
-    LOG(INFO) << "Read new input. Starting scheduling iteration";
+    VLOG(1) << "Read new input. Starting scheduling iteration";
     auto batches = input_.GetBatches();
     std::sort(std::begin(batches), std::end(batches), BatchRewardCmp());
     for (auto batch = batches.crbegin(); batch != batches.crend(); ++batch) {
       AssignJobsFromBatch(*batch);
     }
-    LOG(INFO) << "Finished scheduling iteration";
+    VLOG(1) << "Finished scheduling iteration";
     NotifyDriverIFinishedCompute();
   }
 }
@@ -56,7 +56,7 @@ void GreedyScheduler::AssignJobsFromBatch(const Batch &batch) {
     if (best_machine) {
       VLOG(2) << "Best machine found: " << best_machine->GetId();
       if (basic_writer_.Assign(best_machine->GetId(), job.id)) {
-        LOG(INFO) << "Assigning job succeed";
+        VLOG(2) << "Assigning job succeed";
         input_.Assign(job, best_machine.get());
       } else {
         LOG(ERROR) << "Assigning job failed" << std::endl;
