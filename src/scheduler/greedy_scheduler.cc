@@ -53,7 +53,7 @@ std::shared_ptr<Machine> GreedyScheduler::FindBestMachine(const io::Job &raw_job
     if (!machine->IsWaitingForAJob())
       VLOG(1) << "Trying machine: " << machine->GetId();
     if (!machine->IsWaitingForAJob()) {
-      VLOG(1) << "Machine is not waiting for a job;
+      VLOG(1) << "Machine is not waiting for a job";
       continue;
     }
     double context_change_cost = machine->ContextChangeCost(raw_job);
