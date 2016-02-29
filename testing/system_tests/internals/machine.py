@@ -22,7 +22,8 @@ class Machine:
         self.__lss_assignment_file = os.path.join(lss_assignments_dir, str(self.__id))
         self.__taken_file = self.__lss_assignment_file + '-taken'
         self.__context = (-1, -1, -1)
-        self.__context_changes_costs = context_changes_costs
+        self.__context_changes_costs = {((int(k[0]), int(k[1]), int(k[2])), v)
+                                        for k, v in context_changes_costs.items()}
 
     def show(self):
         return '%s %s' % (self.__id, int(self.__state))
@@ -62,6 +63,6 @@ class Machine:
 
     def __calculate_setup_time(self, job):
         return self.__context_changes_costs[(
-            '1' if self.__context[0] == job['context1'] else '0',
-            '1' if self.__context[1] == job['context2'] else '0',
-            '1' if self.__context[2] == job['context3'] else '0')]
+            1 if self.__context[0] == job['context1'] else 0,
+            1 if self.__context[1] == job['context2'] else 0,
+            1 if self.__context[2] == job['context3'] else 0)]
