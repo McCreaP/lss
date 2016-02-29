@@ -1,6 +1,6 @@
 # Setting up development environment
 
-## Vagrant 
+## Vagrant
 
 First, you need to install the **latest version** of Vagrant. Deb and rpm packages are available [here](https://www.vagrantup.com/downloads.html). More information about Vagrant can be found at https://www.vagrantup.com/
 
@@ -8,21 +8,21 @@ First, you need to install the **latest version** of Vagrant. Deb and rpm packag
 
 ## Docker
 
-You will also need [Docker](https://www.docker.com/). Type the command: 
+You will also need [Docker](https://www.docker.com/). Type the command:
 
-`wget -qO- https://get.docker.com/ | sh`. 
+`wget -qO- https://get.docker.com/ | sh`.
 
-I suggest adding your user to the "docker" group: 
+I suggest adding your user to the "docker" group:
 
 ``sudo usermod -aG docker `whoami` ``
 
-You can verify if docker has been installed correctly: 
+You can verify if docker has been installed correctly:
 
 `docker run hello-world`.
 
 ## Group zpp
 
-Add your user to the group "zpp": 
+Add your user to the group "zpp":
 
 `sudo groupadd -g 1357 zpp`
 
