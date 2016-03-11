@@ -43,7 +43,7 @@ cd /home/vagrant/lss
 
 mkdir -p build && cd build
 cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
-make $MAKE_VERBOSE_FLAG -j 4
+make $MAKE_VERBOSE_FLAG -j `nproc`
 make install
 
 popd > /dev/null
