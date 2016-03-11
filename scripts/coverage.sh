@@ -2,7 +2,7 @@
 
 source "$(dirname "$BASH_SOURCE")/shared/header.sh"
 
-TARGET_COVERAGE=80
+TARGET_COVERAGE=79
 
 REPORTS_DIR="coverage"
 
@@ -33,7 +33,7 @@ done
 
 log_info "Measuring unit tests coverage ..."
 
-pushd .
+pushd . > /dev/null
 
 cd /home/vagrant/lss
 
@@ -42,7 +42,7 @@ mkdir -p ${REPORTS_DIR}
 
 lcov --base-directory . --directory . --no-external --zerocounters --quiet
 lcov --base-directory . --directory . --no-external --capture --initial --quiet --output-file ${REPORTS_DIR}/base.info
-./build/src/unit_tests
+./build/src/unit_tests --gtest_print_time=1 --gtest_output=xml > /dev/null
 lcov --base-directory . --directory . --no-external --capture ${VERBOSE_FLAG} --output-file ${REPORTS_DIR}/test.info
 
 cd ${REPORTS_DIR}
@@ -53,6 +53,7 @@ genhtml --quiet -o html -t "Unit tests coverage" total.info
 COVERAGE=$(lcov --summary total.info  2>&1 | grep lines | awk '{print $2}' | tr -d %)
 
 lcov --summary total.info
+echo "Current lines coverage: $COVERAGE%"
 echo "Target lines coverage: $TARGET_COVERAGE%"
 echo "More detailed information can be found in file:///home/vagrant/lss/${REPORTS_DIR}/html/index.html"
 

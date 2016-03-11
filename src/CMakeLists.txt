@@ -1,5 +1,8 @@
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
+find_package(Boost COMPONENTS program_options REQUIRED)
+include_directories(${Boost_INCLUDE_DIR})
+
 add_executable(lss main.cc)
 add_executable(unit_tests main_test.cc)
 
@@ -7,7 +10,7 @@ add_subdirectory(io)
 add_subdirectory(oo_input_types)
 add_subdirectory(scheduler)
 
-target_link_libraries(lss scheduler glog)
+target_link_libraries(lss scheduler glog ${Boost_LIBRARIES})
 
 # Gtest doesn't find tests from separate compilation units.
 # unit_tests contains no references to anything in the library that contains test definitions
@@ -15,7 +18,7 @@ target_link_libraries(lss scheduler glog)
 # Put your test libraries between "-Wl,--whole-archive" and "-Wl,--no-whole-archive"
 # to prevent linker optimization
 target_link_libraries(unit_tests -Wl,--whole-archive)
-target_link_libraries(unit_tests io_test oo_input_types_test)
+target_link_libraries(unit_tests io_test oo_input_types_test ${CXX_COVERAGE_LINK_FLAGS})
 target_link_libraries(unit_tests -Wl,--no-whole-archive)
 
 find_library(gtest gmock)

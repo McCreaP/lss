@@ -67,10 +67,12 @@ def run_single_test(test_name, lss_input_dir, scheduler_path):
             LOGGER.error("Test: %s NOT FOUND", test_name)
             return
         LOGGER.info("Test: %s ... ", test_name)
-        test = Test(test_data_path,
-                    lss_input_dir,
-                    scheduler_path,
-                    test_log_dir)
+        test = Test(
+            os.path.join(TESTS_DATA_PATH, test_name),
+            lss_input_dir,
+            scheduler_path,
+            test_log_dir
+        )
         test.run()
         if test.has_failed():
             LOGGER.error("Test: %s ... FAILED", test_name)
