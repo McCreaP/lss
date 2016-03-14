@@ -68,7 +68,7 @@ class StoryGenerator(Base):
             b.account = self.accounts[randrange(count)]
 
     def _generate_context_changes(self):
-        self.context_changes = [ContextChange(changes) for changes in itertools.product('01', repeat=3)]
+        self.context_changes = [ContextChange(changes) for changes in itertools.product([0, 1], repeat=3)]
 
     def _generate_machine_events(self, count):
         if count:
