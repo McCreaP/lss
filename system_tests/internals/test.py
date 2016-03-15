@@ -31,6 +31,7 @@ class Test: #pylint: disable=R0903
         self.__verbose = verbose
         self.__state = None
         self.result = None
+        self.quasi_optimal_result = None
         with open(test_data_path, 'rb') as f:
             self.__story = Story(pickle.load(f))
 

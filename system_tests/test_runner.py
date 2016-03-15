@@ -74,7 +74,7 @@ def run_single_test(test_name, run_dir, scheduler_path, verbose):
         if test.has_failed:
             LOGGER.error("Test: %s ... FAILED", test_name)
         else:
-            LOGGER.info("Objective function: %f (%f\%)",
+            LOGGER.info("Objective function: %f (%f%%)",
                         test.result,
                         test.result * 100 / test.quasi_optimal_result)
             LOGGER.info("Test: %s ... PASSED", test_name)
