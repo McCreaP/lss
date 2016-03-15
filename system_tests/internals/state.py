@@ -56,11 +56,11 @@ class State:
         machine.free()
         self.__update_input()
 
-    def gather_history(self):
+    def gather_history(self, finished_jobs=None):
 
         def for_one(k, v):
             if k == 'jobs':
-                return list(self.__finished_jobs.values())
+                return finished_jobs if finished_jobs else list(self.__finished_jobs.values())
             elif k == 'context_changes':
                 return list(v.items())
             else:

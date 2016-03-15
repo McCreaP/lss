@@ -66,11 +66,27 @@ class Test: #pylint: disable=R0903
         timer.setup(self.__story.get_raw('mint'))
 
     def __process_result(self):
+        self.__determine_quasi_optimal_result()
+
         raw_history = self.__state.gather_history()
         self.__write_history_to_files(raw_history)
 
         history = History(raw_history, self.__story.get_raw('jobs'))
         self.result = ObjectiveFunction(history).compute()
+
+    def __determine_quasi_optimal_result(self):
+        mint = self.__story.get_raw('mint')
+        maxt = self.__story.get_raw('maxt')
+        min_setup_time = min(self.__story.get_raw('context_changes').values())
+        finished_jobs = []
+        for job in self.__story.get_raw('jobs'):
+            if mint <= job['ready'] <= maxt:
+                job['real_start_time'] = job['ready']
+                job['real_duration'] = min_setup_time + job['expected_duration_barring_setup']
+                finished_jobs.append(job)
+        raw_history = self.__state.gather_history(finished_jobs)
+        history = History(raw_history, self.__story.get_raw('jobs'))
+        self.quasi_optimal_result = ObjectiveFunction(history).compute()
 
     def __write_history_to_files(self, raw_history):
         log_file = os.path.join(self.__log_dir, 'history')

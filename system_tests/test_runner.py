@@ -65,18 +65,18 @@ def run_single_test(test_name, run_dir, scheduler_path, verbose):
             LOGGER.error("Test: %s NOT FOUND", test_name)
             return
         LOGGER.info("Test: %s ... ", test_name)
-        test = Test(
-            os.path.join(TESTS_DATA_PATH, test_name),
-            run_dir,
-            scheduler_path,
-            test_log_dir,
-            verbose
-        )
+        test = Test(os.path.join(TESTS_DATA_PATH, test_name),
+                    run_dir,
+                    scheduler_path,
+                    test_log_dir,
+                    verbose)
         test.run()
         if test.has_failed:
             LOGGER.error("Test: %s ... FAILED", test_name)
         else:
-            LOGGER.info("Objective function: %f", test.result)
+            LOGGER.info("Objective function: %f (%f\%)",
+                        test.result,
+                        test.result * 100 / test.quasi_optimal_result)
             LOGGER.info("Test: %s ... PASSED", test_name)
 
 
