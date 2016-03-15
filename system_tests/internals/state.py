@@ -8,8 +8,6 @@ from internals import timer
 from internals.input_writer import InputWriter
 from internals.machine import Machine, MachineState
 from internals.exceptions import InvalidJobException
-from internals.objective_function.objective_function import ObjectiveFunction
-from internals.objective_function.history import History
 
 LOGGER = logging.getLogger('test_runner')
 

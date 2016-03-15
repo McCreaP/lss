@@ -20,7 +20,7 @@ LSS_INPUT_DIR = 'input'
 LSS_INPUT_NAME = 'input'
 
 
-class Test:
+class Test: #pylint: disable=R0903
     def __init__(self, test_data_path, run_dir, lss_executable_path, log_dir, verbose):
         self.has_failed = False
         self.__lss_input_dir = os.path.join(run_dir, LSS_INPUT_DIR)
@@ -30,6 +30,7 @@ class Test:
         self.__log_dir = log_dir
         self.__verbose = verbose
         self.__state = None
+        self.result = None
         with open(test_data_path, 'rb') as f:
             self.__story = Story(pickle.load(f))
 
@@ -45,7 +46,7 @@ class Test:
         try:
             EventLoop(self.__story, self.__state).run()
             self.__process_result()
-        except Exception as e:
+        except Exception as e:  # pylint: disable=W0703
             traceback.print_exc()
             LOGGER.warning(e)
             self.has_failed = True

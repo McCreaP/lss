@@ -63,20 +63,11 @@
       "type" : "pylint",
       "include" : "(\\.py$)",
       "exclude" : "(^testing\\/system_tests\\/internals\\/story_stuct\\.py)",
-      "flags" : ["--max-line-length=120"],
+      "flags" : ["--max-line-length=120", "--max-args=6", "--max-attributes=10"],
       "severity" : {
         "C0111": "disabled",
         "C0103": "disabled",
         "E0401": "disabled"
-      }
-    },
-    "flake8" : {
-      "type" : "flake8",
-      "flags": ["--max-line-length=120"],
-      "include" : "(\\.py$)",
-      "exclude" : "(^testing\\/system_tests\\/internals\\/story_stuct\\.py)",
-      "severity" : {
-        "C0103": "disabled"
       }
     }
   }
