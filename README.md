@@ -30,5 +30,3 @@ unless otherwise stated. Zppintel Team members are:
   into master.
 * To merge a branch into master the code __must be reviewed__ by another person,
   it must have sufficent test coverage and all the tests have to pass.
-* We use Phabricator Audit as a core review tool.
-  [Here](https://secure.phabricator.com/book/phabricator/article/audit/) is the guide, how to use it.
