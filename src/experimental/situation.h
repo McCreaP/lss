@@ -23,13 +23,14 @@ class Machine {
 
   Id<Machine> id() const;
   MachineState state() const;
+  Context context() const;
   MachineSets machine_sets() const;
   FairSet fair_set() const;
   Job job() const;
 
  private:
   struct Data;
-  Machine(Data *data) : data_(data) {}
+  explicit Machine(const Data *data) : data_(data) {}
   const Data *const data_ = nullptr;
   friend class Situation;
 };
@@ -45,7 +46,7 @@ class MachineSet {
 
  private:
   struct Data;
-  MachineSet(Data *data) : data_(data) {}
+  explicit MachineSet(const Data *data) : data_(data) {}
   const Data *const data_ = nullptr;
   friend class Situation;
 };
@@ -61,7 +62,7 @@ class FairSet {
 
  private:
   struct Data;
-  FairSet(Data *data) : data_(data) {}
+  explicit FairSet(const Data *data) : data_(data) {}
   const Data *const data_ = nullptr;
   friend class Situation;
 };
@@ -78,7 +79,7 @@ class Account {
 
  private:
   struct Data;
-  Account(Data *data) : data_(data) {}
+  explicit Account(const Data *data) : data_(data) {}
   const Data *const data_ = nullptr;
   friend class Situation;
 };
@@ -101,7 +102,7 @@ class Batch {
 
  private:
   struct Data;
-  Batch(Data *data) : data_(data) {}
+  explicit Batch(const Data *data) : data_(data) {}
   const Data *const data_ = nullptr;
   friend class Situation;
 };
@@ -111,16 +112,16 @@ class Job {
   Job() = default;
 
   Id<Job> id() const;
-  Time start_time() const;
   Duration duration() const;
   Context context() const;
+  Time start_time() const;
   Machine machine() const;
   MachineSet machine_set() const;
   Batch batch() const;
 
  private:
   struct Data;
-  Job(Data *data) : data_(data) {}
+  explicit Job(const Data *data) : data_(data) {}
   const Data *const data_ = nullptr;
   friend class Situation;
 };
@@ -140,6 +141,12 @@ class Situation {
   using Batches = const std::vector<Batch>&;
   using Jobs = const std::vector<Job>&;
 
+  // Situation shall have a constructor that takes const RawData& argument,
+  // but that class doesn't currently hold enough data (missing are: machine contexts,
+  // job assignments, job start times and a time stamp). Simply adding those fields
+  // would be too hasty and insufficient - a solutions shall be suggested
+  // in another commit.
+
   ~Situation();
 
   Jobs jobs() const { return jobs_; }
@@ -149,6 +156,8 @@ class Situation {
   Accounts accounts() const { return accounts_; }
   Batches batches() const { return batches_; }
 
+  Time time_stamp() const { return time_stamp_; }
+
  private:
   std::vector<Machine> machines_;
   std::vector<MachineSet> machine_sets_;
@@ -156,12 +165,15 @@ class Situation {
   std::vector<Account> accounts_;
   std::vector<Batch> batches_;
   std::vector<Job> jobs_;
+
+  Time time_stamp_;
 };
 
 struct Machine::Data {
   Id<Machine> id;
 
   MachineState state;
+  Context context;
 
   std::vector<MachineSet> machine_sets;
   FairSet fair_set;
@@ -205,14 +217,49 @@ struct Batch::Data {
 struct Job::Data {
   Id<Job> id;
 
-  Time start_time;
   Duration duration;
   Context context;
+  Time start_time;
 
   Machine machine;
   MachineSet machine_set;
   Batch batch;
 };
+
+inline Id<Machine> Machine::id() const { return data_->id; }
+inline MachineState Machine::state() const { return data_->state; }
+inline Context Machine::context() const {return data_->context; }
+inline Machine::MachineSets Machine::machine_sets() const { return data_->machine_sets; }
+inline FairSet Machine::fair_set() const { return data_->fair_set; }
+inline Job Machine::job() const { return data_->job; }
+
+inline Id<MachineSet> MachineSet::id() const { return data_->id; }
+inline MachineSet::Machines MachineSet::machines() const { return data_->machines; }
+
+inline Id<FairSet> FairSet::id() const { return data_->id; }
+inline FairSet::Machines FairSet::machines() const { return data_->machines; }
+
+inline Id<Account> Account::id() const { return data_->id; }
+inline FloatType Account::alloc() const { return data_->alloc; }
+inline Account::Batches Account::batches() const { return data_->batches; }
+
+inline Id<Batch> Batch::id() const { return data_->id; }
+inline FloatType Batch::reward() const { return data_->reward; }
+inline FloatType Batch::timely_reward() const { return data_->timely_reward; }
+inline FloatType Batch::job_reward() const { return data_->job_reward; }
+inline FloatType Batch::job_timely_reward() const { return data_->job_timely_reward; }
+inline Duration Batch::duration() const { return data_->duration; }
+inline Time Batch::due_time() const { return data_->due_time; }
+inline Account Batch::account() const { return data_->account; }
+inline Batch::Jobs Batch::jobs() const { return data_->jobs; }
+
+inline Id<Job> Job::id() const { return data_->id; }
+inline Time Job::start_time() const { return data_->start_time; }
+inline Duration Job::duration() const { return data_->duration; }
+inline Context Job::context() const { return data_->context; }
+inline Machine Job::machine() const { return data_->machine; }
+inline MachineSet Job::machine_set() const { return data_->machine_set; }
+inline Batch Job::batch() const { return data_->batch; }
 
 }  // namespace lss
 
