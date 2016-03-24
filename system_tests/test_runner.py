@@ -17,22 +17,20 @@ LOGGER = logging.getLogger("test_runner")
 
 def parse_args():
     parser = ArgumentParser(description="System tests runner")
-    parser.add_argument('scheduler',
-                        metavar='SCHEDULER',
-                        help="The scheduler executable path")
-    parser.add_argument('test_name',
-                        metavar='TEST_NAME',
-                        nargs='?',
-                        help="The name of a test to run. If it was not specified, all test will be run")
+    parser.add_argument('-s', '--scheduler',
+                        default='/home/vagrant/lss/bin/lss',
+                        help="The scheduler executable path (default: /home/vagrant/lss/bin/lss)")
+    parser.add_argument('-t', '--test-name',
+                        help="The name of a test to run. If it was not specified, all tests will be run")
     parser.add_argument('-l', '--list',
                         action='store_true',
                         help="List all tests names")
     parser.add_argument('-v', '--verbose',
-                        action='store_true',
-                        help="Show more logs from running tests")
-    parser.add_argument('-i', '--input-dir',
-                        default='.',
-                        help="Specify scheduler input directory (default .)")
+                        action='count',
+                        help="Increase output verbosity (e.g. -vv is more than -v)")
+    parser.add_argument('-r', '--run-dir',
+                        default='/home/vagrant/lss/system_tests/run',
+                        help="Specify scheduler input directory (default: /home/vagrant/lss/system_tests/run)")
     return parser.parse_args()
 
 
@@ -54,7 +52,7 @@ def generate_story_from_yaml(test_data_path):
         pickle.dump(story, f)
 
 
-def run_single_test(test_name, lss_input_dir, scheduler_path):
+def run_single_test(test_name, run_dir, scheduler_path, verbose):
     with LoggerConfig.test_file_handler(test_name) as test_log_dir:
         test_data_path = os.path.join(TESTS_DATA_PATH, test_name)
         if os.path.exists(test_data_path):
@@ -67,27 +65,31 @@ def run_single_test(test_name, lss_input_dir, scheduler_path):
             LOGGER.error("Test: %s NOT FOUND", test_name)
             return
         LOGGER.info("Test: %s ... ", test_name)
-        test = Test(
-            os.path.join(TESTS_DATA_PATH, test_name),
-            lss_input_dir,
-            scheduler_path,
-            test_log_dir
-        )
+        test = Test(os.path.join(TESTS_DATA_PATH, test_name),
+                    run_dir,
+                    scheduler_path,
+                    test_log_dir,
+                    verbose)
         test.run()
-        if test.has_failed():
+        if test.has_failed:
             LOGGER.error("Test: %s ... FAILED", test_name)
         else:
+            LOGGER.info("Objective function: %f (%f%%)",
+                        test.result,
+                        test.result * 100 / test.quasi_optimal_result)
             LOGGER.info("Test: %s ... PASSED", test_name)
 
 
-def run_all_tests(lss_input_dir, scheduler_path):
+def run_all_tests(run_dir, scheduler_path, verbose):
     for test_name in get_all_tests_names():
-        run_single_test(test_name, lss_input_dir, scheduler_path)
+        run_single_test(test_name, run_dir, scheduler_path, verbose)
         LOGGER.info(60 * '=')
 
 
-if __name__ == "__main__":
+def main():
     args = parse_args()
+    if args.verbose is None:
+        args.verbose = 0
     LoggerConfig.setup(args.test_name, args.verbose)
 
     if args.list:
@@ -97,6 +99,10 @@ if __name__ == "__main__":
 
     scheduler_path = os.path.join(os.curdir, args.scheduler)
     if args.test_name:
-        run_single_test(args.test_name, args.input_dir, scheduler_path)
+        run_single_test(args.test_name, args.run_dir, scheduler_path, args.verbose)
     else:
-        run_all_tests(args.input_dir, scheduler_path)
+        run_all_tests(args.run_dir, scheduler_path, args.verbose)
+
+
+if __name__ == "__main__":
+    main()

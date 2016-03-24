@@ -62,6 +62,6 @@ class Machine:
 
     def __calculate_setup_time(self, job):
         return self.__context_changes_costs[(
-            self.__context[0] == job['context1'],
-            self.__context[1] == job['context2'],
-            self.__context[2] == job['context3'])]
+            1 if self.__context[0] == job['context1'] else 0,
+            1 if self.__context[1] == job['context2'] else 0,
+            1 if self.__context[2] == job['context3'] else 0)]

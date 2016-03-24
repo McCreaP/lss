@@ -51,7 +51,7 @@ class Job(Base):
 
 
 class BaseMachineSet(Base):
-    def __init__(self, machine_set_id: int, machines: List[Machine] = None):
+    def __init__(self, machine_set_id: int, machines: List[Machine]=None):# pylint: disable=E1126
         self.id = machine_set_id
         self.machines = machines or []
 
