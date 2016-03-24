@@ -24,7 +24,7 @@ program_opt::variables_map ProcessCommandLine(int argc, char **argv) {
       ("help,h", "produce help message")
       ("input,i", program_opt::value<string>()->required(), "Set input file path")
       ("assignments,a", program_opt::value<string>()->required(), "Set assignments directory path")
-      ("verbose,v", program_opt::value<int>(), "Increase output verbosity");
+      ("verbose,v", program_opt::value<int>(), "Set verbosity level");
   program_opt::store(program_opt::parse_command_line(argc, argv, desc), variables_map);
 
   if (variables_map.count("help")) {
