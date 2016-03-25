@@ -1,5 +1,6 @@
 import os
 import pickle
+import signal
 import traceback
 import logging
 import subprocess
@@ -43,7 +44,7 @@ class Test: #pylint: disable=R0903
             "assignments": os.path.abspath(self.__lss_assignments_dir),
             "verbose": self.__verbose})
         LOGGER.info("Run scheduler with the command: %s", run_lss_command)
-        scheduler = subprocess.Popen(run_lss_command, shell=True)
+        scheduler = subprocess.Popen(run_lss_command, shell=True, preexec_fn=os.setsid)
         try:
             EventLoop(self.__story, self.__state).run()
             self.__process_result()
@@ -55,7 +56,9 @@ class Test: #pylint: disable=R0903
             if scheduler.poll():  # Scheduler has stopped
                 self.has_failed = True
             else:
-                scheduler.terminate()
+                # Simple scheduler.terminate() does not work
+                # see: http://stackoverflow.com/q/4789837
+                os.killpg(os.getpgid(scheduler.pid), signal.SIGTERM)
 
     def __prepare_for_running(self):
         utils.make_empty_dir(self.__lss_assignments_dir)
@@ -78,16 +81,18 @@ class Test: #pylint: disable=R0903
     def __determine_quasi_optimal_result(self):
         mint = self.__story.get_raw('mint')
         maxt = self.__story.get_raw('maxt')
+        dummy_machine_id = self.__story.get_raw('machines')[0]['id']
         min_setup_time = min(self.__story.get_raw('context_changes').values())
         finished_jobs = []
         for job in self.__story.get_raw('jobs'):
             if mint <= job['ready'] <= maxt:
                 job['real_start_time'] = job['ready']
                 job['real_duration'] = min_setup_time + job['expected_duration_barring_setup']
+                job['real_machine'] = dummy_machine_id
                 finished_jobs.append(job)
         raw_history = self.__state.gather_history(finished_jobs)
         history = History(raw_history, self.__story.get_raw('jobs'))
-        self.quasi_optimal_result = ObjectiveFunction(history).compute()
+        self.quasi_optimal_result = ObjectiveFunction(history, imbalance_factor=0).compute()
 
     def __write_history_to_files(self, raw_history):
         log_file = os.path.join(self.__log_dir, 'history')
