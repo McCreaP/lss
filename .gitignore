@@ -6,9 +6,6 @@
 system_tests/input
 system_tests/assignments
 system_tests/logs
-system_tests/scenarios
-system_tests/scenarios/*.yaml!
-system_tests/scenarios/sample-story!
 system_tests/run
 /build
 /bin
