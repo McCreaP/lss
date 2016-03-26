@@ -77,9 +77,14 @@ RUN cp /home/vagrant/gmock-1.7.0/build/lib*.a /usr/local/lib
 RUN rm -rf /home/vagrant/gmock-1.7.0 && rm /home/vagrant/gmock-1.7.0.zip
 
 # install arcanist
-RUN mkdir /home/vagrant/arcanist
 RUN git clone https://github.com/phacility/libphutil.git /opt/arcanist/libphutil
 RUN git clone https://github.com/phacility/arcanist.git /opt/arcanist/arcanist
+
+#install java (for jenkins)
+RUN wget --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u77-b03/jdk-8u77-linux-x64.tar.gz
+RUN tar -zxf jdk-8u77-linux-x64.tar.gz -C /opt
+RUN update-alternatives --install /usr/bin/java java /opt/jdk1.8.0_77/bin/java 100
+RUN update-alternatives --install /usr/bin/javac javac /opt/jdk1.8.0_77/bin/javac 100
 
 # allow passwordless sudo
 RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
