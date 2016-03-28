@@ -3,19 +3,19 @@
 #ifndef LSS_BASE_RAW_SITUATION_H_
 #define LSS_BASE_RAW_SITUATION_H_
 
-#include "base/types.h"
-
 #include <iostream>
 #include <vector>
+
+#include "base/types.h"
 
 namespace lss {
 
 struct RawJob {
   int id;
   int batch_id;
-  int machine_id;    // The machine this job is assigned to; not present in the input file.
-  double duration;   // Expected duration barring setup time.
-  double start_time; // Not present in the input file.
+  int machine_id;     // The machine this job is assigned to; not present in the input file.
+  double duration;    // Expected duration barring setup time.
+  double start_time;  // Not present in the input file.
   int machineset_id;
   int context[Context::kSize];
 
