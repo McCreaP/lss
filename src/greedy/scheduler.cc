@@ -46,7 +46,7 @@ void Scheduler::Schedule() {
 
 void Scheduler::AssignJobsFromBatch(const BatchWrapper &batch) {
   VLOG(1) << "Assign jobs from batch: " << batch.GetId();
-  for (const io::RawJob &job : batch.GetSortedJobs()) {
+  for (const RawJob &job : batch.GetSortedJobs()) {
     VLOG(2) << "Job: " << job.id;
     if (input_.IsJobAssigned(job.id)) {
       VLOG(2) << "Already assigned";
@@ -66,7 +66,7 @@ void Scheduler::AssignJobsFromBatch(const BatchWrapper &batch) {
   }
 }
 
-std::shared_ptr<MachineWrapper> Scheduler::FindBestMachine(const io::RawJob &raw_job) {
+std::shared_ptr<MachineWrapper> Scheduler::FindBestMachine(const RawJob &raw_job) {
   VLOG(3) << "FindBestMachine for Job: " << raw_job.id;
   double min_context_changed_cost = kMaxContextChangeCost;
   auto machines = input_.GetMachinesFromSet(raw_job.machineset_id);

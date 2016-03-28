@@ -13,7 +13,7 @@ namespace greedy {
 
 static constexpr double kMinValue = std::numeric_limits<double>::lowest();
 
-BatchWrapper::BatchWrapper(io::RawBatch raw_batch) :
+BatchWrapper::BatchWrapper(RawBatch raw_batch) :
     raw_batch_(std::move(raw_batch)), time_to_finish_(0) { }
 
 bool BatchWrapper::operator==(const BatchWrapper& rhs) const {
@@ -31,7 +31,7 @@ double BatchWrapper::RewardAt(std::time_t time) const {
   return raw_batch_.reward + raw_batch_.timely_reward / (1 + exp(r));
 }
 
-void BatchWrapper::AddJob(const io::RawJob& raw_job) {
+void BatchWrapper::AddJob(const RawJob& raw_job) {
   time_to_finish_ += raw_job.duration;
   jobs_.insert(raw_job);
 }
@@ -40,7 +40,7 @@ int BatchWrapper::GetId() const {
   return raw_batch_.id;
 }
 
-const std::set<io::RawJob, JobDurationCmp>& BatchWrapper::GetSortedJobs() const {
+const std::set<RawJob, JobDurationCmp>& BatchWrapper::GetSortedJobs() const {
   return jobs_;
 }
 

@@ -20,7 +20,7 @@ class Scheduler {
 
  private:
   void AssignJobsFromBatch(const BatchWrapper& batch);
-  std::shared_ptr<MachineWrapper> FindBestMachine(const io::RawJob& raw_job);
+  std::shared_ptr<MachineWrapper> FindBestMachine(const RawJob& raw_job);
 
   Input input_;
   io::BasicWriter basic_writer_;

@@ -9,7 +9,6 @@
 #include <vector>
 
 namespace lss {
-namespace io {
 
 struct RawJob {
   int id;
@@ -70,7 +69,6 @@ struct RawSituation {
   std::vector<RawContextChange> context_changes;
 };
 
-}  // namespace io
 }  // namespace lss
 
 #endif  // LSS_BASE_RAW_SITUATION_H_

@@ -3,7 +3,6 @@
 #include <iostream>
 
 namespace lss {
-namespace io {
 
 bool RawJob::operator==(const RawJob& rhs) const {
   bool ok = true;
@@ -25,5 +24,4 @@ bool RawBatch::operator==(const RawBatch& rhs) const {
       due == rhs.due;
 }
 
-}  // namespace io
 }  // namespace lss

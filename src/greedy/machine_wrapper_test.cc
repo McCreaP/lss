@@ -9,22 +9,22 @@ namespace greedy {
 
 TEST(MachineWrapper, GetId) {
   static const int kMachineId = 42;
-  static const io::RawMachine kRawMachine = {kMachineId, MachineState::kIdle, {-1, -1, -1}};
+  static const RawMachine kRawMachine = {kMachineId, MachineState::kIdle, {-1, -1, -1}};
 
   MachineWrapper machine(kRawMachine, std::make_shared<ContextChanges>());
   EXPECT_EQ(kMachineId, machine.GetId());
 }
 
 TEST(MachineWrapper, AssignJob) {
-  static const io::RawMachine kRawMachine = {1, MachineState::kIdle, {-1, -1, -1}};
-  io::RawJob raw_job_1 = io::RawJob();
+  static const RawMachine kRawMachine = {1, MachineState::kIdle, {-1, -1, -1}};
+  RawJob raw_job_1 = RawJob();
   raw_job_1.id = 1;
   raw_job_1.context[0] = 3; raw_job_1.context[1] = 5; raw_job_1.context[2] = 8;
-  io::RawJob raw_job_2 = io::RawJob();
+  RawJob raw_job_2 = RawJob();
   raw_job_2.id = 2;
   raw_job_2.context[0] = 3; raw_job_2.context[1] = 999; raw_job_2.context[2] = 999;
   static const int kContextChangeCost = 42;
-  static const io::RawContextChange kRawContextChange = {0, 1, 1, kContextChangeCost};
+  static const RawContextChange kRawContextChange = {0, 1, 1, kContextChangeCost};
   std::shared_ptr<ContextChanges> context_changes = std::make_shared<ContextChanges>();
   context_changes->SetContextChanges({kRawContextChange});
 
@@ -36,21 +36,21 @@ TEST(MachineWrapper, AssignJob) {
 }
 
 TEST(MachineWrapper, WorkingMachineIsNotWaitingForAJob) {
-  static const io::RawMachine kRawMachine = {1, MachineState::kWorking, {-1, -1, -1}};
+  static const RawMachine kRawMachine = {1, MachineState::kWorking, {-1, -1, -1}};
 
   MachineWrapper machine(kRawMachine, std::make_shared<ContextChanges>());
   EXPECT_FALSE(machine.IsWaitingForAJob());
 }
 
 TEST(MachineWrapper, DeadMachineIsNotWaitingForAJob) {
-  static const io::RawMachine kRawMachine = {1, MachineState::kDead, {-1, -1, -1}};
+  static const RawMachine kRawMachine = {1, MachineState::kDead, {-1, -1, -1}};
 
   MachineWrapper machine(kRawMachine, std::make_shared<ContextChanges>());
   EXPECT_FALSE(machine.IsWaitingForAJob());
 }
 
 TEST(MachineWrapper, SetStateFromWorkingToIdle) {
-  static const io::RawMachine kRawMachine = {1, MachineState::kWorking, {-1, -1, -1}};
+  static const RawMachine kRawMachine = {1, MachineState::kWorking, {-1, -1, -1}};
 
   MachineWrapper machine(kRawMachine, std::make_shared<ContextChanges>());
   EXPECT_FALSE(machine.IsWaitingForAJob());
@@ -59,8 +59,8 @@ TEST(MachineWrapper, SetStateFromWorkingToIdle) {
 }
 
 TEST(MachineWrapper, SetStateFromIdleToIdleWithAssignedJob) {
-  static const io::RawMachine kRawMachine = {1, MachineState::kIdle, {-1, -1, -1}};
-  static const io::RawJob kRawJob = io::RawJob();
+  static const RawMachine kRawMachine = {1, MachineState::kIdle, {-1, -1, -1}};
+  static const RawJob kRawJob = RawJob();
 
   MachineWrapper machine(kRawMachine, std::make_shared<ContextChanges>());
   EXPECT_TRUE(machine.IsWaitingForAJob());

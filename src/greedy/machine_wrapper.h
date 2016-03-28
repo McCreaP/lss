@@ -11,7 +11,7 @@ namespace greedy {
 
 class ContextChanges {
  public:
-  void SetContextChanges(const std::vector<io::RawContextChange> raw_changes);
+  void SetContextChanges(const std::vector<RawContextChange> raw_changes);
   int GetContextChangeCost(bool changed0, bool changed1, bool changed2) const;
 
  private:
@@ -20,13 +20,13 @@ class ContextChanges {
 
 class MachineWrapper {
  public:
-  explicit MachineWrapper(io::RawMachine raw_machine, std::shared_ptr<ContextChanges> context_changes);
+  explicit MachineWrapper(RawMachine raw_machine, std::shared_ptr<ContextChanges> context_changes);
 
   bool operator==(const MachineWrapper& rhs) const;
   int GetId() const;
   void SetState(MachineState new_state);
-  double ContextChangeCost(const io::RawJob& raw_job) const;
-  void AssignJob(const io::RawJob& raw_job);
+  double ContextChangeCost(const RawJob& raw_job) const;
+  void AssignJob(const RawJob& raw_job);
   // Now 'has_assigned_job_' is set back to false
   // when Input::Update() detects the machine has changed its state from kIdle.
   // It causes potentially a race condition - if the machine processes
@@ -34,7 +34,7 @@ class MachineWrapper {
   bool IsWaitingForAJob() const;
 
  private:
-  io::RawMachine raw_machine_;
+  RawMachine raw_machine_;
   int context_[3];
   std::shared_ptr<ContextChanges> context_changes_;
   bool has_assigned_job_;
