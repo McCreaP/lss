@@ -11,7 +11,7 @@ bool RawJob::operator==(const RawJob& rhs) const {
   ok &= (machineset_id == rhs.machineset_id);
   ok &= (batch_id == rhs.batch_id);
   ok &= (duration == rhs.duration);
-  for (int i = 0; i < kContextN; ++i)
+  for (int i = 0; i < Context::kSize; ++i)
     ok &= (context[i] == rhs.context[i]);
   return ok;
 }

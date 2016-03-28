@@ -11,14 +11,6 @@
 namespace lss {
 namespace io {
 
-static constexpr int kContextN = 3;
-
-enum class MachineState {
-  kIdle = 0,
-  kWorking = 1,
-  kDead = 2,
-};
-
 struct RawJob {
   int id;
   int batch_id;
@@ -26,7 +18,7 @@ struct RawJob {
   double duration;   // Expected duration barring setup time.
   double start_time; // Not present in the input file.
   int machineset_id;
-  int context[kContextN];
+  int context[Context::kSize];
 
   bool operator==(const RawJob& rhs) const;
 };
@@ -49,7 +41,7 @@ struct RawBatch {
 struct RawMachine {
   int id;
   MachineState state;
-  int context[kContextN];  // Not present in the input file.
+  int context[Context::kSize];  // Not present in the input file.
 };
 
 struct RawMachineSet {
@@ -63,7 +55,7 @@ struct RawAccount {
 };
 
 struct RawContextChange {
-  bool changed[kContextN];
+  bool changed[Context::kSize];
   int cost;
 };
 

@@ -24,7 +24,7 @@ class MachineWrapper {
 
   bool operator==(const MachineWrapper& rhs) const;
   int GetId() const;
-  void SetState(io::MachineState new_state);
+  void SetState(MachineState new_state);
   double ContextChangeCost(const io::RawJob& raw_job) const;
   void AssignJob(const io::RawJob& raw_job);
   // Now 'has_assigned_job_' is set back to false

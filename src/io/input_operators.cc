@@ -7,7 +7,7 @@ namespace io {
 
 std::istream &operator>>(std::istream &input, RawJob &job) {
   input >> job.id >> job.batch_id >> job.duration >> job.machineset_id;
-  for (int i = 0; i < kContextN; ++i)
+  for (int i = 0; i < Context::kSize; ++i)
     input >> job.context[i];
   return input;
 }
@@ -44,7 +44,7 @@ std::istream &operator>>(std::istream &input, RawAccount &account) {
 }
 
 std::istream &operator>>(std::istream &input, RawContextChange &change) {
-  for (int i = 0; i < kContextN; ++i)
+  for (int i = 0; i < Context::kSize; ++i)
     input >> change.changed[i];
   input >> change.cost;
   return input;

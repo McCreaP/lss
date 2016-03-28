@@ -21,7 +21,7 @@ TEST(InputOperators, JobInput) {
   EXPECT_EQ(kJob.batch_id, job.batch_id);
   EXPECT_EQ(kJob.duration, job.duration);
   EXPECT_EQ(kJob.machineset_id, job.machineset_id);
-  for (int i = 0; i < kContextN; ++i)
+  for (int i = 0; i < Context::kSize; ++i)
     EXPECT_EQ(kJob.context[i], job.context[i]);
 }
 
@@ -79,7 +79,7 @@ TEST(InputOperators, ContextChangeInput) {
 
   RawContextChange context_change;
   input >> context_change;
-  for (int i = 0; i < kContextN; ++i)
+  for (int i = 0; i < Context::kSize; ++i)
     EXPECT_EQ(kContextChange.changed[i], context_change.changed[i]);
   EXPECT_EQ(kContextChange.cost, context_change.cost);
 }

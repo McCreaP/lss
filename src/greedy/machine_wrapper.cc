@@ -11,15 +11,15 @@ bool MachineWrapper::operator==(const MachineWrapper& rhs) const {
   return raw_machine_.id == rhs.raw_machine_.id;
 }
 
-void MachineWrapper::SetState(io::MachineState new_state) {
-  if (new_state != io::MachineState::kIdle)
+void MachineWrapper::SetState(MachineState new_state) {
+  if (new_state != MachineState::kIdle)
     has_assigned_job_ = false;
   raw_machine_.state = new_state;
 }
 
 double MachineWrapper::ContextChangeCost(const io::RawJob& raw_job) const {
-  bool diff[io::kContextN];
-  for (int i = 0; i < io::kContextN; ++i)
+  bool diff[Context::kSize];
+  for (int i = 0; i < Context::kSize; ++i)
     diff[i] = context_[i] != raw_job.context[i];
   return context_changes_->GetContextChangeCost(diff[0], diff[1], diff[2]);
 }
@@ -30,12 +30,12 @@ int MachineWrapper::GetId() const {
 
 void MachineWrapper::AssignJob(const io::RawJob& raw_job) {
   has_assigned_job_ = true;
-  for (int i = 0; i < io::kContextN; ++i)
+  for (int i = 0; i < Context::kSize; ++i)
     context_[i] = raw_job.context[i];
 }
 
 bool MachineWrapper::IsWaitingForAJob() const {
-  return !has_assigned_job_ && raw_machine_.state == io::MachineState::kIdle;
+  return !has_assigned_job_ && raw_machine_.state == MachineState::kIdle;
 }
 
 void ContextChanges::SetContextChanges(const std::vector<io::RawContextChange> raw_changes) {

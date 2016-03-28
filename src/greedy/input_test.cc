@@ -99,7 +99,7 @@ TEST(Input, EmptyMachineSet) {
 }
 
 TEST(Input, SingleMachineSet) {
-  static const io::RawMachine kRawMachine = {1, io::MachineState::kIdle, {-1, -1, -1}};
+  static const io::RawMachine kRawMachine = {1, MachineState::kIdle, {-1, -1, -1}};
   static const io::RawMachineSet kRawMachineSet = {1, std::vector<int>({1})};
   io::RawSituation raw_data = io::RawSituation();
   raw_data.machines = {kRawMachine};
@@ -116,9 +116,9 @@ TEST(Input, SingleMachineSet) {
 }
 
 TEST(Input, MultipleMachineSets) {
-  static const io::RawMachine kRawMachine1 = {1, io::MachineState::kIdle, {-1, -1, -1}};
-  static const io::RawMachine kRawMachine2 = {2, io::MachineState::kWorking, {-1, -1, -1}};
-  static const io::RawMachine kRawMachine3 = {3, io::MachineState::kDead, {-1, -1, -1}};
+  static const io::RawMachine kRawMachine1 = {1, MachineState::kIdle, {-1, -1, -1}};
+  static const io::RawMachine kRawMachine2 = {2, MachineState::kWorking, {-1, -1, -1}};
+  static const io::RawMachine kRawMachine3 = {3, MachineState::kDead, {-1, -1, -1}};
   static const io::RawMachineSet kRawMachineSet1 = {1, std::vector<int>({1, 2})};
   static const io::RawMachineSet kRawMachineSet2 = {2, std::vector<int>({3})};
   io::RawSituation raw_data = io::RawSituation();
@@ -142,7 +142,7 @@ TEST(Input, MultipleMachineSets) {
 }
 
 TEST(Input, KeepsOldMachine) {
-  static const io::RawMachine kRawMachine = {1, io::MachineState::kIdle, {-1, -1, -1}};
+  static const io::RawMachine kRawMachine = {1, MachineState::kIdle, {-1, -1, -1}};
   static const io::RawMachineSet kRawMachineSet = {1, std::vector<int>({1})};
   io::RawSituation raw_data = io::RawSituation();
   raw_data.machines = {kRawMachine};
@@ -168,7 +168,7 @@ TEST(Input, AssignOneJob) {
   static const int kAssignedJobId = 42;
   io::RawJob kRawJob = io::RawJob();
   kRawJob.id = kAssignedJobId;
-  static const io::RawMachine kRawMachine1 = {10, io::MachineState::kIdle, {-1, -1, -1}};
+  static const io::RawMachine kRawMachine1 = {10, MachineState::kIdle, {-1, -1, -1}};
   MachineWrapper machine = MachineWrapper(kRawMachine1, std::make_shared<ContextChanges>());
   std::unique_ptr<io::ReaderMock> reader = std::make_unique<io::ReaderMock>();
 
@@ -190,8 +190,8 @@ TEST(Input, AssignedJobsAfterUpdate) {
   io::RawSituation raw_data = io::RawSituation();
   raw_data.jobs = {raw_job_2};
   raw_data.batches = {kRawBatch};
-  static const io::RawMachine kRawMachine1 = {10, io::MachineState::kIdle, {-1, -1, -1}};
-  static const io::RawMachine kRawMachine2 = {20, io::MachineState::kIdle, {-1, -1, -1}};
+  static const io::RawMachine kRawMachine1 = {10, MachineState::kIdle, {-1, -1, -1}};
+  static const io::RawMachine kRawMachine2 = {20, MachineState::kIdle, {-1, -1, -1}};
   MachineWrapper machine1 = MachineWrapper(kRawMachine1, std::make_shared<ContextChanges>());
   MachineWrapper machine2 = MachineWrapper(kRawMachine2, std::make_shared<ContextChanges>());
   std::unique_ptr<io::ReaderMock> reader = std::make_unique<io::ReaderMock>();
