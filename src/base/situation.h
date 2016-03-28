@@ -1,7 +1,7 @@
-#ifndef LSS_EXPERIMENTAL_SITUATION_H_
-#define LSS_EXPERIMENTAL_SITUATION_H_
+#ifndef LSS_BASE_SITUATION_H_
+#define LSS_BASE_SITUATION_H_
 
-#include "experimental/basic_types.h"
+#include "base/types.h"
 
 #include <vector>
 
@@ -263,4 +263,4 @@ inline Batch Job::batch() const { return data_->batch; }
 
 }  // namespace lss
 
-#endif  // LSS_EXPERIMENTAL_SITUATION_H_
+#endif  // LSS_BASE_SITUATION_H_

@@ -1,5 +1,5 @@
-#ifndef LSS_EXPERIMENTAL_BASIC_TYPES_H_
-#define LSS_EXPERIMENTAL_BASIC_TYPES_H_
+#ifndef LSS_BASE_TYPES_H_
+#define LSS_BASE_TYPES_H_
 
 #include <bitset>
 #include <limits>
@@ -12,7 +12,6 @@ using Time = double;
 using Duration = double;
 using Cost = int;
 
-// This definition should be moved from raw_input_types.h to this header.
 enum class MachineState {
   kIdle = 0,
   kWorking = 1,
@@ -37,7 +36,7 @@ class Id {
   friend bool operator>=(Id lhs, Id rhs) { return lhs.id_ >= rhs.id_; }
 
  private:
-  const int id_ = kNone;
+  int id_ = kNone;
 };
 
 class Context {
@@ -58,7 +57,7 @@ class Context {
   friend bool operator>=(const Context &lhs, const Context &rhs) { return lhs.context_ >= rhs.context_; }
 
  private:
-  const int context_[kSize] = {kNone, kNone, kNone};
+  int context_[kSize] = {kNone, kNone, kNone};
 };
 
 class Change {
@@ -71,7 +70,7 @@ class Change {
   bool operator[](size_t idx) const { return change_.test(idx); }
 
  private:
-  const std::bitset<Context::kSize> change_;
+  std::bitset<Context::kSize> change_;
 
   friend struct std::hash<Change>;
 };
@@ -101,4 +100,4 @@ struct hash<lss::Change> {
 
 }  // namespace std
 
-#endif  // LSS_EXPERIMENTAL_BASIC_TYPES_H_
+#endif  // LSS_BASE_TYPES_H_

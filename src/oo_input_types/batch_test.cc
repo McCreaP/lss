@@ -5,7 +5,7 @@
 
 #include "gtest/gtest.h"
 
-#include "io/raw_input_types.h"
+#include "base/raw_situation.h"
 
 namespace lss {
 

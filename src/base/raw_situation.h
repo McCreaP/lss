@@ -1,7 +1,9 @@
 // This file defines simple structs to store information about the world. Most fields directly
 // correspond with data available in the input file; a few which don't are commented appropriately.
-#ifndef LSS_IO_RAW_INPUT_TYPES_H_
-#define LSS_IO_RAW_INPUT_TYPES_H_
+#ifndef LSS_BASE_RAW_SITUATION_H_
+#define LSS_BASE_RAW_SITUATION_H_
+
+#include "base/types.h"
 
 #include <iostream>
 #include <vector>
@@ -79,4 +81,4 @@ struct RawSituation {
 }  // namespace io
 }  // namespace lss
 
-#endif  // LSS_IO_RAW_INPUT_TYPES_H_
+#endif  // LSS_BASE_RAW_SITUATION_H_

@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "io/raw_input_types.h"
+#include "base/raw_situation.h"
 #include "io/reader.h"
 
 namespace lss {

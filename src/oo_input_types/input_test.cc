@@ -6,7 +6,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-#include "io/raw_input_types.h"
+#include "base/raw_situation.h"
 #include "oo_input_types/batch.h"
 
 using ::testing::SetArgPointee;
