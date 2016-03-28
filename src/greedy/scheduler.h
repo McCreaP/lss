@@ -1,5 +1,5 @@
-#ifndef LSS_GREEDY_GREEDY_SCHEDULER_H_
-#define LSS_GREEDY_GREEDY_SCHEDULER_H_
+#ifndef LSS_GREEDY_SCHEDULER_H_
+#define LSS_GREEDY_SCHEDULER_H_
 
 #include <string>
 
@@ -9,12 +9,12 @@
 namespace lss {
 namespace greedy {
 
-class GreedyScheduler {
+class Scheduler {
  public:
   // 'input_path' should name a file (not directory) with input data.
   // 'assignments_path' should name a directory
   // with files representing assigning jobs to machines.
-  explicit GreedyScheduler(const std::string& input_path, const std::string& assignments_path);
+  explicit Scheduler(const std::string& input_path, const std::string& assignments_path);
 
   void Schedule();
 
@@ -29,4 +29,4 @@ class GreedyScheduler {
 }  // namespace greedy
 }  // namespace lss
 
-#endif  // LSS_GREEDY_GREEDY_SCHEDULER_H_
+#endif  // LSS_GREEDY_SCHEDULER_H_

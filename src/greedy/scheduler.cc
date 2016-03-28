@@ -1,4 +1,4 @@
-#include "greedy/greedy_scheduler.h"
+#include "greedy/scheduler.h"
 
 #include <glog/logging.h>
 #include <pstreams/pstream.h>
@@ -24,12 +24,12 @@ void NotifyDriverIFinishedCompute() {
 
 static constexpr double kMaxContextChangeCost = std::numeric_limits<double>::infinity();
 
-GreedyScheduler::GreedyScheduler(const std::string &input_path,
+Scheduler::Scheduler(const std::string &input_path,
                                  const std::string &assignments_path)
   : input_(std::make_unique<io::BasicReader>(input_path)),
     basic_writer_(assignments_path) { }
 
-void GreedyScheduler::Schedule() {
+void Scheduler::Schedule() {
   while (true) {
     if (!input_.Update())
       continue;
@@ -44,7 +44,7 @@ void GreedyScheduler::Schedule() {
   }
 }
 
-void GreedyScheduler::AssignJobsFromBatch(const BatchWrapper &batch) {
+void Scheduler::AssignJobsFromBatch(const BatchWrapper &batch) {
   VLOG(1) << "Assign jobs from batch: " << batch.GetId();
   for (const io::RawJob &job : batch.GetSortedJobs()) {
     VLOG(2) << "Job: " << job.id;
@@ -66,7 +66,7 @@ void GreedyScheduler::AssignJobsFromBatch(const BatchWrapper &batch) {
   }
 }
 
-std::shared_ptr<MachineWrapper> GreedyScheduler::FindBestMachine(const io::RawJob &raw_job) {
+std::shared_ptr<MachineWrapper> Scheduler::FindBestMachine(const io::RawJob &raw_job) {
   VLOG(3) << "FindBestMachine for Job: " << raw_job.id;
   double min_context_changed_cost = kMaxContextChangeCost;
   auto machines = input_.GetMachinesFromSet(raw_job.machineset_id);

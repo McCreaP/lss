@@ -2,7 +2,7 @@
 #include <glog/logging.h>
 #include <iostream>
 #include <string>
-#include "greedy/greedy_scheduler.h"
+#include "greedy/scheduler.h"
 
 namespace program_opt = boost::program_options;
 using std::string;
@@ -39,8 +39,8 @@ int main(int argc, char **argv) {
   program_opt::variables_map config = ProcessCommandLine(argc, argv);
   ConfigLogger(argv, config["verbose"].as<int>());
   LOG(INFO) << "Scheduler start";
-  lss::greedy::GreedyScheduler scheduler(config["input"].as<string>(),
-                                         config["assignments"].as<string>());
+  lss::greedy::Scheduler scheduler(config["input"].as<string>(),
+                                   config["assignments"].as<string>());
   scheduler.Schedule();
   LOG(INFO) << "Scheduler stop";
   return 0;
