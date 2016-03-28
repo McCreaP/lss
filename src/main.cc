@@ -2,7 +2,7 @@
 #include <glog/logging.h>
 #include <iostream>
 #include <string>
-#include "scheduler/greedy_scheduler.h"
+#include "greedy/greedy_scheduler.h"
 
 namespace program_opt = boost::program_options;
 using std::string;

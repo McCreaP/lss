@@ -1,5 +1,5 @@
-#ifndef LSS_OO_INPUT_TYPES_MACHINE_WRAPPER_H_
-#define LSS_OO_INPUT_TYPES_MACHINE_WRAPPER_H_
+#ifndef LSS_GREEDY_MACHINE_WRAPPER_H_
+#define LSS_GREEDY_MACHINE_WRAPPER_H_
 
 #include <memory>
 #include <vector>
@@ -41,4 +41,4 @@ class MachineWrapper {
 
 }  // namespace lss
 
-#endif  // LSS_OO_INPUT_TYPES_MACHINE_WRAPPER_H_
+#endif  // LSS_GREEDY_MACHINE_WRAPPER_H_

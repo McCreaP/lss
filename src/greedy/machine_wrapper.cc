@@ -1,4 +1,4 @@
-#include "oo_input_types/machine_wrapper.h"
+#include "greedy/machine_wrapper.h"
 
 namespace lss {
 

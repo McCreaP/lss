@@ -1,4 +1,4 @@
-#include "oo_input_types/input.h"
+#include "greedy/input.h"
 
 #include <algorithm>
 #include <memory>

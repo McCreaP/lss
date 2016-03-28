@@ -1,10 +1,10 @@
-#ifndef LSS_SCHEDULER_GREEDY_SCHEDULER_H_
-#define LSS_SCHEDULER_GREEDY_SCHEDULER_H_
+#ifndef LSS_GREEDY_GREEDY_SCHEDULER_H_
+#define LSS_GREEDY_GREEDY_SCHEDULER_H_
 
 #include <string>
 
 #include "io/basic_output.h"
-#include "oo_input_types/input.h"
+#include "greedy/input.h"
 
 namespace lss {
 
@@ -27,4 +27,4 @@ class GreedyScheduler {
 
 }  // namespace lss
 
-#endif  // LSS_SCHEDULER_GREEDY_SCHEDULER_H_
+#endif  // LSS_GREEDY_GREEDY_SCHEDULER_H_

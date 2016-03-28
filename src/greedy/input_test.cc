@@ -1,4 +1,4 @@
-#include "oo_input_types/input.h"
+#include "greedy/input.h"
 
 #include <memory>
 #include <string>
@@ -7,7 +7,7 @@
 #include "gtest/gtest.h"
 
 #include "base/raw_situation.h"
-#include "oo_input_types/batch_wrapper.h"
+#include "greedy/batch_wrapper.h"
 
 using ::testing::SetArgPointee;
 using ::testing::DoAll;

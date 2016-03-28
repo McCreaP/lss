@@ -1,5 +1,5 @@
-#ifndef LSS_OO_INPUT_TYPES_BATCH_WRAPPER_H_
-#define LSS_OO_INPUT_TYPES_BATCH_WRAPPER_H_
+#ifndef LSS_GREEDY_BATCH_WRAPPER_H_
+#define LSS_GREEDY_BATCH_WRAPPER_H_
 
 #include <set>
 #include <ctime>
@@ -54,4 +54,4 @@ class BatchRewardCmp {
 
 }  // namespace lss
 
-#endif  // LSS_OO_INPUT_TYPES_BATCH_WRAPPER_H_
+#endif  // LSS_GREEDY_BATCH_WRAPPER_H_

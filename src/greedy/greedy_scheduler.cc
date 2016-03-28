@@ -1,4 +1,4 @@
-#include "scheduler/greedy_scheduler.h"
+#include "greedy/greedy_scheduler.h"
 
 #include <glog/logging.h>
 #include <pstreams/pstream.h>
@@ -9,8 +9,8 @@
 #include <memory>
 
 #include "io/basic_input.h"
-#include "oo_input_types/batch_wrapper.h"
-#include "oo_input_types/machine_wrapper.h"
+#include "greedy/batch_wrapper.h"
+#include "greedy/machine_wrapper.h"
 
 namespace lss {
 namespace {

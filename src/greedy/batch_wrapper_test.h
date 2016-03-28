@@ -1,4 +1,4 @@
-#include "oo_input_types/batch_wrapper.h"
+#include "greedy/batch_wrapper.h"
 
 #include <algorithm>
 #include <vector>

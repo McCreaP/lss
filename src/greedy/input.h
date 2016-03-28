@@ -1,5 +1,5 @@
-#ifndef LSS_OO_INPUT_TYPES_INPUT_H_
-#define LSS_OO_INPUT_TYPES_INPUT_H_
+#ifndef LSS_GREEDY_INPUT_H_
+#define LSS_GREEDY_INPUT_H_
 
 #include <map>
 #include <memory>
@@ -10,8 +10,8 @@
 #include <vector>
 
 #include "io/reader.h"
-#include "oo_input_types/batch_wrapper.h"
-#include "oo_input_types/machine_wrapper.h"
+#include "greedy/batch_wrapper.h"
+#include "greedy/machine_wrapper.h"
 
 namespace lss {
 
@@ -44,4 +44,4 @@ class Input {
 
 }  // namespace lss
 
-#endif  // LSS_OO_INPUT_TYPES_INPUT_H_
+#endif  // LSS_GREEDY_INPUT_H_
