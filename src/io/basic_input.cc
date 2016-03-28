@@ -35,7 +35,7 @@ constexpr std::array<HeaderReaderPair, 7> kReaders{
   },
   HeaderReaderPair{
     "fair-service-machine-sets",
-    &ReadOne<RawMachineSet, &RawSituation::fair_machine_sets>
+    &ReadOne<RawMachineSet, &RawSituation::fair_sets>
   },
   HeaderReaderPair{
     "jobs",

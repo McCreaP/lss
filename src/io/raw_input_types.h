@@ -1,5 +1,5 @@
-// This file defines types which represent input data exactly
-// as it is read from files.
+// This file defines simple structs to store information about the world. Most fields directly
+// correspond with data available in the input file; a few which don't are commented appropriately.
 #ifndef LSS_IO_RAW_INPUT_TYPES_H_
 #define LSS_IO_RAW_INPUT_TYPES_H_
 
@@ -20,7 +20,9 @@ enum class MachineState {
 struct RawJob {
   int id;
   int batch_id;
-  double duration;  // Expected duration barring setup time.
+  int machine_id;    // The machine this job is assigned to; not present in the input file.
+  double duration;   // Expected duration barring setup time.
+  double start_time; // Not present in the input file.
   int machineset_id;
   int context[kContextN];
 
@@ -45,6 +47,7 @@ struct RawBatch {
 struct RawMachine {
   int id;
   MachineState state;
+  int context[kContextN];  // Not present in the input file.
 };
 
 struct RawMachineSet {
@@ -63,9 +66,10 @@ struct RawContextChange {
 };
 
 struct RawSituation {
+  double time_stamp;  // Not present in the input file.
   std::vector<RawMachine> machines;
   std::vector<RawMachineSet> machine_sets;
-  std::vector<RawMachineSet> fair_machine_sets;
+  std::vector<RawMachineSet> fair_sets;
   std::vector<RawJob> jobs;
   std::vector<RawBatch> batches;
   std::vector<RawAccount> accounts;

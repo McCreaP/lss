@@ -8,14 +8,14 @@ namespace lss {
 
 TEST(Machine, GetId) {
   static const int kMachineId = 42;
-  static const io::RawMachine kRawMachine = {kMachineId, io::MachineState::kIdle};
+  static const io::RawMachine kRawMachine = {kMachineId, io::MachineState::kIdle, {-1, -1, -1}};
 
   Machine machine(kRawMachine, std::make_shared<ContextChanges>());
   EXPECT_EQ(kMachineId, machine.GetId());
 }
 
 TEST(Machine, AssignJob) {
-  static const io::RawMachine kRawMachine = {1, io::MachineState::kIdle};
+  static const io::RawMachine kRawMachine = {1, io::MachineState::kIdle, {-1, -1, -1}};
   io::RawJob raw_job_1 = io::RawJob();
   raw_job_1.id = 1;
   raw_job_1.context[0] = 3; raw_job_1.context[1] = 5; raw_job_1.context[2] = 8;
@@ -35,21 +35,21 @@ TEST(Machine, AssignJob) {
 }
 
 TEST(Machine, WorkingMachineIsNotWaitingForAJob) {
-  static const io::RawMachine kRawMachine = {1, io::MachineState::kWorking};
+  static const io::RawMachine kRawMachine = {1, io::MachineState::kWorking, {-1, -1, -1}};
 
   Machine machine(kRawMachine, std::make_shared<ContextChanges>());
   EXPECT_FALSE(machine.IsWaitingForAJob());
 }
 
 TEST(Machine, DeadMachineIsNotWaitingForAJob) {
-  static const io::RawMachine kRawMachine = {1, io::MachineState::kDead};
+  static const io::RawMachine kRawMachine = {1, io::MachineState::kDead, {-1, -1, -1}};
 
   Machine machine(kRawMachine, std::make_shared<ContextChanges>());
   EXPECT_FALSE(machine.IsWaitingForAJob());
 }
 
 TEST(Machine, SetStateFromWorkingToIdle) {
-  static const io::RawMachine kRawMachine = {1, io::MachineState::kWorking};
+  static const io::RawMachine kRawMachine = {1, io::MachineState::kWorking, {-1, -1, -1}};
 
   Machine machine(kRawMachine, std::make_shared<ContextChanges>());
   EXPECT_FALSE(machine.IsWaitingForAJob());
@@ -58,7 +58,7 @@ TEST(Machine, SetStateFromWorkingToIdle) {
 }
 
 TEST(Machine, SetStateFromIdleToIdleWithAssignedJob) {
-  static const io::RawMachine kRawMachine = {1, io::MachineState::kIdle};
+  static const io::RawMachine kRawMachine = {1, io::MachineState::kIdle, {-1, -1, -1}};
   static const io::RawJob kRawJob = io::RawJob();
 
   Machine machine(kRawMachine, std::make_shared<ContextChanges>());

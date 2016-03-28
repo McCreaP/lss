@@ -11,7 +11,7 @@ namespace io {
 // to mock filesystem).
 
 TEST(InputOperators, JobInput) {
-  static const RawJob kJob = {1, 7, 18, 293, {4, 3, 2}};
+  static const RawJob kJob = {1, 7, -1, 18, -1, 293, {4, 3, 2}};
   static const std::string data = "1 7 18 293 4 3 2";
   std::istringstream input(data);
 
@@ -40,7 +40,7 @@ TEST(InputOperators, BatchInput) {
 }
 
 TEST(InputOperators, MachineInput) {
-  static const RawMachine kMachine = {1, MachineState::kWorking};
+  static const RawMachine kMachine = {1, MachineState::kWorking, {-1, -1, -1}};
   static const std::string data = "1 1";
   std::istringstream input(data);
 
