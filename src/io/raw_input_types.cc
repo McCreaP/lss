@@ -5,7 +5,7 @@
 namespace lss {
 namespace io {
 
-bool Job::operator==(const Job& rhs) const {
+bool RawJob::operator==(const RawJob& rhs) const {
   bool ok = true;
   ok &= (id == rhs.id);
   ok &= (machineset_id == rhs.machineset_id);
@@ -16,7 +16,7 @@ bool Job::operator==(const Job& rhs) const {
   return ok;
 }
 
-bool Batch::operator==(const Batch& rhs) const {
+bool RawBatch::operator==(const RawBatch& rhs) const {
   return id == rhs.id &&
       account_id == rhs.account_id &&
       timely_reward == rhs.timely_reward &&

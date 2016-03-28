@@ -10,10 +10,10 @@
 namespace lss {
 
 TEST(Batch, JobCmpRetrunsTrue) {
-  io::Job raw_job_1 = io::Job();
+  io::RawJob raw_job_1 = io::RawJob();
   raw_job_1.id = 1;
   raw_job_1.duration = 1.5;
-  io::Job raw_job_2 = io::Job();
+  io::RawJob raw_job_2 = io::RawJob();
   raw_job_2.id = 2;
   raw_job_2.duration = 2.0;
 
@@ -21,10 +21,10 @@ TEST(Batch, JobCmpRetrunsTrue) {
 }
 
 TEST(Batch, JobCmpRetrunsFalse) {
-  io::Job raw_job_1 = io::Job();
+  io::RawJob raw_job_1 = io::RawJob();
   raw_job_1.id = 1;
   raw_job_1.duration = 1.99;
-  io::Job raw_job_2 = io::Job();
+  io::RawJob raw_job_2 = io::RawJob();
   raw_job_2.id = 2;
   raw_job_2.duration = 1.98;
 
@@ -32,35 +32,35 @@ TEST(Batch, JobCmpRetrunsFalse) {
 }
 
 TEST(Batch, WithNoJobs) {
-  static const io::Batch kRawBatch = io::Batch();
+  static const io::RawBatch kRawBatch = io::RawBatch();
   Batch batch(kRawBatch);
   EXPECT_EQ(0, batch.GetSortedJobs().size());
 }
 
 TEST(Batch, GetMultipleJobs) {
-  io::Job raw_job_1 = io::Job();
+  io::RawJob raw_job_1 = io::RawJob();
   raw_job_1.id = 1;
   raw_job_1.duration = 2.2;
-  io::Job raw_job_2 = io::Job();
+  io::RawJob raw_job_2 = io::RawJob();
   raw_job_2.id = 2;
   raw_job_2.duration = 1.1;
-  io::Job raw_job_3 = io::Job();
+  io::RawJob raw_job_3 = io::RawJob();
   raw_job_3.id = 3;
   raw_job_3.duration = 3.3;
-  static const io::Batch kRawBatch = io::Batch();
+  static const io::RawBatch kRawBatch = io::RawBatch();
   Batch batch(kRawBatch);
   batch.AddJob(raw_job_1);
   batch.AddJob(raw_job_2);
   batch.AddJob(raw_job_3);
 
-  static const std::set<io::Job, JobDurationCmp> kExpectedJobs{raw_job_2, raw_job_1, raw_job_3};
+  static const std::set<io::RawJob, JobDurationCmp> kExpectedJobs{raw_job_2, raw_job_1, raw_job_3};
   auto sorted_jobs = batch.GetSortedJobs();
   EXPECT_EQ(kExpectedJobs, sorted_jobs);
 }
 
 TEST(Batch, GetId) {
   static const int kBatchId = 42;
-  io::Batch raw_batch = io::Batch();
+  io::RawBatch raw_batch = io::RawBatch();
   raw_batch.id = 42;
   Batch batch(raw_batch);
   EXPECT_EQ(kBatchId, batch.GetId());
@@ -68,31 +68,31 @@ TEST(Batch, GetId) {
 
 TEST(Batch, BatchCompareOperator) {
   static const std::time_t kTime = 1450000000;
-  io::Batch raw_batch_1 = io::Batch();
+  io::RawBatch raw_batch_1 = io::RawBatch();
   raw_batch_1.id = 1;
   raw_batch_1.due = kTime + 350;
   raw_batch_1.expected_time = 1800;
   raw_batch_1.reward = 1;
   raw_batch_1.timely_reward = 10;
-  io::Batch raw_batch_2 = io::Batch();
+  io::RawBatch raw_batch_2 = io::RawBatch();
   raw_batch_2.id = 2;
   raw_batch_2.due = kTime + 500;
   raw_batch_2.expected_time = 1300;
   raw_batch_2.reward = 3;
   raw_batch_2.timely_reward = 7;
-  io::Batch raw_batch_3 = io::Batch();
+  io::RawBatch raw_batch_3 = io::RawBatch();
   raw_batch_3.id = 3;
   raw_batch_3.due = kTime + 10000;
   raw_batch_3.expected_time = 15000;
   raw_batch_3.reward = 3;
   raw_batch_3.timely_reward = 100;
-  io::Batch raw_batch_4 = io::Batch();
+  io::RawBatch raw_batch_4 = io::RawBatch();
   raw_batch_4.id = 4;
   raw_batch_4.due = kTime - 700;
   raw_batch_4.expected_time = 1800;
   raw_batch_4.reward = 3;
   raw_batch_4.timely_reward = 10;
-  io::Batch raw_batch_5 = io::Batch();
+  io::RawBatch raw_batch_5 = io::RawBatch();
   raw_batch_5.id = 5;
   raw_batch_5.due = kTime + 1000000000;
   raw_batch_5.expected_time = 1;
@@ -113,14 +113,14 @@ TEST(Batch, BatchCompareOperator) {
 }
 
 TEST(Batch, SortTwoBatchesOneEmpty) {
-  io::Batch raw_batch_1 = io::Batch();
+  io::RawBatch raw_batch_1 = io::RawBatch();
   raw_batch_1.id = 1;
-  io::Batch raw_batch_2 = io::Batch();
+  io::RawBatch raw_batch_2 = io::RawBatch();
   raw_batch_2.id = 2;
-  io::Job raw_job = io::Job();
+  io::RawJob raw_job = io::RawJob();
   raw_job.batch_id = 1;
   raw_job.duration = 1;
-  io::RawData raw_data = io::RawData();
+  io::RawSituation raw_data = io::RawSituation();
   raw_data.batches = {raw_batch_1, raw_batch_2};
   raw_data.jobs = {raw_job};
 
@@ -134,25 +134,25 @@ TEST(Batch, SortTwoBatchesOneEmpty) {
 }
 
 TEST(Input, SortThreeBatches) {
-  io::Batch raw_batch_1 = io::Batch();
+  io::RawBatch raw_batch_1 = io::RawBatch();
   raw_batch_1.id = 1;
   raw_batch_1.reward = 2.0;
-  io::Batch raw_batch_2 = io::Batch();
+  io::RawBatch raw_batch_2 = io::RawBatch();
   raw_batch_2.id = 2;
   raw_batch_2.reward = 3.0;
-  io::Batch raw_batch_3 = io::Batch();
+  io::RawBatch raw_batch_3 = io::RawBatch();
   raw_batch_3.id = 3;
   raw_batch_3.reward = 1.0;
-  io::Job raw_job_1 = io::Job();
+  io::RawJob raw_job_1 = io::RawJob();
   raw_job_1.batch_id = 1;
   raw_job_1.duration = 1;
-  io::Job raw_job_2 = io::Job();
+  io::RawJob raw_job_2 = io::RawJob();
   raw_job_2.batch_id = 2;
   raw_job_2.duration = 1;
-  io::Job raw_job_3 = io::Job();
+  io::RawJob raw_job_3 = io::RawJob();
   raw_job_3.batch_id = 3;
   raw_job_3.duration = 1;
-  io::RawData raw_data = io::RawData();
+  io::RawSituation raw_data = io::RawSituation();
   raw_data.batches = {raw_batch_1, raw_batch_2, raw_batch_3};
   raw_data.jobs = {raw_job_1, raw_job_2, raw_job_3};
 

@@ -10,7 +10,7 @@ namespace lss {
 
 class ContextChanges {
  public:
-  void SetContextChanges(const std::vector<io::ContextChange> raw_changes);
+  void SetContextChanges(const std::vector<io::RawContextChange> raw_changes);
   int GetContextChangeCost(bool changed0, bool changed1, bool changed2) const;
 
  private:
@@ -19,13 +19,13 @@ class ContextChanges {
 
 class Machine {
  public:
-  explicit Machine(io::Machine raw_machine, std::shared_ptr<ContextChanges> context_changes);
+  explicit Machine(io::RawMachine raw_machine, std::shared_ptr<ContextChanges> context_changes);
 
   bool operator==(const Machine& rhs) const;
   int GetId() const;
   void SetState(io::MachineState new_state);
-  double ContextChangeCost(const io::Job& raw_job) const;
-  void AssignJob(const io::Job& raw_job);
+  double ContextChangeCost(const io::RawJob& raw_job) const;
+  void AssignJob(const io::RawJob& raw_job);
   // Now 'has_assigned_job_' is set back to false
   // when Input::Update() detects the machine has changed its state from kIdle.
   // It causes potentially a race condition - if the machine processes
@@ -33,7 +33,7 @@ class Machine {
   bool IsWaitingForAJob() const;
 
  private:
-  io::Machine raw_machine_;
+  io::RawMachine raw_machine_;
   int context_[3];
   std::shared_ptr<ContextChanges> context_changes_;
   bool has_assigned_job_;

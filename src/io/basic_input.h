@@ -21,18 +21,18 @@ class BasicReader: public Reader {
 
   // The contents of the files are not validated and reading malformed
   // records will quietly result in corrupted data.
-  bool Read(RawData* destination) override;
+  bool Read(RawSituation* destination) override;
 
  private:
   std::string input_path_;
 };
 
-std::istream &operator>>(std::istream &input, Job &job);
-std::istream &operator>>(std::istream &input, Batch &batch);
-std::istream &operator>>(std::istream &input, Machine &machine);
-std::istream &operator>>(std::istream &input, MachineSet &set);
-std::istream &operator>>(std::istream &input, Account &account);
-std::istream &operator>>(std::istream &input, ContextChange &change);
+std::istream &operator>>(std::istream &input, RawJob &job);
+std::istream &operator>>(std::istream &input, RawBatch &batch);
+std::istream &operator>>(std::istream &input, RawMachine &machine);
+std::istream &operator>>(std::istream &input, RawMachineSet &set);
+std::istream &operator>>(std::istream &input, RawAccount &account);
+std::istream &operator>>(std::istream &input, RawContextChange &change);
 
 }  // namespace io
 }  // namespace lss

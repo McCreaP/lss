@@ -12,7 +12,7 @@ namespace lss {
 
 static constexpr double kMinValue = std::numeric_limits<double>::lowest();
 
-Batch::Batch(io::Batch raw_batch) :
+Batch::Batch(io::RawBatch raw_batch) :
     raw_batch_(std::move(raw_batch)), time_to_finish_(0) { }
 
 bool Batch::operator==(const Batch& rhs) const {
@@ -30,7 +30,7 @@ double Batch::RewardAt(std::time_t time) const {
   return raw_batch_.reward + raw_batch_.timely_reward / (1 + exp(r));
 }
 
-void Batch::AddJob(const io::Job& raw_job) {
+void Batch::AddJob(const io::RawJob& raw_job) {
   time_to_finish_ += raw_job.duration;
   jobs_.insert(raw_job);
 }
@@ -39,7 +39,7 @@ int Batch::GetId() const {
   return raw_batch_.id;
 }
 
-const std::set<io::Job, JobDurationCmp>& Batch::GetSortedJobs() const {
+const std::set<io::RawJob, JobDurationCmp>& Batch::GetSortedJobs() const {
   return jobs_;
 }
 

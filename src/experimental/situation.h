@@ -141,7 +141,7 @@ class Situation {
   using Batches = const std::vector<Batch>&;
   using Jobs = const std::vector<Job>&;
 
-  // Situation shall have a constructor that takes const RawData& argument,
+  // Situation shall have a constructor that takes const RawSituation& argument,
   // but that class doesn't currently hold enough data (missing are: machine contexts,
   // job assignments, job start times and a time stamp). Simply adding those fields
   // would be too hasty and insufficient - a solutions shall be suggested

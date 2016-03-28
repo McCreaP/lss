@@ -17,21 +17,21 @@ enum class MachineState {
   kDead = 2,
 };
 
-struct Job {
+struct RawJob {
   int id;
   int batch_id;
   double duration;  // Expected duration barring setup time.
   int machineset_id;
   int context[kContextN];
 
-  bool operator==(const Job& rhs) const;
+  bool operator==(const RawJob& rhs) const;
 };
 
 // The following fields are not named in objective function definition:
 // - timely_reward (called A in paper),
 // - reward (called B in paper),
 // - expected_time (called T in paper).
-struct Batch {
+struct RawBatch {
   int id;
   int account_id;
   double timely_reward;
@@ -39,37 +39,37 @@ struct Batch {
   double expected_time;
   double due;
 
-  bool operator==(const Batch& rhs) const;
+  bool operator==(const RawBatch& rhs) const;
 };
 
-struct Machine {
+struct RawMachine {
   int id;
   MachineState state;
 };
 
-struct MachineSet {
+struct RawMachineSet {
   int id;
   std::vector<int> machines;
 };
 
-struct Account {
+struct RawAccount {
   int id;
   double alloc;
 };
 
-struct ContextChange {
+struct RawContextChange {
   bool changed[kContextN];
   int cost;
 };
 
-struct RawData {
-  std::vector<Machine> machines;
-  std::vector<MachineSet> machine_sets;
-  std::vector<MachineSet> fair_machine_sets;
-  std::vector<Job> jobs;
-  std::vector<Batch> batches;
-  std::vector<Account> accounts;
-  std::vector<ContextChange> context_changes;
+struct RawSituation {
+  std::vector<RawMachine> machines;
+  std::vector<RawMachineSet> machine_sets;
+  std::vector<RawMachineSet> fair_machine_sets;
+  std::vector<RawJob> jobs;
+  std::vector<RawBatch> batches;
+  std::vector<RawAccount> accounts;
+  std::vector<RawContextChange> context_changes;
 };
 
 }  // namespace io

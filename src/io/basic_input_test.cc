@@ -11,11 +11,11 @@ namespace io {
 // to mock filesystem).
 
 TEST(InputOperators, JobInput) {
-  static const Job kJob = {1, 7, 18, 293, {4, 3, 2}};
+  static const RawJob kJob = {1, 7, 18, 293, {4, 3, 2}};
   static const std::string data = "1 7 18 293 4 3 2";
   std::istringstream input(data);
 
-  Job job;
+  RawJob job;
   input >> job;
   EXPECT_EQ(kJob.id, job.id);
   EXPECT_EQ(kJob.batch_id, job.batch_id);
@@ -26,11 +26,11 @@ TEST(InputOperators, JobInput) {
 }
 
 TEST(InputOperators, BatchInput) {
-  static const Batch kBatch = {5, 2, 50, 34, 10, 44};
+  static const RawBatch kBatch = {5, 2, 50, 34, 10, 44};
   static const std::string data = "5 2 50 34 10 44";
   std::istringstream input(data);
 
-  Batch batch;
+  RawBatch batch;
   input >> batch;
   EXPECT_EQ(kBatch.id, batch.id);
   EXPECT_EQ(kBatch.account_id, batch.account_id);
@@ -40,44 +40,44 @@ TEST(InputOperators, BatchInput) {
 }
 
 TEST(InputOperators, MachineInput) {
-  static const Machine kMachine = {1, MachineState::kWorking};
+  static const RawMachine kMachine = {1, MachineState::kWorking};
   static const std::string data = "1 1";
   std::istringstream input(data);
 
-  Machine machine;
+  RawMachine machine;
   input >> machine;
   EXPECT_EQ(kMachine.id, machine.id);
   EXPECT_EQ(kMachine.state, machine.state);
 }
 
 TEST(InputOperators, MachineSetInput) {
-  static const MachineSet kMachineSet = {1, {2, 3, 4, 5, 6}};
+  static const RawMachineSet kMachineSet = {1, {2, 3, 4, 5, 6}};
   static const std::string data = "1 2 3 4 5 6";
   std::istringstream input(data);
 
-  MachineSet machine_set;
+  RawMachineSet machine_set;
   input >> machine_set;
   EXPECT_EQ(kMachineSet.id, machine_set.id);
   EXPECT_EQ(kMachineSet.machines, machine_set.machines);
 }
 
 TEST(InputOperators, AccountInput) {
-  static const Account kAccount = {1, 4.55};
+  static const RawAccount kAccount = {1, 4.55};
   static const std::string data = "1 4.55";
   std::istringstream input(data);
 
-  Account account;
+  RawAccount account;
   input >> account;
   EXPECT_EQ(kAccount.id, account.id);
   EXPECT_EQ(kAccount.alloc, account.alloc);
 }
 
 TEST(InputOperators, ContextChangeInput) {
-  static const ContextChange kContextChange = {{true, false, true}, 20};
+  static const RawContextChange kContextChange = {{true, false, true}, 20};
   static const std::string data = "1 0 1 20";
   std::istringstream input(data);
 
-  ContextChange context_change;
+  RawContextChange context_change;
   input >> context_change;
   for (int i = 0; i < kContextN; ++i)
     EXPECT_EQ(kContextChange.changed[i], context_change.changed[i]);

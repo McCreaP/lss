@@ -45,7 +45,7 @@ void GreedyScheduler::Schedule() {
 
 void GreedyScheduler::AssignJobsFromBatch(const Batch &batch) {
   VLOG(1) << "Assign jobs from batch: " << batch.GetId();
-  for (const io::Job &job : batch.GetSortedJobs()) {
+  for (const io::RawJob &job : batch.GetSortedJobs()) {
     VLOG(2) << "Job: " << job.id;
     if (input_.IsJobAssigned(job.id)) {
       VLOG(2) << "Already assigned";
@@ -65,7 +65,7 @@ void GreedyScheduler::AssignJobsFromBatch(const Batch &batch) {
   }
 }
 
-std::shared_ptr<Machine> GreedyScheduler::FindBestMachine(const io::Job &raw_job) {
+std::shared_ptr<Machine> GreedyScheduler::FindBestMachine(const io::RawJob &raw_job) {
   VLOG(3) << "FindBestMachine for Job: " << raw_job.id;
   double min_context_changed_cost = kMaxContextChangeCost;
   auto machines = input_.GetMachinesFromSet(raw_job.machineset_id);

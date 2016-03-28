@@ -5,28 +5,28 @@
 namespace lss {
 namespace io {
 
-std::istream &operator>>(std::istream &input, Job &job) {
+std::istream &operator>>(std::istream &input, RawJob &job) {
   input >> job.id >> job.batch_id >> job.duration >> job.machineset_id;
   for (int i = 0; i < kContextN; ++i)
     input >> job.context[i];
   return input;
 }
 
-std::istream &operator>>(std::istream &input, Batch &batch) {
+std::istream &operator>>(std::istream &input, RawBatch &batch) {
   input >> batch.id >> batch.account_id;
   input >> batch.timely_reward >> batch.reward >> batch.expected_time;
   input >> batch.due;
   return input;
 }
 
-std::istream &operator>>(std::istream &input, Machine &machine) {
+std::istream &operator>>(std::istream &input, RawMachine &machine) {
   int state;
   input >> machine.id >> state;
   machine.state = static_cast<MachineState>(state);
   return input;
 }
 
-std::istream &operator>>(std::istream &input, MachineSet &set) {
+std::istream &operator>>(std::istream &input, RawMachineSet &set) {
   input >> set.id;
 
   std::string line;
@@ -38,12 +38,12 @@ std::istream &operator>>(std::istream &input, MachineSet &set) {
   return input;
 }
 
-std::istream &operator>>(std::istream &input, Account &account) {
+std::istream &operator>>(std::istream &input, RawAccount &account) {
   input >> account.id >> account.alloc;
   return input;
 }
 
-std::istream &operator>>(std::istream &input, ContextChange &change) {
+std::istream &operator>>(std::istream &input, RawContextChange &change) {
   for (int i = 0; i < kContextN; ++i)
     input >> change.changed[i];
   input >> change.cost;

@@ -22,17 +22,17 @@ class Input {
   // Returns false if reading data from file failed.
   // If the data is erroneous behavior is undefined.
   bool Update();
-  void Assign(const io::Job& raw_job, Machine* machine);
+  void Assign(const io::RawJob& raw_job, Machine* machine);
   bool IsJobAssigned(int job_id) const;
   std::vector<Batch> GetBatches() const;
   // The returned reference is valid till a non-const method of Input is called
   const std::vector<std::shared_ptr<Machine>>& GetMachinesFromSet(int set_id) const;
 
  private:
-  void UpdateBatches(const std::vector<io::Batch>& raw_batches);
-  void UpdateJobs(const std::vector<io::Job>& raw_jobs);
-  void UpdateMachines(const std::vector<io::Machine>& raw_machines);
-  void UpdateMachineSets(const std::vector<io::MachineSet>& raw_machine_sets);
+  void UpdateBatches(const std::vector<io::RawBatch>& raw_batches);
+  void UpdateJobs(const std::vector<io::RawJob>& raw_jobs);
+  void UpdateMachines(const std::vector<io::RawMachine>& raw_machines);
+  void UpdateMachineSets(const std::vector<io::RawMachineSet>& raw_machine_sets);
 
   std::unique_ptr<io::Reader> reader_;
   std::map<int, Batch> batches_;
