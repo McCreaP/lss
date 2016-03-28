@@ -3,7 +3,8 @@
 namespace lss {
 namespace greedy {
 
-MachineWrapper::MachineWrapper(RawMachine raw_machine, std::shared_ptr<ContextChanges> context_changes) :
+MachineWrapper::MachineWrapper(RawMachine raw_machine,
+                               std::shared_ptr<ContextChanges> context_changes) :
     raw_machine_(std::move(raw_machine)), context_{-1, -1, -1},
     context_changes_(context_changes), has_assigned_job_(false) { }
 

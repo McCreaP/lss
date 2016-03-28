@@ -49,12 +49,24 @@ class Context {
 
   int operator[](size_t idx) const { return context_[idx]; }
 
-  friend bool operator==(const Context &lhs, const Context &rhs) { return lhs.context_ == rhs.context_; }
-  friend bool operator!=(const Context &lhs, const Context &rhs) { return lhs.context_ != rhs.context_; }
-  friend bool operator<(const Context &lhs, const Context &rhs) { return lhs.context_ < rhs.context_; }
-  friend bool operator>(const Context &lhs, const Context &rhs) { return lhs.context_ > rhs.context_; }
-  friend bool operator<=(const Context &lhs, const Context &rhs) { return lhs.context_ <= rhs.context_; }
-  friend bool operator>=(const Context &lhs, const Context &rhs) { return lhs.context_ >= rhs.context_; }
+  friend bool operator==(const Context &lhs, const Context &rhs) {
+    return lhs.context_ == rhs.context_;
+  }
+  friend bool operator!=(const Context &lhs, const Context &rhs) {
+    return lhs.context_ != rhs.context_;
+  }
+  friend bool operator<(const Context &lhs, const Context &rhs) {
+    return lhs.context_ < rhs.context_;
+  }
+  friend bool operator>(const Context &lhs, const Context &rhs) {
+    return lhs.context_ > rhs.context_;
+  }
+  friend bool operator<=(const Context &lhs, const Context &rhs) {
+    return lhs.context_ <= rhs.context_;
+  }
+  friend bool operator>=(const Context &lhs, const Context &rhs) {
+    return lhs.context_ >= rhs.context_;
+  }
 
  private:
   int context_[kSize] = {kNone, kNone, kNone};
@@ -87,7 +99,7 @@ struct hash<lss::Id<T>> {
 template<>
 struct hash<lss::Context> {
   size_t operator()(const lss::Context &x) const {
-    // TODO: Use boost::hash_combine instead.
+    // TODO(kzyla): Use boost::hash_combine instead.
     return hash<int>()(x[0] ^ 0xDeadBeef) ^ hash<int>()(x[1] ^ 0xBeefDead)
         ^ hash<int>()(x[2] ^ 0xCafeBabe);
   }
@@ -95,7 +107,9 @@ struct hash<lss::Context> {
 
 template<>
 struct hash<lss::Change> {
-  size_t operator()(const lss::Change &x) const { return hash<bitset<lss::Context::kSize>>()(x.change_); }
+  size_t operator()(const lss::Change &x) const {
+    return hash<bitset<lss::Context::kSize>>()(x.change_);
+  }
 };
 
 }  // namespace std

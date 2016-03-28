@@ -1,9 +1,9 @@
 #ifndef LSS_BASE_SITUATION_H_
 #define LSS_BASE_SITUATION_H_
 
-#include "base/types.h"
-
 #include <vector>
+
+#include "base/types.h"
 
 namespace lss {
 
