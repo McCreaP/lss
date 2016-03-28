@@ -1,5 +1,5 @@
-#ifndef LSS_OO_INPUT_TYPES_MACHINE_H_
-#define LSS_OO_INPUT_TYPES_MACHINE_H_
+#ifndef LSS_OO_INPUT_TYPES_MACHINE_WRAPPER_H_
+#define LSS_OO_INPUT_TYPES_MACHINE_WRAPPER_H_
 
 #include <memory>
 #include <vector>
@@ -17,11 +17,11 @@ class ContextChanges {
   int context_changes_[2][2][2];
 };
 
-class Machine {
+class MachineWrapper {
  public:
-  explicit Machine(io::RawMachine raw_machine, std::shared_ptr<ContextChanges> context_changes);
+  explicit MachineWrapper(io::RawMachine raw_machine, std::shared_ptr<ContextChanges> context_changes);
 
-  bool operator==(const Machine& rhs) const;
+  bool operator==(const MachineWrapper& rhs) const;
   int GetId() const;
   void SetState(io::MachineState new_state);
   double ContextChangeCost(const io::RawJob& raw_job) const;
@@ -41,4 +41,4 @@ class Machine {
 
 }  // namespace lss
 
-#endif  // LSS_OO_INPUT_TYPES_MACHINE_H_
+#endif  // LSS_OO_INPUT_TYPES_MACHINE_WRAPPER_H_

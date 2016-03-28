@@ -10,8 +10,8 @@
 #include <vector>
 
 #include "io/reader.h"
-#include "oo_input_types/batch.h"
-#include "oo_input_types/machine.h"
+#include "oo_input_types/batch_wrapper.h"
+#include "oo_input_types/machine_wrapper.h"
 
 namespace lss {
 
@@ -22,11 +22,11 @@ class Input {
   // Returns false if reading data from file failed.
   // If the data is erroneous behavior is undefined.
   bool Update();
-  void Assign(const io::RawJob& raw_job, Machine* machine);
+  void Assign(const io::RawJob& raw_job, MachineWrapper* machine);
   bool IsJobAssigned(int job_id) const;
-  std::vector<Batch> GetBatches() const;
+  std::vector<BatchWrapper> GetBatches() const;
   // The returned reference is valid till a non-const method of Input is called
-  const std::vector<std::shared_ptr<Machine>>& GetMachinesFromSet(int set_id) const;
+  const std::vector<std::shared_ptr<MachineWrapper>>& GetMachinesFromSet(int set_id) const;
 
  private:
   void UpdateBatches(const std::vector<io::RawBatch>& raw_batches);
@@ -35,10 +35,10 @@ class Input {
   void UpdateMachineSets(const std::vector<io::RawMachineSet>& raw_machine_sets);
 
   std::unique_ptr<io::Reader> reader_;
-  std::map<int, Batch> batches_;
+  std::map<int, BatchWrapper> batches_;
   std::unordered_set<int> assigned_jobs_ids_;
-  std::unordered_map<int, std::shared_ptr<Machine>> machines_;
-  std::unordered_map<int, std::vector<std::shared_ptr<Machine>>> machines_from_set_;
+  std::unordered_map<int, std::shared_ptr<MachineWrapper>> machines_;
+  std::unordered_map<int, std::vector<std::shared_ptr<MachineWrapper>>> machines_from_set_;
   std::shared_ptr<ContextChanges> context_changes_;
 };
 

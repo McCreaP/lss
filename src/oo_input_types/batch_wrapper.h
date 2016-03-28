@@ -1,5 +1,5 @@
-#ifndef LSS_OO_INPUT_TYPES_BATCH_H_
-#define LSS_OO_INPUT_TYPES_BATCH_H_
+#ifndef LSS_OO_INPUT_TYPES_BATCH_WRAPPER_H_
+#define LSS_OO_INPUT_TYPES_BATCH_WRAPPER_H_
 
 #include <set>
 #include <ctime>
@@ -14,11 +14,11 @@ struct JobDurationCmp {
   }
 };
 
-class Batch {
+class BatchWrapper {
  public:
-  explicit Batch(io::RawBatch raw_batch);
+  explicit BatchWrapper(io::RawBatch raw_batch);
 
-  bool operator==(const Batch& rhs) const;
+  bool operator==(const BatchWrapper& rhs) const;
 
   // Returns an evaluation of a batch at given time.
   // It is used to compare two batches by greedy scheduler
@@ -31,7 +31,7 @@ class Batch {
   void AddJob(const io::RawJob& raw_job);
   int GetId() const;
 
-  // The returned reference is valid till a non-const method of Batch is called
+  // The returned reference is valid till a non-const method of BatchWrapper is called
   const std::set<io::RawJob, JobDurationCmp>& GetSortedJobs() const;
 
  private:
@@ -44,7 +44,7 @@ class BatchRewardCmp {
  public:
   BatchRewardCmp() : time_(std::time(nullptr)) {}
 
-  bool operator() (Batch lhs, Batch rhs) {
+  bool operator() (BatchWrapper lhs, BatchWrapper rhs) {
     return lhs.Evaluate(time_) < rhs.Evaluate(time_);
   }
 
@@ -54,4 +54,4 @@ class BatchRewardCmp {
 
 }  // namespace lss
 
-#endif  // LSS_OO_INPUT_TYPES_BATCH_H_
+#endif  // LSS_OO_INPUT_TYPES_BATCH_WRAPPER_H_

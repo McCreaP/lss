@@ -25,7 +25,7 @@ bool Input::Update() {
   return true;
 }
 
-void Input::Assign(const io::RawJob &raw_job, Machine* machine) {
+void Input::Assign(const io::RawJob &raw_job, MachineWrapper* machine) {
   machine->AssignJob(raw_job);
   assigned_jobs_ids_.insert(raw_job.id);
 }
@@ -37,7 +37,7 @@ bool Input::IsJobAssigned(int job_id) const {
 void Input::UpdateBatches(const std::vector<io::RawBatch> &raw_batches) {
   batches_.clear();
   for (const io::RawBatch &raw_batch : raw_batches)
-    batches_.insert(std::make_pair(raw_batch.id, Batch(raw_batch)));
+    batches_.insert(std::make_pair(raw_batch.id, BatchWrapper(raw_batch)));
 }
 
 void Input::UpdateJobs(const std::vector<io::RawJob> &raw_jobs) {
@@ -55,15 +55,15 @@ void Input::UpdateJobs(const std::vector<io::RawJob> &raw_jobs) {
 }
 
 void Input::UpdateMachines(const std::vector<io::RawMachine> &raw_machines) {
-  std::unordered_map<int, std::shared_ptr<Machine>> updated_machines;
+  std::unordered_map<int, std::shared_ptr<MachineWrapper>> updated_machines;
   for (const io::RawMachine &raw_machine : raw_machines) {
-    std::shared_ptr<Machine> machine;
+    std::shared_ptr<MachineWrapper> machine;
     auto machines_iter = machines_.find(raw_machine.id);
     if (machines_iter != machines_.end()) {
       machine = machines_iter->second;
       machine->SetState(raw_machine.state);
     } else {
-      machine = std::make_shared<Machine>(raw_machine, context_changes_);
+      machine = std::make_shared<MachineWrapper>(raw_machine, context_changes_);
     }
     updated_machines.insert(std::make_pair(machine->GetId(), machine));
   }
@@ -73,20 +73,20 @@ void Input::UpdateMachines(const std::vector<io::RawMachine> &raw_machines) {
 void Input::UpdateMachineSets(const std::vector<io::RawMachineSet> &raw_machine_sets) {
   machines_from_set_.clear();
   for (const io::RawMachineSet &raw_machine_set : raw_machine_sets) {
-    machines_from_set_[raw_machine_set.id];  // Machine set can contain no machines
+    machines_from_set_[raw_machine_set.id];  // MachineWrapper set can contain no machines
     for (int machine_id : raw_machine_set.machines)
       machines_from_set_[raw_machine_set.id].push_back(machines_[machine_id]);
   }
 }
 
-std::vector<Batch> Input::GetBatches() const {
-  std::vector<Batch> batches;
+std::vector<BatchWrapper> Input::GetBatches() const {
+  std::vector<BatchWrapper> batches;
   for (const auto &batch : batches_)
     batches.push_back(batch.second);
   return batches;
 }
 
-const std::vector<std::shared_ptr<Machine>> &Input::GetMachinesFromSet(int set_id) const {
+const std::vector<std::shared_ptr<MachineWrapper>> &Input::GetMachinesFromSet(int set_id) const {
   return machines_from_set_.at(set_id);
 }
 
