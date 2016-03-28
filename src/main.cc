@@ -39,8 +39,8 @@ int main(int argc, char **argv) {
   program_opt::variables_map config = ProcessCommandLine(argc, argv);
   ConfigLogger(argv, config["verbose"].as<int>());
   LOG(INFO) << "Scheduler start";
-  lss::GreedyScheduler scheduler(config["input"].as<string>(),
-                                 config["assignments"].as<string>());
+  lss::greedy::GreedyScheduler scheduler(config["input"].as<string>(),
+                                         config["assignments"].as<string>());
   scheduler.Schedule();
   LOG(INFO) << "Scheduler stop";
   return 0;

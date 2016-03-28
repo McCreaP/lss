@@ -1,6 +1,7 @@
 #include "greedy/machine_wrapper.h"
 
 namespace lss {
+namespace greedy {
 
 MachineWrapper::MachineWrapper(io::RawMachine raw_machine, std::shared_ptr<ContextChanges> context_changes) :
     raw_machine_(std::move(raw_machine)), context_{-1, -1, -1},
@@ -48,5 +49,5 @@ int ContextChanges::GetContextChangeCost(bool changed0, bool changed1, bool chan
   return context_changes_[changed0][changed1][changed2];
 }
 
-
+}  // namespace greedy
 }  // namespace lss

@@ -7,6 +7,7 @@
 #include "base/raw_situation.h"
 
 namespace lss {
+namespace greedy {
 
 class ContextChanges {
  public:
@@ -39,6 +40,7 @@ class MachineWrapper {
   bool has_assigned_job_;
 };
 
+}  // namespace greedy
 }  // namespace lss
 
 #endif  // LSS_GREEDY_MACHINE_WRAPPER_H_

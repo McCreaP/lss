@@ -14,6 +14,7 @@
 #include "greedy/machine_wrapper.h"
 
 namespace lss {
+namespace greedy {
 
 class Input {
  public:
@@ -42,6 +43,7 @@ class Input {
   std::shared_ptr<ContextChanges> context_changes_;
 };
 
+}  // namespace greedy
 }  // namespace lss
 
 #endif  // LSS_GREEDY_INPUT_H_

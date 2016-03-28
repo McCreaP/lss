@@ -7,6 +7,7 @@
 #include "base/raw_situation.h"
 
 namespace lss {
+namespace greedy {
 
 struct JobDurationCmp {
   bool operator()(const io::RawJob& job1, const io::RawJob& job2) const {
@@ -52,6 +53,7 @@ class BatchRewardCmp {
   std::time_t time_;
 };
 
+}  // namespace greedy
 }  // namespace lss
 
 #endif  // LSS_GREEDY_BATCH_WRAPPER_H_

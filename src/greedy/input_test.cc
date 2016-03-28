@@ -15,15 +15,7 @@ using ::testing::Return;
 using ::testing::_;
 
 namespace lss {
-namespace io {
-
-class ReaderMock: public Reader {
- public:
-  MOCK_METHOD1(SetInputPath, void(const std::string&));
-  MOCK_METHOD1(Read, bool(RawSituation*));
-};
-
-}  // namespace io
+namespace greedy {
 
 TEST(Input, UpdateSucceed) {
   std::unique_ptr<io::ReaderMock> reader = std::make_unique<io::ReaderMock>();
@@ -217,4 +209,5 @@ TEST(Input, AssignedJobsAfterUpdate) {
   EXPECT_TRUE(input.IsJobAssigned(kSecondJobId));
 }
 
+}  // namespace greedy
 }  // namespace lss

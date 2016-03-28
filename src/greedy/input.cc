@@ -8,6 +8,7 @@
 #include "io/basic_input.h"
 
 namespace lss {
+namespace greedy {
 
 Input::Input(std::unique_ptr<io::Reader> reader) :
   reader_(std::move(reader)), context_changes_(std::make_shared<ContextChanges>()) { }
@@ -90,4 +91,5 @@ const std::vector<std::shared_ptr<MachineWrapper>> &Input::GetMachinesFromSet(in
   return machines_from_set_.at(set_id);
 }
 
+}  // namespace greedy
 }  // namespace lss

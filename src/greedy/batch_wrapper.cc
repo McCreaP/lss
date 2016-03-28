@@ -9,6 +9,7 @@
 #include "base/raw_situation.h"
 
 namespace lss {
+namespace greedy {
 
 static constexpr double kMinValue = std::numeric_limits<double>::lowest();
 
@@ -43,4 +44,5 @@ const std::set<io::RawJob, JobDurationCmp>& BatchWrapper::GetSortedJobs() const 
   return jobs_;
 }
 
+}  // namespace greedy
 }  // namespace lss

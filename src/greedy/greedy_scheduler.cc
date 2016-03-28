@@ -13,6 +13,7 @@
 #include "greedy/machine_wrapper.h"
 
 namespace lss {
+namespace greedy {
 namespace {
 
 void NotifyDriverIFinishedCompute() {
@@ -88,4 +89,5 @@ std::shared_ptr<MachineWrapper> GreedyScheduler::FindBestMachine(const io::RawJo
   return best_machine;
 }
 
+}  // namespace greedy
 }  // namespace lss

@@ -8,6 +8,7 @@
 #include "base/raw_situation.h"
 
 namespace lss {
+namespace greedy {
 
 TEST(BatchWrapper, JobCmpRetrunsTrue) {
   io::RawJob raw_job_1 = io::RawJob();
@@ -168,4 +169,5 @@ TEST(Input, SortThreeBatches) {
   EXPECT_EQ(std::vector<BatchWrapper>({batch3, batch1, batch2}), batches);
 }
 
+}  // namespace greedy
 }  // namespace lss

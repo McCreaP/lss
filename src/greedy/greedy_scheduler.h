@@ -7,6 +7,7 @@
 #include "greedy/input.h"
 
 namespace lss {
+namespace greedy {
 
 class GreedyScheduler {
  public:
@@ -25,6 +26,7 @@ class GreedyScheduler {
   io::BasicWriter basic_writer_;
 };
 
+}  // namespace greedy
 }  // namespace lss
 
 #endif  // LSS_GREEDY_GREEDY_SCHEDULER_H_

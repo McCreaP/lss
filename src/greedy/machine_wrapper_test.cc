@@ -5,6 +5,7 @@
 #include "gtest/gtest.h"
 
 namespace lss {
+namespace greedy {
 
 TEST(MachineWrapper, GetId) {
   static const int kMachineId = 42;
@@ -69,4 +70,5 @@ TEST(MachineWrapper, SetStateFromIdleToIdleWithAssignedJob) {
   EXPECT_FALSE(machine.IsWaitingForAJob());
 }
 
+}  // namespace greedy
 }  // namespace lss
