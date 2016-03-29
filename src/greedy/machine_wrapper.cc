@@ -41,7 +41,7 @@ bool MachineWrapper::IsWaitingForAJob() const {
 
 void ContextChanges::SetContextChanges(const std::vector<RawContextChange> raw_changes) {
   for (const auto& raw_change : raw_changes) {
-    const bool* changed = raw_change.changed;
+    const Change& changed = raw_change.changed;
     context_changes_[changed[0]][changed[1]][changed[2]] = raw_change.cost;
   }
 }

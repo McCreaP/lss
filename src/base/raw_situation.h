@@ -17,7 +17,7 @@ struct RawJob {
   Duration duration;  // Expected duration barring setup time.
   Time start_time;    // Not present in the input file.
   IdType machineset_id;
-  int context[Context::kSize];
+  Context context;
 
   bool operator==(const RawJob& rhs) const;
 };
@@ -42,7 +42,7 @@ struct RawBatch {
 struct RawMachine {
   IdType id;
   MachineState state;
-  int context[Context::kSize];  // Not present in the input file.
+  Context context;  // Not present in the input file.
 };
 
 struct RawMachineSet {
@@ -56,7 +56,7 @@ struct RawAccount {
 };
 
 struct RawContextChange {
-  bool changed[Context::kSize];
+  Change changed;
   Cost cost;
 };
 

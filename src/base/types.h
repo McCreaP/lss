@@ -1,7 +1,8 @@
 #ifndef LSS_BASE_TYPES_H_
 #define LSS_BASE_TYPES_H_
 
-#include <bitset>
+#include <cstdlib>
+
 #include <limits>
 
 namespace lss {
@@ -48,7 +49,8 @@ class Context {
   Context() = default;
   Context(int c1, int c2, int c3) : context_{c1, c2, c3} {}
 
-  int operator[](size_t idx) const { return context_[idx]; }
+  int& operator[](size_t idx) { return context_[idx]; }
+  const int& operator[](size_t idx) const { return context_[idx]; }
 
   friend bool operator==(const Context &lhs, const Context &rhs) {
     return lhs.context_ == rhs.context_;
@@ -75,17 +77,18 @@ class Context {
 
 class Change {
  public:
+  static constexpr int kSize = Context::kSize;
+
   Change() = default;
-  Change(bool c1, bool c2, bool c3) : change_(1*c1 + 2*c2 + 4*c3) {}
+  Change(bool c1, bool c2, bool c3) : change_{c1, c2, c3} {}
   Change(const Context &from, const Context &to)
       : Change(from[0] != to[0], from[1] != to[1], from[2] != to[2]) {}
 
-  bool operator[](size_t idx) const { return change_.test(idx); }
+  bool& operator[](size_t idx) { return change_[idx]; }
+  const bool& operator[](size_t idx) const { return change_[idx]; }
 
  private:
-  std::bitset<Context::kSize> change_;
-
-  friend struct std::hash<Change>;
+  bool change_[kSize];
 };
 
 }  // namespace lss
@@ -109,7 +112,7 @@ struct hash<lss::Context> {
 template<>
 struct hash<lss::Change> {
   size_t operator()(const lss::Change &x) const {
-    return hash<bitset<lss::Context::kSize>>()(x.change_);
+    return 1*x[0] + 2*x[1] + 4*x[2];
   }
 };
 
