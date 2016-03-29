@@ -14,8 +14,8 @@ std::istream &operator>>(std::istream &input, RawJob &job) {
 
 std::istream &operator>>(std::istream &input, RawBatch &batch) {
   input >> batch.id >> batch.account_id;
-  input >> batch.timely_reward >> batch.reward >> batch.expected_time;
-  input >> batch.due;
+  input >> batch.job_reward >> batch.job_timely_reward >> batch.reward >> batch.timely_reward;
+  input >> batch.expected_time >> batch.due;
   return input;
 }
 

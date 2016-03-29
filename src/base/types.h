@@ -7,6 +7,7 @@
 namespace lss {
 
 // More adequate types might be substituted in the future.
+using IdType = int;
 using FloatType = double;
 using Time = double;
 using Duration = double;

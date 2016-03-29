@@ -26,15 +26,18 @@ TEST(InputOperators, JobInput) {
 }
 
 TEST(InputOperators, BatchInput) {
-  static const RawBatch kBatch = {5, 2, 50, 34, 10, 44};
-  static const std::string data = "5 2 50 34 10 44";
+  static const RawBatch kBatch = {5, 2, 50, 234, 4, 34, 10, 44};
+  static const std::string data = "5 2 50 234 4 34 10 44";
   std::istringstream input(data);
 
   RawBatch batch;
   input >> batch;
   EXPECT_EQ(kBatch.id, batch.id);
   EXPECT_EQ(kBatch.account_id, batch.account_id);
+  EXPECT_EQ(kBatch.job_reward, batch.job_reward);
+  EXPECT_EQ(kBatch.job_timely_reward, batch.job_timely_reward);
   EXPECT_EQ(kBatch.reward, batch.reward);
+  EXPECT_EQ(kBatch.timely_reward, batch.timely_reward);
   EXPECT_EQ(kBatch.expected_time, batch.expected_time);
   EXPECT_EQ(kBatch.due, batch.due);
 }

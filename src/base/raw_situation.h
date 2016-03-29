@@ -11,12 +11,12 @@
 namespace lss {
 
 struct RawJob {
-  int id;
-  int batch_id;
-  int machine_id;     // The machine this job is assigned to; not present in the input file.
-  double duration;    // Expected duration barring setup time.
-  double start_time;  // Not present in the input file.
-  int machineset_id;
+  IdType id;
+  IdType batch_id;
+  IdType machine_id;  // The machine this job is assigned to; not present in the input file.
+  Duration duration;  // Expected duration barring setup time.
+  Time start_time;    // Not present in the input file.
+  IdType machineset_id;
   int context[Context::kSize];
 
   bool operator==(const RawJob& rhs) const;
@@ -27,39 +27,41 @@ struct RawJob {
 // - reward (called B in paper),
 // - expected_time (called T in paper).
 struct RawBatch {
-  int id;
-  int account_id;
-  double timely_reward;
-  double reward;
-  double expected_time;
-  double due;
+  IdType id;
+  IdType account_id;
+  FloatType job_reward;
+  FloatType job_timely_reward;
+  FloatType reward;
+  FloatType timely_reward;
+  Duration expected_time;
+  Time due;
 
   bool operator==(const RawBatch& rhs) const;
 };
 
 struct RawMachine {
-  int id;
+  IdType id;
   MachineState state;
   int context[Context::kSize];  // Not present in the input file.
 };
 
 struct RawMachineSet {
-  int id;
-  std::vector<int> machines;
+  IdType id;
+  std::vector<IdType> machines;
 };
 
 struct RawAccount {
-  int id;
-  double alloc;
+  IdType id;
+  FloatType alloc;
 };
 
 struct RawContextChange {
   bool changed[Context::kSize];
-  int cost;
+  Cost cost;
 };
 
 struct RawSituation {
-  double time_stamp;  // Not present in the input file.
+  Time time_stamp;  // Not present in the input file.
   std::vector<RawMachine> machines;
   std::vector<RawMachineSet> machine_sets;
   std::vector<RawMachineSet> fair_sets;
