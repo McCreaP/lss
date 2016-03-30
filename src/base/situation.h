@@ -41,6 +41,7 @@ class Machine {
 class MachineSet {
  public:
   using Machines = const std::vector<Machine>&;
+  using Jobs = const std::vector<Job>&;
 
   MachineSet() = default;
 
@@ -48,6 +49,7 @@ class MachineSet {
 
   Id<MachineSet> id() const;
   Machines machines() const;
+  Jobs jobs() const;
 
  private:
   struct Data;
@@ -155,7 +157,7 @@ class Situation {
   using Jobs = const std::vector<Job>&;
 
   // The behavior is undefined if raw contains several objects of the same type with the same ID.
-  // Situation(const RawSituation &raw);
+  Situation(const RawSituation &raw);
 
   ~Situation();
 
@@ -176,6 +178,16 @@ class Situation {
   Jobs jobs() const { return jobs_; }
 
  private:
+  template<class T>
+  static T Get(const std::vector<T> &from, Id<T> id);
+
+  void AddMachines(const std::vector<RawMachine> &raw);
+  void AddMachineSets(const std::vector<RawMachineSet> &raw);
+  void AddFairSets(const std::vector<RawMachineSet> &raw);
+  void AddAccounts(const std::vector<RawAccount> &raw);
+  void AddBatches(const std::vector<RawBatch> &raw);
+  void AddJobs(const std::vector<RawJob> &raw);
+
   Time time_stamp_;
 
   std::vector<Machine> machines_;
@@ -184,9 +196,6 @@ class Situation {
   std::vector<Account> accounts_;
   std::vector<Batch> batches_;
   std::vector<Job> jobs_;
-
-  template<class T>
-  static T Get(const std::vector<T> &from, Id<T> id);
 };
 
 struct Machine::Data {
@@ -204,6 +213,7 @@ struct MachineSet::Data {
   Id<MachineSet> id;
 
   std::vector<Machine> machines;
+  std::vector<Job> jobs;
 };
 
 struct FairSet::Data {
