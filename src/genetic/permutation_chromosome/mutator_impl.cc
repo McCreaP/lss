@@ -13,7 +13,7 @@ void MutatorImpl::mutate(const Situation &situation, Chromosome *chromosome) con
     bool takeJobMachineToMutation = getRandInRange(0., 1.) < kMutationProbability;
     if (takeJobMachineToMutation) {
       const Job *job = std::get<0>((*chromosome)[i]);
-      const Machine *machine = findRandomMachineForJob(situation, &job);
+      const Machine *machine = findRandomMachineForJob(situation, *job);
       (*chromosome)[i] = std::make_tuple(job, machine);
     }
   }

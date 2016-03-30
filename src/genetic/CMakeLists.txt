@@ -1,1 +1,5 @@
 add_library(genetic_algorithm algorithm.cc selector_impl.cc)
+
+add_subdirectory(permutation_chromosome)
+
+target_link_libraries(genetic_algorithm permutation_chromosome)
