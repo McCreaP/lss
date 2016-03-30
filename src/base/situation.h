@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "base/raw_situation.h"
 #include "base/types.h"
 
 namespace lss {
@@ -30,8 +31,8 @@ class Machine {
 
  private:
   struct Data;
-  explicit Machine(const Data *data) : data_(data) {}
-  const Data *const data_ = nullptr;
+  explicit Machine(Data *data) : data_(data) {}
+  Data *data_ = nullptr;
   friend class Situation;
 };
 
@@ -46,8 +47,8 @@ class MachineSet {
 
  private:
   struct Data;
-  explicit MachineSet(const Data *data) : data_(data) {}
-  const Data *const data_ = nullptr;
+  explicit MachineSet(Data *data) : data_(data) {}
+  Data *data_ = nullptr;
   friend class Situation;
 };
 
@@ -62,8 +63,8 @@ class FairSet {
 
  private:
   struct Data;
-  explicit FairSet(const Data *data) : data_(data) {}
-  const Data *const data_ = nullptr;
+  explicit FairSet(Data *data) : data_(data) {}
+  Data *data_ = nullptr;
   friend class Situation;
 };
 
@@ -79,8 +80,8 @@ class Account {
 
  private:
   struct Data;
-  explicit Account(const Data *data) : data_(data) {}
-  const Data *const data_ = nullptr;
+  explicit Account(Data *data) : data_(data) {}
+  Data *data_ = nullptr;
   friend class Situation;
 };
 
@@ -102,8 +103,8 @@ class Batch {
 
  private:
   struct Data;
-  explicit Batch(const Data *data) : data_(data) {}
-  const Data *const data_ = nullptr;
+  explicit Batch(Data *data) : data_(data) {}
+  Data *data_ = nullptr;
   friend class Situation;
 };
 
@@ -121,8 +122,8 @@ class Job {
 
  private:
   struct Data;
-  explicit Job(const Data *data) : data_(data) {}
-  const Data *const data_ = nullptr;
+  explicit Job(Data *data) : data_(data) {}
+  Data *data_ = nullptr;
   friend class Situation;
 };
 
@@ -141,24 +142,30 @@ class Situation {
   using Batches = const std::vector<Batch>&;
   using Jobs = const std::vector<Job>&;
 
-  // Situation shall have a constructor that takes const RawSituation& argument,
-  // but that class doesn't currently hold enough data (missing are: machine contexts,
-  // job assignments, job start times and a time stamp). Simply adding those fields
-  // would be too hasty and insufficient - a solutions shall be suggested
-  // in another commit.
+  // The behavior is undefined if raw contains several objects of the same type with the same ID.
+  // Situation(const RawSituation &raw);
 
   ~Situation();
 
-  Jobs jobs() const { return jobs_; }
+  Time time_stamp() const { return time_stamp_; }
+
+  Machine operator[](Id<Machine> id) const { return Get(machines_, id); }
+  MachineSet operator[](Id<MachineSet> id) const { return Get(machine_sets_, id); }
+  FairSet operator[](Id<FairSet> id) const { return Get(fair_sets_, id); }
+  Account operator[](Id<Account> id) const { return Get(accounts_, id); }
+  Batch operator[](Id<Batch> id) const { return Get(batches_, id); }
+  Job operator[](Id<Job> id) const { return Get(jobs_, id); }
+
   Machines machines() const { return machines_; }
   MachineSets machine_sets() const { return machine_sets_; }
   FairSets fair_sets() const { return fair_sets_; }
   Accounts accounts() const { return accounts_; }
   Batches batches() const { return batches_; }
-
-  Time time_stamp() const { return time_stamp_; }
+  Jobs jobs() const { return jobs_; }
 
  private:
+  Time time_stamp_;
+
   std::vector<Machine> machines_;
   std::vector<MachineSet> machine_sets_;
   std::vector<FairSet> fair_sets_;
@@ -166,7 +173,8 @@ class Situation {
   std::vector<Batch> batches_;
   std::vector<Job> jobs_;
 
-  Time time_stamp_;
+  template<class T>
+  static T Get(const std::vector<T> &from, Id<T> id);
 };
 
 struct Machine::Data {

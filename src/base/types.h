@@ -31,7 +31,7 @@ class Id {
   explicit operator int() const { return id_; }
 
   friend bool operator==(Id lhs, Id rhs) { return lhs.id_ == rhs.id_; }
-  friend bool operator!=(Id lhs, Id rhs) { return lhs.Id != rhs.id_; }
+  friend bool operator!=(Id lhs, Id rhs) { return lhs.id_ != rhs.id_; }
   friend bool operator<(Id lhs, Id rhs) { return lhs.id_ < rhs.id_; }
   friend bool operator>(Id lhs, Id rhs) { return lhs.id_ > rhs.id_; }
   friend bool operator<=(Id lhs, Id rhs) { return lhs.id_ <= rhs.id_; }
