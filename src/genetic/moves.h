@@ -30,13 +30,13 @@ class Evaluator {
 template<class T>
 class Mutator {
  public:
-  Mutator(double mutationProbability) : mutationProbability_(mutationProbability) {}
+  Mutator(double mutationProbability) : kMutationProbability(mutationProbability) {}
 
-  virtual void mutate(T *chromosome) const = 0;
+  virtual void mutate(const Situation &situation, T *chromosome) const = 0;
   virtual ~Mutator();
 
- private:
-  double mutationProbability_;
+ protected:
+  const double kMutationProbability;
 };
 
 template<class T>
@@ -44,9 +44,6 @@ class Crosser {
  public:
   virtual void crossover(T *lhs, T *rhs) const = 0;
   virtual ~Crosser();
-
- protected:
-  double crossoverProbability_;
 };
 
 }  // namespace genetic
