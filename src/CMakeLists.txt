@@ -9,6 +9,7 @@ add_executable(unit_tests main_test.cc)
 add_subdirectory(base)
 add_subdirectory(greedy)
 add_subdirectory(io)
+add_subdirectory(genetic)
 
 target_link_libraries(lss base greedy io glog ${Boost_LIBRARIES})
 
