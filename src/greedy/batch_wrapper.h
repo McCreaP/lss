@@ -1,24 +1,25 @@
-#ifndef LSS_OO_INPUT_TYPES_BATCH_H_
-#define LSS_OO_INPUT_TYPES_BATCH_H_
+#ifndef LSS_GREEDY_BATCH_WRAPPER_H_
+#define LSS_GREEDY_BATCH_WRAPPER_H_
 
 #include <set>
 #include <ctime>
 #include <cstdlib>
-#include "io/raw_input_types.h"
+#include "base/raw_situation.h"
 
 namespace lss {
+namespace greedy {
 
 struct JobDurationCmp {
-  bool operator()(const io::Job& job1, const io::Job& job2) const {
+  bool operator()(const RawJob& job1, const RawJob& job2) const {
     return job1.duration < job2.duration;
   }
 };
 
-class Batch {
+class BatchWrapper {
  public:
-  explicit Batch(io::Batch raw_batch);
+  explicit BatchWrapper(RawBatch raw_batch);
 
-  bool operator==(const Batch& rhs) const;
+  bool operator==(const BatchWrapper& rhs) const;
 
   // Returns an evaluation of a batch at given time.
   // It is used to compare two batches by greedy scheduler
@@ -28,23 +29,23 @@ class Batch {
   // The reward that the objective function would give us
   // for completing the batch in moment 'time'
   double RewardAt(std::time_t time) const;
-  void AddJob(const io::Job& raw_job);
+  void AddJob(const RawJob& raw_job);
   int GetId() const;
 
-  // The returned reference is valid till a non-const method of Batch is called
-  const std::set<io::Job, JobDurationCmp>& GetSortedJobs() const;
+  // The returned reference is valid till a non-const method of BatchWrapper is called
+  const std::set<RawJob, JobDurationCmp>& GetSortedJobs() const;
 
  private:
-  io::Batch raw_batch_;
+  RawBatch raw_batch_;
   double time_to_finish_;
-  std::set<io::Job, JobDurationCmp> jobs_;
+  std::set<RawJob, JobDurationCmp> jobs_;
 };
 
 class BatchRewardCmp {
  public:
   BatchRewardCmp() : time_(std::time(nullptr)) {}
 
-  bool operator() (Batch lhs, Batch rhs) {
+  bool operator() (BatchWrapper lhs, BatchWrapper rhs) {
     return lhs.Evaluate(time_) < rhs.Evaluate(time_);
   }
 
@@ -52,6 +53,7 @@ class BatchRewardCmp {
   std::time_t time_;
 };
 
+}  // namespace greedy
 }  // namespace lss
 
-#endif  // LSS_OO_INPUT_TYPES_BATCH_H_
+#endif  // LSS_GREEDY_BATCH_WRAPPER_H_

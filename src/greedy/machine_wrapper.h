@@ -1,31 +1,32 @@
-#ifndef LSS_OO_INPUT_TYPES_MACHINE_H_
-#define LSS_OO_INPUT_TYPES_MACHINE_H_
+#ifndef LSS_GREEDY_MACHINE_WRAPPER_H_
+#define LSS_GREEDY_MACHINE_WRAPPER_H_
 
 #include <memory>
 #include <vector>
 
-#include "io/raw_input_types.h"
+#include "base/raw_situation.h"
 
 namespace lss {
+namespace greedy {
 
 class ContextChanges {
  public:
-  void SetContextChanges(const std::vector<io::ContextChange> raw_changes);
+  void SetContextChanges(const std::vector<RawContextChange> raw_changes);
   int GetContextChangeCost(bool changed0, bool changed1, bool changed2) const;
 
  private:
   int context_changes_[2][2][2];
 };
 
-class Machine {
+class MachineWrapper {
  public:
-  explicit Machine(io::Machine raw_machine, std::shared_ptr<ContextChanges> context_changes);
+  explicit MachineWrapper(RawMachine raw_machine, std::shared_ptr<ContextChanges> context_changes);
 
-  bool operator==(const Machine& rhs) const;
+  bool operator==(const MachineWrapper& rhs) const;
   int GetId() const;
-  void SetState(io::MachineState new_state);
-  double ContextChangeCost(const io::Job& raw_job) const;
-  void AssignJob(const io::Job& raw_job);
+  void SetState(MachineState new_state);
+  double ContextChangeCost(const RawJob& raw_job) const;
+  void AssignJob(const RawJob& raw_job);
   // Now 'has_assigned_job_' is set back to false
   // when Input::Update() detects the machine has changed its state from kIdle.
   // It causes potentially a race condition - if the machine processes
@@ -33,12 +34,13 @@ class Machine {
   bool IsWaitingForAJob() const;
 
  private:
-  io::Machine raw_machine_;
+  RawMachine raw_machine_;
   int context_[3];
   std::shared_ptr<ContextChanges> context_changes_;
   bool has_assigned_job_;
 };
 
+}  // namespace greedy
 }  // namespace lss
 
-#endif  // LSS_OO_INPUT_TYPES_MACHINE_H_
+#endif  // LSS_GREEDY_MACHINE_WRAPPER_H_

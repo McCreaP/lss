@@ -1,22 +1,21 @@
-#include "io/raw_input_types.h"
+#include "base/raw_situation.h"
 
 #include <iostream>
 
 namespace lss {
-namespace io {
 
-bool Job::operator==(const Job& rhs) const {
+bool RawJob::operator==(const RawJob& rhs) const {
   bool ok = true;
   ok &= (id == rhs.id);
   ok &= (machineset_id == rhs.machineset_id);
   ok &= (batch_id == rhs.batch_id);
   ok &= (duration == rhs.duration);
-  for (int i = 0; i < kContextN; ++i)
+  for (int i = 0; i < Context::kSize; ++i)
     ok &= (context[i] == rhs.context[i]);
   return ok;
 }
 
-bool Batch::operator==(const Batch& rhs) const {
+bool RawBatch::operator==(const RawBatch& rhs) const {
   return id == rhs.id &&
       account_id == rhs.account_id &&
       timely_reward == rhs.timely_reward &&
@@ -25,5 +24,4 @@ bool Batch::operator==(const Batch& rhs) const {
       due == rhs.due;
 }
 
-}  // namespace io
 }  // namespace lss

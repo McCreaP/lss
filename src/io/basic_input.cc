@@ -15,43 +15,43 @@ namespace lss {
 namespace io {
 namespace {
 
-template<class T, std::vector<T> RawData::* VEC>
-void ReadOne(std::istream* input, RawData* destination) {
+template<class T, std::vector<T> RawSituation::* VEC>
+void ReadOne(std::istream* input, RawSituation* destination) {
   (destination->*VEC).push_back(T());
   *input >> (destination->*VEC).back();
 }
 
-using SectionReader = void (*)(std::istream*, RawData*);
+using SectionReader = void (*)(std::istream*, RawSituation*);
 using HeaderReaderPair = std::tuple<const char*, SectionReader>;
 
 constexpr std::array<HeaderReaderPair, 7> kReaders{
   HeaderReaderPair{
     "machines",
-    &ReadOne<Machine, &RawData::machines>
+    &ReadOne<RawMachine, &RawSituation::machines>
   },
   HeaderReaderPair{
     "machine-sets",
-    &ReadOne<MachineSet, &RawData::machine_sets>
+    &ReadOne<RawMachineSet, &RawSituation::machine_sets>
   },
   HeaderReaderPair{
     "fair-service-machine-sets",
-    &ReadOne<MachineSet, &RawData::fair_machine_sets>
+    &ReadOne<RawMachineSet, &RawSituation::fair_sets>
   },
   HeaderReaderPair{
     "jobs",
-    &ReadOne<Job, &RawData::jobs>
+    &ReadOne<RawJob, &RawSituation::jobs>
   },
   HeaderReaderPair{
     "batches",
-    &ReadOne<Batch, &RawData::batches>
+    &ReadOne<RawBatch, &RawSituation::batches>
   },
   HeaderReaderPair{
     "accounts",
-    &ReadOne<Account, &RawData::accounts>
+    &ReadOne<RawAccount, &RawSituation::accounts>
   },
   HeaderReaderPair{
     "context-changes",
-    &ReadOne<ContextChange, &RawData::context_changes>
+    &ReadOne<RawContextChange, &RawSituation::context_changes>
   },
 };
 
@@ -72,7 +72,7 @@ void BasicReader::SetInputPath(const std::string &input_path) {
   input_path_ = input_path;
 }
 
-bool BasicReader::Read(RawData* destination) {
+bool BasicReader::Read(RawSituation* destination) {
   std::string new_path = input_path_ + ".read";
   if (std::rename(input_path_.c_str(), new_path.c_str())) {
     return false;
