@@ -22,6 +22,8 @@ class Machine {
 
   Machine() = default;
 
+  explicit operator bool() { return data_; }
+
   Id<Machine> id() const;
   MachineState state() const;
   Context context() const;
@@ -42,6 +44,8 @@ class MachineSet {
 
   MachineSet() = default;
 
+  explicit operator bool() { return data_; }
+
   Id<MachineSet> id() const;
   Machines machines() const;
 
@@ -57,6 +61,8 @@ class FairSet {
   using Machines = const std::vector<Machine>&;
 
   FairSet() = default;
+
+  explicit operator bool() { return data_; }
 
   Id<FairSet> id() const;
   Machines machines() const;
@@ -74,6 +80,8 @@ class Account {
 
   Account() = default;
 
+  explicit operator bool() { return data_; }
+
   Id<Account> id() const;
   FloatType alloc() const;
   Batches batches() const;
@@ -90,6 +98,8 @@ class Batch {
   using Jobs = const std::vector<Job>&;
 
   Batch() = default;
+
+  explicit operator bool() { return data_; }
 
   Id<Batch> id() const;
   FloatType reward() const;
@@ -111,6 +121,8 @@ class Batch {
 class Job {
  public:
   Job() = default;
+
+  explicit operator bool() { return data_; }
 
   Id<Job> id() const;
   Duration duration() const;
