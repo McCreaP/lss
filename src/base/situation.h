@@ -156,8 +156,20 @@ class Situation {
   using Batches = const std::vector<Batch>&;
   using Jobs = const std::vector<Job>&;
 
-  // The behavior is undefined if raw contains several objects of the same type with the same ID.
-  Situation(const RawSituation &raw);
+  // In `raw` all objects of the same type must have unique, known ids (id != Id::kNone)
+  // and their relations must be valid (other_id references an existing object).
+  // Otherwise std::invalid_argument will be thrown.
+  //
+  // If `safe` is set to false objects are allowed to have id == Id::kNone (such objects cannot
+  // be retrieved with operator[]) or other_id == Id::kNone (the corresponding method returns
+  // default-constructed object).
+  explicit Situation(const RawSituation &raw, bool safe = true);
+
+  // Copying is pointless as Situation is immutable. Copy constructor and copy assignment operator
+  // would be just syntax sugar for keeping std::shared_ptr<Situation>.
+  // They might be added in the future.
+  Situation(const Situation &) = delete;
+  Situation& operator=(const Situation &) = delete;
 
   ~Situation();
 
@@ -181,12 +193,12 @@ class Situation {
   template<class T>
   static T Get(const std::vector<T> &from, Id<T> id);
 
-  void AddMachines(const std::vector<RawMachine> &raw);
-  void AddMachineSets(const std::vector<RawMachineSet> &raw);
-  void AddFairSets(const std::vector<RawMachineSet> &raw);
-  void AddAccounts(const std::vector<RawAccount> &raw);
-  void AddBatches(const std::vector<RawBatch> &raw);
-  void AddJobs(const std::vector<RawJob> &raw);
+  void AddMachines(const std::vector<RawMachine> &raw, bool safe);
+  void AddMachineSets(const std::vector<RawMachineSet> &raw, bool safe);
+  void AddFairSets(const std::vector<RawMachineSet> &raw, bool safe);
+  void AddAccounts(const std::vector<RawAccount> &raw, bool safe);
+  void AddBatches(const std::vector<RawBatch> &raw, bool safe);
+  void AddJobs(const std::vector<RawJob> &raw, bool safe);
 
   Time time_stamp_;
 

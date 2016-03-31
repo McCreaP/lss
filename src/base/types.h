@@ -29,6 +29,7 @@ class Id {
   explicit Id(int id) : id_(id) {}
 
   explicit operator int() const { return id_; }
+  explicit operator bool() const { return id_ != kNone; }
 
   friend bool operator==(Id lhs, Id rhs) { return lhs.id_ == rhs.id_; }
   friend bool operator!=(Id lhs, Id rhs) { return lhs.id_ != rhs.id_; }

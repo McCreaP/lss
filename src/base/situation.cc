@@ -1,6 +1,7 @@
 #include "base/situation.h"
 
 #include <algorithm>
+#include <stdexcept>
 
 namespace lss {
 namespace {
@@ -8,22 +9,40 @@ namespace {
 template<class T>
 bool IdCmp(T lhs, T rhs)  { return lhs.id() < rhs.id(); }
 
+template<class T>
+void SortAndVerify(std::vector<T> *vec, bool safe) {
+  std::sort(vec->begin(), vec->end(), &IdCmp<T>);
+
+  // We rely on the fact that Id::kNone has the smallest possible value.
+  if (safe && !vec->empty() && vec->front().id() == Id<T>())
+    throw std::invalid_argument("Object with id == kNone.");
+
+  for (size_t i = 1; i < vec->size(); ++i)
+    if ((*vec)[i-1].id() == (*vec)[i].id() && (*vec)[i].id() != Id<T>())
+      throw std::invalid_argument("Multiple objects of with the same id.");
+}
+
 }  // namespace
 
-Situation::Situation(const RawSituation &raw) {
+Situation::Situation(const RawSituation &raw, bool safe) {
   time_stamp_ = raw.time_stamp;
 
   // The order of adding is important - we rely on the fact, that the (one-way) relations
   // form an acyclic graph.
-  AddMachines(raw.machines);
-  AddMachineSets(raw.machine_sets);
-  AddFairSets(raw.fair_sets);
-  AddAccounts(raw.accounts);
-  AddBatches(raw.batches);
-  AddJobs(raw.jobs);
+  try {
+    AddMachines(raw.machines, safe);
+    AddMachineSets(raw.machine_sets, safe);
+    AddFairSets(raw.fair_sets, safe);
+    AddAccounts(raw.accounts, safe);
+    AddBatches(raw.batches, safe);
+    AddJobs(raw.jobs, safe);
+  } catch (std::invalid_argument &) {
+    this->~Situation();
+    throw;
+  }
 }
 
-void Situation::AddMachines(const std::vector<RawMachine> &raw) {
+void Situation::AddMachines(const std::vector<RawMachine> &raw, bool safe) {
   machines_.reserve(raw.size());
   for (auto &rm : raw) {
     Machine m(new Machine::Data);
@@ -33,10 +52,10 @@ void Situation::AddMachines(const std::vector<RawMachine> &raw) {
     m.data_->state = rm.state;
     m.data_->context = rm.context;
   }
-  std::sort(machines_.begin(), machines_.end(), &IdCmp<Machine>);
+  SortAndVerify(&machines_, safe);
 }
 
-void Situation::AddMachineSets(const std::vector<RawMachineSet> &raw) {
+void Situation::AddMachineSets(const std::vector<RawMachineSet> &raw, bool safe) {
   machine_sets_.reserve(raw.size());
   for (auto &rs : raw) {
     MachineSet s(new MachineSet::Data);
@@ -48,13 +67,15 @@ void Situation::AddMachineSets(const std::vector<RawMachineSet> &raw) {
       if (Machine m = (*this)[Id<Machine>(m_id)]) {
         s.data_->machines.push_back(m);
         m.data_->machine_sets.push_back(s);
+      } else if (safe || Id<Machine>(m_id)) {
+        throw std::invalid_argument("Invalid relation.");
       }
     }
   }
-  std::sort(machine_sets_.begin(), machine_sets_.end(), &IdCmp<MachineSet>);
+  SortAndVerify(&machine_sets_, safe);
 }
 
-void Situation::AddFairSets(const std::vector<RawMachineSet> &raw) {
+void Situation::AddFairSets(const std::vector<RawMachineSet> &raw, bool safe) {
   fair_sets_.reserve(raw.size());
   for (auto &rf : raw) {
     FairSet f(new FairSet::Data);
@@ -66,13 +87,15 @@ void Situation::AddFairSets(const std::vector<RawMachineSet> &raw) {
       if (Machine m = (*this)[Id<Machine>(m_id)]) {
         f.data_->machines.push_back(m);
         m.data_->fair_set = f;
+      } else if (safe || Id<Machine>(m_id)) {
+        throw std::invalid_argument("Invalid relation.");
       }
     }
   }
-  std::sort(fair_sets_.begin(), fair_sets_.end(), &IdCmp<FairSet>);
+  SortAndVerify(&fair_sets_, safe);
 }
 
-void Situation::AddAccounts(const std::vector<RawAccount> &raw) {
+void Situation::AddAccounts(const std::vector<RawAccount> &raw, bool safe) {
   accounts_.reserve(raw.size());
   for (auto &ra : raw) {
     Account a(new Account::Data);
@@ -81,10 +104,10 @@ void Situation::AddAccounts(const std::vector<RawAccount> &raw) {
     a.data_->id = Id<Account>(ra.id);
     a.data_->alloc = ra.alloc;
   }
-  std::sort(accounts_.begin(), accounts_.end(), &IdCmp<Account>);
+  SortAndVerify(&accounts_, safe);
 }
 
-void Situation::AddBatches(const std::vector<RawBatch> &raw) {
+void Situation::AddBatches(const std::vector<RawBatch> &raw, bool safe) {
   batches_.reserve(raw.size());
   for (auto &rb : raw) {
     Batch b(new Batch::Data);
@@ -100,12 +123,14 @@ void Situation::AddBatches(const std::vector<RawBatch> &raw) {
     if (Account a = (*this)[Id<Account>(rb.account_id)]) {
       b.data_->account = a;
       a.data_->batches.push_back(b);
+    } else if (safe || Id<Account>(rb.account_id)) {
+      throw std::invalid_argument("Invalid relation.");
     }
   }
-  std::sort(batches_.begin(), batches_.end(), &IdCmp<Batch>);
+  SortAndVerify(&batches_, safe);
 }
 
-void Situation::AddJobs(const std::vector<RawJob> &raw) {
+void Situation::AddJobs(const std::vector<RawJob> &raw, bool safe) {
   jobs_.reserve(raw.size());
   for (auto &rj : raw) {
     Job j(new Job::Data);
@@ -118,17 +143,23 @@ void Situation::AddJobs(const std::vector<RawJob> &raw) {
     if (Machine m = (*this)[Id<Machine>(rj.machine_id)]) {
       j.data_->machine = m;
       m.data_->job = j;
+    } else if (safe || Id<Machine>(rj.machine_id)) {
+      throw std::invalid_argument("Invalid relation.");
     }
     if (MachineSet s = (*this)[Id<MachineSet>(rj.machineset_id)]) {
       j.data_->machine_set = s;
       s.data_->jobs.push_back(j);
+    } else if (safe || Id<MachineSet>(rj.machineset_id)) {
+      throw std::invalid_argument("Invalid relation.");
     }
     if (Batch b = (*this)[Id<Batch>(rj.batch_id)]) {
       j.data_->batch = b;
       b.data_->jobs.push_back(j);
+    } else if (safe || Id<MachineSet>(rj.batch_id)) {
+      throw std::invalid_argument("Invalid relation.");
     }
   }
-  std::sort(jobs_.begin(), jobs_.end(), &IdCmp<Job>);
+  SortAndVerify(&jobs_, safe);
 }
 
 Situation::~Situation() {
@@ -142,6 +173,9 @@ Situation::~Situation() {
 
 template<class T>
 T Situation::Get(const std::vector<T> &from, Id<T> id) {
+  if (!id)
+    return T();
+
   // We'd use lower_bound but it would require creating special dummy object for holding id.
   auto lo = from.begin(), hi = from.end();
   while (hi - lo > 1) {
