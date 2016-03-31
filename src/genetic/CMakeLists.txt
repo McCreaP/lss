@@ -1,1 +1,1 @@
-add_library(genetic_algorithm algorithm.cc selector_impl.cc)
+add_library(genetic algorithm.cc selector_impl.cc)

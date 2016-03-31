@@ -1,4 +1,4 @@
-#include "algorithm.h"
+#include "genetic/algorithm.h"
 
 #include <algorithm>
 
@@ -10,13 +10,17 @@ namespace lss {
 namespace genetic {
 
 template<class T>
-GeneticAlgorithm<T>::run(const Schedule &prevSchedule, const Situation &situation) {
-  Population<T> population = kInitializer.initPopulation(situation, kPopulationSize);
+Schedule GeneticAlgorithm<T>::run(const Schedule &prevSchedule, const Situation &situation) {
+  static_assert(std::is_base_of<Chromosome, T>::value,
+                "Genetic algorithm template should be chromosome specialized");
+  ChromosomeImprover<T> improver;
+  Population<T> population = kMoves.kInitializer.initPopulation(situation, kPopulationSize);
   for (int generation = 0; generation < kNumberOfGenerations; ++generation) {
-    population = kSelector.select(population);
+    population = kMoves.kSelector.select(population, &improver);
     crossover(&population);
-    mutate(&population);
+    mutate(situation, &population);
   }
+  return improver.getBestChromosome().toSchedule();
 }
 
 template<class T>
@@ -27,7 +31,7 @@ void GeneticAlgorithm<T>::crossover(Population<T> *population) {
     bool takeToCrossover = getRandInRange(0., 1.) < kCrossoverProbability;
     if (takeToCrossover) {
       if (chromosomeWaitingForCrossover) {
-        kCrosser.crossover(chromosomeWaitingForCrossover, chromosome);
+        kMoves.kCrosser.crossover(chromosomeWaitingForCrossover, chromosome);
         chromosomeWaitingForCrossover = nullptr;
       } else {
         chromosomeWaitingForCrossover = chromosome;
@@ -37,9 +41,9 @@ void GeneticAlgorithm<T>::crossover(Population<T> *population) {
 }
 
 template<class T>
-void GeneticAlgorithm<T>::mutate(Population<T> *population) {
+void GeneticAlgorithm<T>::mutate(const Situation &situation, Population<T> *population) {
   for (T *chromosome : *population) {
-    kMutator.mutate(chromosome);
+    kMoves.kMutator.mutate(situation, chromosome);
   }
 }
 

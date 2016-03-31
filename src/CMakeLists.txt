@@ -11,7 +11,7 @@ add_subdirectory(greedy)
 add_subdirectory(io)
 add_subdirectory(genetic)
 
-target_link_libraries(lss base greedy io glog ${Boost_LIBRARIES})
+target_link_libraries(lss base greedy io genetic glog ${Boost_LIBRARIES})
 
 # Gtest doesn't find tests from separate compilation units.
 # unit_tests contains no references to anything in the library that contains test definitions

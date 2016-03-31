@@ -1,6 +1,6 @@
-#ifndef LSS_UTILS_H
-#define LSS_UTILS_H
+#ifndef LSS_BASE_UTILS_H_
+#define LSS_BASE_UTILS_H_
 
 double getRandInRange(double from, double to);
 
-#endif //LSS_UTILS_H
+#endif  // LSS_BASE_UTILS_H_
