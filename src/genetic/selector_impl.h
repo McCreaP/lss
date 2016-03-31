@@ -15,14 +15,14 @@ template<class T>
 class SelectorImpl: public Selector<T> {
  public:
   explicit SelectorImpl(Evaluator<T> evaluator) : kEvaluator(evaluator) {}
-  Population<T> select(const Population<T> &population,
+  Population<T> Select(const Population<T> &population,
                        ChromosomeImprover<T> *improver) const override;
 
  private:
   const Evaluator<T> kEvaluator;
   T bestChromosome_;
 
-  std::vector<double> calcCumulativeFitness(const Population<T> &population,
+  std::vector<double> CalcCumulativeFitness(const Population<T> &population,
                                             ChromosomeImprover<T> *improver) const;
 };
 

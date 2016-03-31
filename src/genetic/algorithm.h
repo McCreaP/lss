@@ -15,7 +15,7 @@ namespace genetic {
 class Chromosome {
  public:
   Chromosome() = default;
-  virtual Schedule toSchedule() const = 0;
+  virtual Schedule ToSchedule() const = 0;
 };
 
 template<class T>
@@ -30,11 +30,11 @@ class GeneticAlgorithm: public Algorithm {
         kCrossoverProbability(crossoverProbability),
         kMoves(std::move(moves)) {}
 
-  Schedule run(const Schedule &prevSchedule, const Situation &situation) override;
+  Schedule Run(const Schedule &prevSchedule, const Situation &situation) override;
 
  private:
-  void crossover(Population<T> *population);
-  void mutate(const Situation &situation, Population<T> *population);
+  void Crossover(Population<T> *population);
+  void Mutate(const Situation &situation, Population<T> *population);
 
   const int kPopulationSize;
   const int kNumberOfGenerations;

@@ -11,7 +11,7 @@ namespace genetic {
 namespace {
 
 int selectChromosomeIndex(const std::vector<double> &cumulativeFitness) {
-  double rand = getRandInRange(0, cumulativeFitness.back());
+  double rand = GetRandInRange(0, cumulativeFitness.back());
   auto low = std::lower_bound(std::begin(cumulativeFitness), std::end(cumulativeFitness), rand);
   return low - std::begin(cumulativeFitness);
 }
@@ -19,9 +19,9 @@ int selectChromosomeIndex(const std::vector<double> &cumulativeFitness) {
 }  // namespace
 
 template<class T>
-Population<T> SelectorImpl<T>::select(const Population<T> &population,
+Population<T> SelectorImpl<T>::Select(const Population<T> &population,
                                       ChromosomeImprover<T> *improver) const {
-  std::vector<double> cumulativeFitness = calcCumulativeFitness(population, improver);
+  std::vector<double> cumulativeFitness = CalcCumulativeFitness(population, improver);
   Population<T> newPopulation;
   for (int i = 0; i < population.size(); ++i) {
     int index = selectChromosomeIndex(cumulativeFitness);
@@ -31,16 +31,16 @@ Population<T> SelectorImpl<T>::select(const Population<T> &population,
 }
 
 template<class T>
-std::vector<double> SelectorImpl<T>::calcCumulativeFitness(const Population<T> &population,
+std::vector<double> SelectorImpl<T>::CalcCumulativeFitness(const Population<T> &population,
                                                            ChromosomeImprover<T> *improver) const {
   std::vector<double> fitnesses;
   ChromosomeImprover<T> populationImprover;
   for (const T &chromosome : population) {
-    double fitness = kEvaluator.evaluate(chromosome);
-    populationImprover.tryImprove(chromosome, fitness);
+    double fitness = kEvaluator.Evaluate(chromosome);
+    populationImprover.TryImprove(chromosome, fitness);
     fitnesses.push_back(fitness);
   }
-  improver->tryImprove(populationImprover);
+  improver->TryImprove(populationImprover);
 
   std::vector<double> cumulativeFitness;
   double accumulator = 0.;
@@ -52,7 +52,7 @@ std::vector<double> SelectorImpl<T>::calcCumulativeFitness(const Population<T> &
 }
 
 template<class T>
-void ChromosomeImprover<T>::tryImprove(const T &chromosome, double fitness) {
+void ChromosomeImprover<T>::TryImprove(const T &chromosome, double fitness) {
   if (fitness > bestFitness_) {
     bestFitness_ = fitness;
     bestChromosome_ = chromosome;
@@ -60,8 +60,8 @@ void ChromosomeImprover<T>::tryImprove(const T &chromosome, double fitness) {
 }
 
 template<class T>
-void ChromosomeImprover<T>::tryImprove(const ChromosomeImprover<T> &other) {
-  tryImprove(other.getBestChromosome(), other.getBestFitness());
+void ChromosomeImprover<T>::TryImprove(const ChromosomeImprover<T> &other) {
+  TryImprove(other.GetBestChromosome(), other.GetBestFitness());
 }
 
 }  // namespace genetic

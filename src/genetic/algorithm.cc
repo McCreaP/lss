@@ -10,28 +10,28 @@ namespace lss {
 namespace genetic {
 
 template<class T>
-Schedule GeneticAlgorithm<T>::run(const Schedule &prevSchedule, const Situation &situation) {
+Schedule GeneticAlgorithm<T>::Run(const Schedule &prevSchedule, const Situation &situation) {
   static_assert(std::is_base_of<Chromosome, T>::value,
                 "Genetic algorithm template should be chromosome specialized");
   ChromosomeImprover<T> improver;
-  Population<T> population = kMoves.kInitializer.initPopulation(situation, kPopulationSize);
+  Population<T> population = kMoves.kInitializer.InitPopulation(situation, kPopulationSize);
   for (int generation = 0; generation < kNumberOfGenerations; ++generation) {
-    population = kMoves.kSelector.select(population, &improver);
-    crossover(&population);
-    mutate(situation, &population);
+    population = kMoves.kSelector.Select(population, &improver);
+    Crossover(&population);
+    Mutate(situation, &population);
   }
-  return improver.getBestChromosome().toSchedule();
+  return improver.GetBestChromosome().toSchedule();
 }
 
 template<class T>
-void GeneticAlgorithm<T>::crossover(Population<T> *population) {
+void GeneticAlgorithm<T>::Crossover(Population<T> *population) {
   std::random_shuffle(std::begin(*population), std::end(*population));
   T *chromosomeWaitingForCrossover = nullptr;
   for (T *chromosome : *population) {
-    bool takeToCrossover = getRandInRange(0., 1.) < kCrossoverProbability;
+    bool takeToCrossover = GetRandInRange(0., 1.) < kCrossoverProbability;
     if (takeToCrossover) {
       if (chromosomeWaitingForCrossover) {
-        kMoves.kCrosser.crossover(chromosomeWaitingForCrossover, chromosome);
+        kMoves.kCrosser.Crossover(chromosomeWaitingForCrossover, chromosome);
         chromosomeWaitingForCrossover = nullptr;
       } else {
         chromosomeWaitingForCrossover = chromosome;
@@ -41,9 +41,9 @@ void GeneticAlgorithm<T>::crossover(Population<T> *population) {
 }
 
 template<class T>
-void GeneticAlgorithm<T>::mutate(const Situation &situation, Population<T> *population) {
+void GeneticAlgorithm<T>::Mutate(const Situation &situation, Population<T> *population) {
   for (T *chromosome : *population) {
-    kMoves.kMutator.mutate(situation, chromosome);
+    kMoves.kMutator.Mutate(situation, chromosome);
   }
 }
 
