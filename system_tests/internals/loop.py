@@ -31,6 +31,7 @@ class EventLoop:
                 self.__condition.acquire()
                 self.__condition.wait(time_left)
                 self.__condition.release()
+                timer.setup(event.get_execution_time())
             event.execute()
             self.__progress_bar.show_progress(now)
 
@@ -56,7 +57,7 @@ class ProgressBar:
         self.__progress_shown = None
 
     def show_progress(self, now):
-        progress = int(100 * (now - self.__min_t) / (self.__timespan))
+        progress = int(100 * (now - self.__min_t) / self.__timespan)
         if self.__progress_shown != progress:
             self.__progress_shown = progress
             LOGGER.debug('%s%% of the simulated period elapsed (of %s s)',
