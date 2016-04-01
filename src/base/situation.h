@@ -22,7 +22,7 @@ class Machine {
 
   Machine() = default;
 
-  explicit operator bool() { return data_; }
+  explicit operator bool() { return data_ != nullptr; }
 
   Id<Machine> id() const;
   MachineState state() const;
@@ -45,7 +45,7 @@ class MachineSet {
 
   MachineSet() = default;
 
-  explicit operator bool() { return data_; }
+  explicit operator bool() { return data_ != nullptr; }
 
   Id<MachineSet> id() const;
   Machines machines() const;
@@ -64,7 +64,7 @@ class FairSet {
 
   FairSet() = default;
 
-  explicit operator bool() { return data_; }
+  explicit operator bool() { return data_ != nullptr; }
 
   Id<FairSet> id() const;
   Machines machines() const;
@@ -82,7 +82,7 @@ class Account {
 
   Account() = default;
 
-  explicit operator bool() { return data_; }
+  explicit operator bool() { return data_ != nullptr; }
 
   Id<Account> id() const;
   FloatType alloc() const;
@@ -101,7 +101,7 @@ class Batch {
 
   Batch() = default;
 
-  explicit operator bool() { return data_; }
+  explicit operator bool() { return data_ != nullptr; }
 
   Id<Batch> id() const;
   FloatType reward() const;
@@ -124,7 +124,7 @@ class Job {
  public:
   Job() = default;
 
-  explicit operator bool() { return data_; }
+  explicit operator bool() { return data_ != nullptr; }
 
   Id<Job> id() const;
   Duration duration() const;
@@ -277,6 +277,7 @@ inline Job Machine::job() const { return data_->job; }
 
 inline Id<MachineSet> MachineSet::id() const { return data_->id; }
 inline MachineSet::Machines MachineSet::machines() const { return data_->machines; }
+inline MachineSet::Jobs MachineSet::jobs() const { return data_->jobs; }
 
 inline Id<FairSet> FairSet::id() const { return data_->id; }
 inline FairSet::Machines FairSet::machines() const { return data_->machines; }
