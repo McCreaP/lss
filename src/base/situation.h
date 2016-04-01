@@ -143,8 +143,18 @@ class Job {
 
 class ChangeCosts {
  public:
-  Cost cost(Change c) const;
-  Cost cost(Context from, Context to) const;
+  Cost cost(Change c) const { return cost_[static_cast<size_t>(c)]; }
+  Cost cost(Context from, Context to) const { return cost(Change(from, to)); }
+
+ private:
+  ChangeCosts(const ChangeCosts &) = delete;
+  ChangeCosts& operator=(const ChangeCosts &) = delete;
+
+  ChangeCosts(const std::vector<RawContextChange> &raw, bool safe);
+
+  Cost cost_[Change::kNum] = {};
+
+  friend class Situation;
 };
 
 class Situation {
@@ -158,11 +168,12 @@ class Situation {
 
   // In `raw` all objects of the same type must have unique, known ids (id != Id::kNone)
   // and their relations must be valid (other_id references an existing object).
+  // Also context_changes must hold exactly one element for each possible Change.
   // Otherwise std::invalid_argument will be thrown.
   //
   // If `safe` is set to false objects are allowed to have id == Id::kNone (such objects cannot
   // be retrieved with operator[]) or other_id == Id::kNone (the corresponding method returns
-  // default-constructed object).
+  // default-constructed object). The costs missing from context_changes default to 0.
   explicit Situation(const RawSituation &raw, bool safe = true);
 
   // Copying is pointless as Situation is immutable. Copy constructor and copy assignment operator
@@ -189,6 +200,8 @@ class Situation {
   Batches batches() const { return batches_; }
   Jobs jobs() const { return jobs_; }
 
+  const ChangeCosts& change_costs() const { return change_costs_; }
+
  private:
   template<class T>
   static T Get(const std::vector<T> &from, Id<T> id);
@@ -208,6 +221,8 @@ class Situation {
   std::vector<Account> accounts_;
   std::vector<Batch> batches_;
   std::vector<Job> jobs_;
+
+  ChangeCosts change_costs_;
 };
 
 struct Machine::Data {

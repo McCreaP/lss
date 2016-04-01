@@ -24,7 +24,23 @@ void SortAndVerify(std::vector<T> *vec, bool safe) {
 
 }  // namespace
 
-Situation::Situation(const RawSituation &raw, bool safe) {
+ChangeCosts::ChangeCosts(const std::vector<RawContextChange> &raw, bool safe) {
+  if (safe && raw.size() != Change::kNum)
+    throw std::invalid_argument("Missing costs for changes.");
+
+  bool found[Change::kNum] = {};
+  for (auto &change : raw) {
+    size_t idx = static_cast<size_t>(change.changed);
+    if (found[idx])
+      throw std::invalid_argument("Multiple costs for single change.");
+
+    found[idx] = true;
+    cost_[idx] = change.cost;
+  }
+}
+
+Situation::Situation(const RawSituation &raw, bool safe)
+    : change_costs_(raw.context_changes, safe) {
   time_stamp_ = raw.time_stamp;
 
   // The order of adding is important - we rely on the fact, that the (one-way) relations

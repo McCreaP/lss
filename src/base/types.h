@@ -79,11 +79,15 @@ class Context {
 class Change {
  public:
   static constexpr int kSize = Context::kSize;
+  static constexpr int kNum = 1 << kSize;  // The number of possible changes.
 
   Change() = default;
   Change(bool c1, bool c2, bool c3) : change_{c1, c2, c3} {}
   Change(const Context &from, const Context &to)
       : Change(from[0] != to[0], from[1] != to[1], from[2] != to[2]) {}
+
+  // Returns a number with corresponding bits.
+  explicit operator size_t() const { return 1 * change_[0] + 2 * change_[1] + 4 * change_[2]; }
 
   bool& operator[](size_t idx) { return change_[idx]; }
   const bool& operator[](size_t idx) const { return change_[idx]; }
@@ -113,7 +117,7 @@ struct hash<lss::Context> {
 template<>
 struct hash<lss::Change> {
   size_t operator()(const lss::Change &x) const {
-    return 1*x[0] + 2*x[1] + 4*x[2];
+    return hash<size_t>()(static_cast<size_t>(x));
   }
 };
 
