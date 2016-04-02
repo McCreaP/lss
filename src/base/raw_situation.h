@@ -11,64 +11,64 @@
 namespace lss {
 
 struct RawJob {
-  IdType id;
-  IdType batch_id;
-  IdType machine_id;  // The machine this job is assigned to; not present in the input file.
-  Duration duration;  // Expected duration barring setup time.
-  Time start_time;    // Not present in the input file.
-  IdType machineset_id;
-  Context context;
+  IdType id_;
+  IdType batch_;
+  IdType machine_;  // The machine this job is assigned to; not present in the input file.
+  Duration duration_;  // Expected duration barring setup time.
+  Time start_time_;    // Not present in the input file.
+  IdType machine_set_;
+  Context context_;
 
   bool operator==(const RawJob& rhs) const;
 };
 
 // The following fields are not named in objective function definition:
-// - timely_reward (called A in paper),
-// - reward (called B in paper),
-// - expected_time (called T in paper).
+// - timely_reward_ (called A in paper),
+// - reward_ (called B in paper),
+// - duration_ (called T in paper).
 struct RawBatch {
-  IdType id;
-  IdType account_id;
-  FloatType job_reward;
-  FloatType job_timely_reward;
-  FloatType reward;
-  FloatType timely_reward;
-  Duration expected_time;
-  Time due;
+  IdType id_;
+  IdType account_;
+  FloatType job_reward_;
+  FloatType job_timely_reward_;
+  FloatType reward_;
+  FloatType timely_reward_;
+  Duration duration_;
+  Time due_;
 
   bool operator==(const RawBatch& rhs) const;
 };
 
 struct RawMachine {
-  IdType id;
-  MachineState state;
-  Context context;  // Not present in the input file.
+  IdType id_;
+  MachineState state_;
+  Context context_;  // Not present in the input file.
 };
 
 struct RawMachineSet {
-  IdType id;
-  std::vector<IdType> machines;
+  IdType id_;
+  std::vector<IdType> machines_;
 };
 
 struct RawAccount {
-  IdType id;
-  FloatType alloc;
+  IdType id_;
+  FloatType alloc_;
 };
 
-struct RawContextChange {
-  Change changed;
-  Cost cost;
+struct RawChangeCost {
+  Change change_;
+  Cost cost_;
 };
 
 struct RawSituation {
-  Time time_stamp;  // Not present in the input file.
-  std::vector<RawMachine> machines;
-  std::vector<RawMachineSet> machine_sets;
-  std::vector<RawMachineSet> fair_sets;
-  std::vector<RawJob> jobs;
-  std::vector<RawBatch> batches;
-  std::vector<RawAccount> accounts;
-  std::vector<RawContextChange> context_changes;
+  Time time_stamp_;  // Not present in the input file.
+  std::vector<RawMachine> machines_;
+  std::vector<RawMachineSet> machine_sets_;
+  std::vector<RawMachineSet> fair_sets_;
+  std::vector<RawJob> jobs_;
+  std::vector<RawBatch> batches_;
+  std::vector<RawAccount> accounts_;
+  std::vector<RawChangeCost> change_costs_;
 };
 
 }  // namespace lss

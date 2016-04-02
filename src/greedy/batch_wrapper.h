@@ -11,7 +11,7 @@ namespace greedy {
 
 struct JobDurationCmp {
   bool operator()(const RawJob& job1, const RawJob& job2) const {
-    return job1.duration < job2.duration;
+    return job1.duration_ < job2.duration_;
   }
 };
 

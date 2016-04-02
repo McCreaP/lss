@@ -109,7 +109,7 @@ class Batch {
   FloatType job_reward() const;
   FloatType job_timely_reward() const;
   Duration duration() const;
-  Time due_time() const;
+  Time due() const;
   Account account() const;
   Jobs jobs() const;
 
@@ -150,7 +150,7 @@ class ChangeCosts {
   ChangeCosts(const ChangeCosts &) = delete;
   ChangeCosts& operator=(const ChangeCosts &) = delete;
 
-  ChangeCosts(const std::vector<RawContextChange> &raw, bool safe);
+  ChangeCosts(const std::vector<RawChangeCost> &raw, bool safe);
 
   Cost cost_[Change::kNum] = {};
 
@@ -168,12 +168,12 @@ class Situation {
 
   // In `raw` all objects of the same type must have unique, known ids (id != Id::kNone)
   // and their relations must be valid (other_id references an existing object).
-  // Also context_changes must hold exactly one element for each possible Change.
+  // Also change_costs_ must hold exactly one element for each possible Change.
   // Otherwise std::invalid_argument will be thrown.
   //
   // If `safe` is set to false objects are allowed to have id == Id::kNone (such objects cannot
   // be retrieved with operator[]) or other_id == Id::kNone (the corresponding method returns
-  // default-constructed object). The costs missing from context_changes default to 0.
+  // default-constructed object). The costs missing from change_costs_ default to 0.
   explicit Situation(const RawSituation &raw, bool safe = true);
 
   // Copying is pointless as Situation is immutable. Copy constructor and copy assignment operator
@@ -307,7 +307,7 @@ inline FloatType Batch::timely_reward() const { return data_->timely_reward; }
 inline FloatType Batch::job_reward() const { return data_->job_reward; }
 inline FloatType Batch::job_timely_reward() const { return data_->job_timely_reward; }
 inline Duration Batch::duration() const { return data_->duration; }
-inline Time Batch::due_time() const { return data_->due_time; }
+inline Time Batch::due() const { return data_->due_time; }
 inline Account Batch::account() const { return data_->account; }
 inline Batch::Jobs Batch::jobs() const { return data_->jobs; }
 

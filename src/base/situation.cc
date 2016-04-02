@@ -24,34 +24,34 @@ void SortAndVerify(std::vector<T> *vec, bool safe) {
 
 }  // namespace
 
-ChangeCosts::ChangeCosts(const std::vector<RawContextChange> &raw, bool safe) {
+ChangeCosts::ChangeCosts(const std::vector<RawChangeCost> &raw, bool safe) {
   if (safe && raw.size() != Change::kNum)
     throw std::invalid_argument("Missing costs for changes.");
 
   bool found[Change::kNum] = {};
   for (auto &change : raw) {
-    size_t idx = static_cast<size_t>(change.changed);
+    size_t idx = static_cast<size_t>(change.change_);
     if (found[idx])
       throw std::invalid_argument("Multiple costs for single change.");
 
     found[idx] = true;
-    cost_[idx] = change.cost;
+    cost_[idx] = change.cost_;
   }
 }
 
 Situation::Situation(const RawSituation &raw, bool safe)
-    : change_costs_(raw.context_changes, safe) {
-  time_stamp_ = raw.time_stamp;
+    : change_costs_(raw.change_costs_, safe) {
+  time_stamp_ = raw.time_stamp_;
 
   // The order of adding is important - we rely on the fact, that the (one-way) relations
   // form an acyclic graph.
   try {
-    AddMachines(raw.machines, safe);
-    AddMachineSets(raw.machine_sets, safe);
-    AddFairSets(raw.fair_sets, safe);
-    AddAccounts(raw.accounts, safe);
-    AddBatches(raw.batches, safe);
-    AddJobs(raw.jobs, safe);
+    AddMachines(raw.machines_, safe);
+    AddMachineSets(raw.machine_sets_, safe);
+    AddFairSets(raw.fair_sets_, safe);
+    AddAccounts(raw.accounts_, safe);
+    AddBatches(raw.batches_, safe);
+    AddJobs(raw.jobs_, safe);
   } catch (std::invalid_argument &) {
     this->~Situation();
     throw;
@@ -64,9 +64,9 @@ void Situation::AddMachines(const std::vector<RawMachine> &raw, bool safe) {
     Machine m(new Machine::Data);
     machines_.push_back(m);
 
-    m.data_->id = Id<Machine>(rm.id);
-    m.data_->state = rm.state;
-    m.data_->context = rm.context;
+    m.data_->id = Id<Machine>(rm.id_);
+    m.data_->state = rm.state_;
+    m.data_->context = rm.context_;
   }
   SortAndVerify(&machines_, safe);
 }
@@ -77,9 +77,9 @@ void Situation::AddMachineSets(const std::vector<RawMachineSet> &raw, bool safe)
     MachineSet s(new MachineSet::Data);
     machine_sets_.push_back(s);
 
-    s.data_->id = Id<MachineSet>(rs.id);
-    s.data_->machines.reserve(rs.machines.size());
-    for (IdType m_id : rs.machines) {
+    s.data_->id = Id<MachineSet>(rs.id_);
+    s.data_->machines.reserve(rs.machines_.size());
+    for (IdType m_id : rs.machines_) {
       if (Machine m = (*this)[Id<Machine>(m_id)]) {
         s.data_->machines.push_back(m);
         m.data_->machine_sets.push_back(s);
@@ -97,9 +97,9 @@ void Situation::AddFairSets(const std::vector<RawMachineSet> &raw, bool safe) {
     FairSet f(new FairSet::Data);
     fair_sets_.push_back(f);
 
-    f.data_->id = Id<FairSet>(rf.id);
-    f.data_->machines.reserve(rf.machines.size());
-    for (IdType m_id : rf.machines) {
+    f.data_->id = Id<FairSet>(rf.id_);
+    f.data_->machines.reserve(rf.machines_.size());
+    for (IdType m_id : rf.machines_) {
       if (Machine m = (*this)[Id<Machine>(m_id)]) {
         f.data_->machines.push_back(m);
         m.data_->fair_set = f;
@@ -117,8 +117,8 @@ void Situation::AddAccounts(const std::vector<RawAccount> &raw, bool safe) {
     Account a(new Account::Data);
     accounts_.push_back(a);
 
-    a.data_->id = Id<Account>(ra.id);
-    a.data_->alloc = ra.alloc;
+    a.data_->id = Id<Account>(ra.id_);
+    a.data_->alloc = ra.alloc_;
   }
   SortAndVerify(&accounts_, safe);
 }
@@ -129,17 +129,17 @@ void Situation::AddBatches(const std::vector<RawBatch> &raw, bool safe) {
     Batch b(new Batch::Data);
     batches_.push_back(b);
 
-    b.data_->id = Id<Batch>(rb.id);
-    b.data_->reward = rb.reward;
-    b.data_->timely_reward = rb.timely_reward;
-    b.data_->job_reward = rb.job_reward;
-    b.data_->job_timely_reward = rb.job_timely_reward;
-    b.data_->duration = rb.expected_time;
-    b.data_->due_time = rb.due;
-    if (Account a = (*this)[Id<Account>(rb.account_id)]) {
+    b.data_->id = Id<Batch>(rb.id_);
+    b.data_->reward = rb.reward_;
+    b.data_->timely_reward = rb.timely_reward_;
+    b.data_->job_reward = rb.job_reward_;
+    b.data_->job_timely_reward = rb.job_timely_reward_;
+    b.data_->duration = rb.duration_;
+    b.data_->due_time = rb.due_;
+    if (Account a = (*this)[Id<Account>(rb.account_)]) {
       b.data_->account = a;
       a.data_->batches.push_back(b);
-    } else if (safe || Id<Account>(rb.account_id)) {
+    } else if (safe || Id<Account>(rb.account_)) {
       throw std::invalid_argument("Invalid relation.");
     }
   }
@@ -152,26 +152,26 @@ void Situation::AddJobs(const std::vector<RawJob> &raw, bool safe) {
     Job j(new Job::Data);
     jobs_.push_back(j);
 
-    j.data_->id = Id<Job>(rj.id);
-    j.data_->duration = rj.duration;
-    j.data_->context = rj.context;
-    j.data_->start_time = rj.start_time;
-    if (Machine m = (*this)[Id<Machine>(rj.machine_id)]) {
+    j.data_->id = Id<Job>(rj.id_);
+    j.data_->duration = rj.duration_;
+    j.data_->context = rj.context_;
+    j.data_->start_time = rj.start_time_;
+    if (Machine m = (*this)[Id<Machine>(rj.machine_)]) {
       j.data_->machine = m;
       m.data_->job = j;
-    } else if (safe || Id<Machine>(rj.machine_id)) {
+    } else if (safe || Id<Machine>(rj.machine_)) {
       throw std::invalid_argument("Invalid relation.");
     }
-    if (MachineSet s = (*this)[Id<MachineSet>(rj.machineset_id)]) {
+    if (MachineSet s = (*this)[Id<MachineSet>(rj.machine_set_)]) {
       j.data_->machine_set = s;
       s.data_->jobs.push_back(j);
-    } else if (safe || Id<MachineSet>(rj.machineset_id)) {
+    } else if (safe || Id<MachineSet>(rj.machine_set_)) {
       throw std::invalid_argument("Invalid relation.");
     }
-    if (Batch b = (*this)[Id<Batch>(rj.batch_id)]) {
+    if (Batch b = (*this)[Id<Batch>(rj.batch_)]) {
       j.data_->batch = b;
       b.data_->jobs.push_back(j);
-    } else if (safe || Id<MachineSet>(rj.batch_id)) {
+    } else if (safe || Id<MachineSet>(rj.batch_)) {
       throw std::invalid_argument("Invalid relation.");
     }
   }
