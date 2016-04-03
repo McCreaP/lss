@@ -10,7 +10,7 @@ class Algorithm {
  public:
   virtual Schedule Run(const Schedule &prevSchedule, const Situation &situation) = 0;
 
-  virtual ~Algorithm();
+  virtual ~Algorithm() = default;
 };
 
 }  // namespace lss
