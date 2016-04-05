@@ -107,6 +107,15 @@ struct RawSituation {
   std::vector<RawBatch> batches_;
   std::vector<RawAccount> accounts_;
   std::vector<RawChangeCost> change_costs_;
+
+  RawSituation& time_stamp(Time val) { time_stamp_ = val; return *this; }
+  RawSituation& add(RawMachine val) { machines_.push_back(val); return *this; }
+  RawSituation& add(RawMachineSet val) { machine_sets_.push_back(val); return *this; }
+  RawSituation& add(RawFairSet val) { fair_sets_.push_back(val); return *this; }
+  RawSituation& add(RawJob val) { jobs_.push_back(val); return *this; }
+  RawSituation& add(RawBatch val) { batches_.push_back(val); return *this; }
+  RawSituation& add(RawAccount val) { accounts_.push_back(val); return *this; }
+  RawSituation& add(RawChangeCost val) { change_costs_.push_back(val); return *this; }
 };
 
 }  // namespace lss
