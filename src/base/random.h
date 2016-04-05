@@ -1,9 +1,10 @@
-#ifndef LSS_BASE_RAND_H_
-#define LSS_BASE_RAND_H_
+#ifndef LSS_BASE_RANDOM_H_
+#define LSS_BASE_RANDOM_H_
 
 #include <algorithm>
 #include <cstdlib>
 #include <random>
+#include <vector>
 
 class Random {
  public:
@@ -21,4 +22,4 @@ class Random {
   virtual ~Random() = default;
 };
 
-#endif  // LSS_BASE_RAND_H_
+#endif  // LSS_BASE_RANDOM_H_

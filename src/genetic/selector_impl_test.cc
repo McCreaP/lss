@@ -1,5 +1,7 @@
 #include "genetic/selector_impl.h"
 
+#include <limits>
+
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 

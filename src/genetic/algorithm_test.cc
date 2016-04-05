@@ -1,6 +1,7 @@
 #include "genetic/algorithm.h"
 
 #include <memory>
+#include <tuple>
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -16,58 +17,6 @@ using ::testing::_;
 using ::testing::Return;
 using ::testing::SetArgPointee;
 using ::testing::InvokeWithoutArgs;
-
-class ChromosomeFake : public Chromosome {
- public:
-  ChromosomeFake() : id_(-1) {}
-  ChromosomeFake(int id) : id_(id) {}
-
-  bool operator==(const ChromosomeFake &other) const {return id_ == other.id_;}
-
-  friend std::ostream &operator<<(std::ostream &os, const ChromosomeFake &chromosome) {
-    os << "Chromosome: " << chromosome.id_;
-    return os;
-  }
-
-  Schedule ToSchedule() const override {return Schedule();}
-
- private:
-  int id_;
-};
-
-template<class T>
-class InitializerMock: public Initializer<T> {
- public:
-  MOCK_CONST_METHOD2_T(InitPopulation, Population<T>(const Situation &, int));
-};
-
-template<class T>
-class SelectorMock: public Selector<T> {
- public:
-  MOCK_CONST_METHOD2_T(Select, Population<T>(const Population<T> &, ChromosomeImprover<T> *));
-};
-
-template<class T>
-class MutatorMock: public Mutator<T> {
- public:
-  MutatorMock() = default;
-  MOCK_CONST_METHOD2_T(Mutate, void(const Situation &, T *));
-};
-
-template<class T>
-class CrosserMock: public Crosser<T> {
- public:
-  MOCK_CONST_METHOD2_T(Crossover, void(T *, T *));
-};
-
-template<class T>
-class MovesMock: public Moves<T> {
- public:
-  MOCK_CONST_METHOD2_T(InitPopulation, Population<T>(const Situation &, int));
-  MOCK_CONST_METHOD2_T(Select, Population<T>(const Population<T> &, ChromosomeImprover<T> *));
-  MOCK_CONST_METHOD2_T(Mutate, void(const Situation &, T *));
-  MOCK_CONST_METHOD2_T(Crossover, void (T *, T *));
-};
 
 class CrosserFake: public Crosser<ChromosomeFake> {
  public:
@@ -99,7 +48,7 @@ class MutatorFake: public Mutator<ChromosomeFake> {
 template<class T>
 class Iterator {
  public:
-  Iterator(std::vector<T> v) : v_(std::move(v)) {}
+  explicit Iterator(std::vector<T> v) : v_(std::move(v)) {}
 
   T Next() {
     return v_[counter_++];

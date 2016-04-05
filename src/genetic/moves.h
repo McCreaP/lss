@@ -1,6 +1,7 @@
 #ifndef LSS_GENETIC_MOVES_H_
 #define LSS_GENETIC_MOVES_H_
 
+#include <limits>
 #include <vector>
 #include <memory>
 
