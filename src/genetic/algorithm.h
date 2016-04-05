@@ -29,13 +29,13 @@ class GeneticAlgorithm: public Algorithm {
   GeneticAlgorithm(int populationSize,
                    int numberOfGenerations,
                    double crossoverProbability,
-                   Moves<T> moves,
-                   Random rand)
+                   std::shared_ptr<Moves<T>> moves,
+                   std::shared_ptr<Random> rand)
       : populationSize_(populationSize),
         numberOfGenerations_(numberOfGenerations),
         crossoverProbability_(crossoverProbability),
-        moves_(std::make_shared<Moves<T>>(std::move(moves))),
-        rand_(std::make_shared<Random>(std::move(rand))) {}
+        moves_(moves),
+        rand_(rand) {}
 
   Schedule Run(const Schedule &prevSchedule, const Situation &situation) override;
 
@@ -52,8 +52,6 @@ class GeneticAlgorithm: public Algorithm {
 
 template<class T>
 Schedule GeneticAlgorithm<T>::Run(__attribute__((unused)) const Schedule &prevSchedule, const Situation &situation) {
-  static_assert(std::is_base_of<Chromosome, T>::value,
-                "Genetic algorithm template should be chromosome specialized");
   ChromosomeImprover<T> improver;
   Population<T> population = moves_->InitPopulation(situation, populationSize_);
   for (int generation = 0; generation < numberOfGenerations_; ++generation) {
@@ -66,16 +64,18 @@ Schedule GeneticAlgorithm<T>::Run(__attribute__((unused)) const Schedule &prevSc
 
 template<class T>
 void GeneticAlgorithm<T>::Crossover(Population<T> *population) {
-  std::random_shuffle(std::begin(*population), std::end(*population));
+  std::vector<size_t> indexes(population->size());
+  std::iota(std::begin(indexes), std::end(indexes), 0);
+  rand_->RandomShuffle(&indexes);
   T *chromosomeWaitingForCrossover = nullptr;
-  for (T &chromosome : *population) {
+  for (size_t i = 0; i < population->size(); ++i) {
     bool takeToCrossover = rand_->GetRealInRange(0., 1.) < crossoverProbability_;
     if (takeToCrossover) {
       if (chromosomeWaitingForCrossover) {
-        moves_->Crossover(chromosomeWaitingForCrossover, &chromosome);
+        moves_->Crossover(chromosomeWaitingForCrossover, &(*population)[i]);
         chromosomeWaitingForCrossover = nullptr;
       } else {
-        chromosomeWaitingForCrossover = &chromosome;
+        chromosomeWaitingForCrossover = &(*population)[i];
       }
     }
   }

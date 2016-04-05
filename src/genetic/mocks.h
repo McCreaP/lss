@@ -51,6 +51,7 @@ class ImproverMock : public ChromosomeImprover<T> {
 class RandomMock: public Random {
  public:
   MOCK_CONST_METHOD2(GetRealInRange, double(double, double));
+  MOCK_CONST_METHOD1_T(RandomShuffle, void(std::vector<size_t> *));
 };
 
 }  // genetic

@@ -1,6 +1,7 @@
 #ifndef LSS_BASE_RAND_H_
 #define LSS_BASE_RAND_H_
 
+#include <algorithm>
 #include <cstdlib>
 #include <random>
 
@@ -11,6 +12,10 @@ class Random {
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dist(from, to);
     return dist(gen);
+  }
+
+  void RandomShuffle(std::vector<size_t> *v) const {
+    std::random_shuffle(std::begin(*v), std::end(*v));
   }
 
   virtual ~Random() = default;

@@ -54,14 +54,9 @@ class Selector {
 template<class T>
 class Mutator {
  public:
-  explicit Mutator(double mutationProbability) : kMutationProbability(mutationProbability) {}
-
   virtual void Mutate(const Situation &situation, T *chromosome) const = 0;
 
   virtual ~Mutator() = default;
-
- protected:
-  const double kMutationProbability;
 };
 
 template<class T>
