@@ -14,7 +14,7 @@ class Random {
     return dist(gen);
   }
 
-  void RandomShuffle(std::vector<size_t> *v) const {
+  virtual void RandomShuffle(std::vector<size_t> *v) const {
     std::random_shuffle(std::begin(*v), std::end(*v));
   }
 
