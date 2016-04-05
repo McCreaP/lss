@@ -72,10 +72,10 @@ void GeneticAlgorithm<T>::Crossover(Population<T> *population) {
     bool takeToCrossover = rand_->GetRealInRange(0., 1.) < crossoverProbability_;
     if (takeToCrossover) {
       if (chromosomeWaitingForCrossover) {
-        moves_->Crossover(chromosomeWaitingForCrossover, &(*population)[i]);
+        moves_->Crossover(chromosomeWaitingForCrossover, &(*population)[indexes[i]]);
         chromosomeWaitingForCrossover = nullptr;
       } else {
-        chromosomeWaitingForCrossover = &(*population)[i];
+        chromosomeWaitingForCrossover = &(*population)[indexes[i]];
       }
     }
   }

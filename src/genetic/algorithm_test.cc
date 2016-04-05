@@ -171,9 +171,9 @@ TEST_F(AlgorithmShould, take_chromosome_to_crossover_in_right_order) {
 
   auto calledCrossoverArgs = crosser->GetCalledCrossoverArgs();
   EXPECT_EQ(2, calledCrossoverArgs.size());
-  auto expectedCrossoverArgs1 = std::make_tuple(population_[0], population_[2]);
+  auto expectedCrossoverArgs1 = std::make_tuple(ChromosomeFake(2), ChromosomeFake(1));
   EXPECT_EQ(expectedCrossoverArgs1, calledCrossoverArgs[0]);
-  auto expectedCrossoverArgs2 = std::make_tuple(population_[3], population_[4]);
+  auto expectedCrossoverArgs2 = std::make_tuple(ChromosomeFake(4), ChromosomeFake(0));
   EXPECT_EQ(expectedCrossoverArgs2, calledCrossoverArgs[1]);
 }
 
