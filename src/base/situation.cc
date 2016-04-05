@@ -91,7 +91,7 @@ void Situation::AddMachineSets(const std::vector<RawMachineSet> &raw, bool safe)
   SortAndVerify(&machine_sets_, safe);
 }
 
-void Situation::AddFairSets(const std::vector<RawMachineSet> &raw, bool safe) {
+void Situation::AddFairSets(const std::vector<RawFairSet> &raw, bool safe) {
   fair_sets_.reserve(raw.size());
   for (auto &rf : raw) {
     FairSet f(new FairSet::Data);

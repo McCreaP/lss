@@ -74,6 +74,14 @@ struct RawMachineSet {
   RawMachineSet& add(IdType val) { machines_.push_back(val); return *this; };
 };
 
+struct RawFairSet {
+  IdType id_;
+  std::vector<IdType> machines_;
+
+  RawFairSet& id(IdType val) { id_ = val; return *this; }
+  RawFairSet& add(IdType val) { machines_.push_back(val); return *this; };
+};
+
 struct RawAccount {
   IdType id_;
   FloatType alloc_;
@@ -94,7 +102,7 @@ struct RawSituation {
   Time time_stamp_;  // Not present in the input file.
   std::vector<RawMachine> machines_;
   std::vector<RawMachineSet> machine_sets_;
-  std::vector<RawMachineSet> fair_sets_;
+  std::vector<RawFairSet> fair_sets_;
   std::vector<RawJob> jobs_;
   std::vector<RawBatch> batches_;
   std::vector<RawAccount> accounts_;

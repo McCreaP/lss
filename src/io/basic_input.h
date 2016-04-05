@@ -31,6 +31,7 @@ std::istream &operator>>(std::istream &input, ::lss::RawJob &job);
 std::istream &operator>>(std::istream &input, ::lss::RawBatch &batch);
 std::istream &operator>>(std::istream &input, ::lss::RawMachine &machine);
 std::istream &operator>>(std::istream &input, ::lss::RawMachineSet &set);
+std::istream &operator>>(std::istream &input, ::lss::RawFairSet &set);
 std::istream &operator>>(std::istream &input, ::lss::RawAccount &account);
 std::istream &operator>>(std::istream &input, ::lss::RawChangeCost &change);
 

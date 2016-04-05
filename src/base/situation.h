@@ -208,7 +208,7 @@ class Situation {
 
   void AddMachines(const std::vector<RawMachine> &raw, bool safe);
   void AddMachineSets(const std::vector<RawMachineSet> &raw, bool safe);
-  void AddFairSets(const std::vector<RawMachineSet> &raw, bool safe);
+  void AddFairSets(const std::vector<RawFairSet> &raw, bool safe);
   void AddAccounts(const std::vector<RawAccount> &raw, bool safe);
   void AddBatches(const std::vector<RawBatch> &raw, bool safe);
   void AddJobs(const std::vector<RawJob> &raw, bool safe);

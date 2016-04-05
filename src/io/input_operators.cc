@@ -4,6 +4,21 @@
 
 namespace lss {
 namespace io {
+namespace {
+
+std::istream &ReadMachineSet(std::istream *input, IdType *id, std::vector<IdType> *machines) {
+  *input >> *id;
+
+  std::string line;
+  std::getline(*input, line);
+  std::istringstream line_stream(line);
+  int machine_id;
+  while (line_stream >> machine_id) machines->push_back(machine_id);
+
+  return *input;
+}
+
+}  // namespace
 
 std::istream &operator>>(std::istream &input, ::lss::RawJob &job) {
   input >> job.id_ >> job.batch_ >> job.duration_ >> job.machine_set_;
@@ -27,15 +42,11 @@ std::istream &operator>>(std::istream &input, ::lss::RawMachine &machine) {
 }
 
 std::istream &operator>>(std::istream &input, ::lss::RawMachineSet &set) {
-  input >> set.id_;
+  return ReadMachineSet(&input, &set.id_, &set.machines_);
+}
 
-  std::string line;
-  std::getline(input, line);
-  std::istringstream line_stream(line);
-  int machine_id;
-  while (line_stream >> machine_id) set.machines_.push_back(machine_id);
-
-  return input;
+std::istream &operator>>(std::istream &input, ::lss::RawFairSet &set) {
+  return ReadMachineSet(&input, &set.id_, &set.machines_);
 }
 
 std::istream &operator>>(std::istream &input, ::lss::RawAccount &account) {

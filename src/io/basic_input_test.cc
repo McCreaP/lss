@@ -64,6 +64,17 @@ TEST(InputOperators, MachineSetInput) {
   EXPECT_EQ(kMachineSet.machines_, machine_set.machines_);
 }
 
+TEST(InputOperators, FairSetInput) {
+  static const RawMachineSet kMachineSet = {1, {2, 3, 4, 5, 6}};
+  static const std::string data = "1 2 3 4 5 6";
+  std::istringstream input(data);
+
+  RawFairSet fair_set;
+  input >> fair_set;
+  EXPECT_EQ(kMachineSet.id_, fair_set.id_);
+  EXPECT_EQ(kMachineSet.machines_, fair_set.machines_);
+}
+
 TEST(InputOperators, AccountInput) {
   static const RawAccount kAccount = {1, 4.55};
   static const std::string data = "1 4.55";
