@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 
+#include <array>
 #include <limits>
 
 namespace lss {
@@ -73,7 +74,7 @@ class Context {
   }
 
  private:
-  int context_[kSize] = {kNone, kNone, kNone};
+  std::array<int, kSize> context_{{kNone, kNone, kNone}};
 };
 
 class Change {

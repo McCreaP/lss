@@ -187,25 +187,4 @@ Situation::~Situation() {
   for (auto j : jobs_) delete j.data_;
 }
 
-template<class T>
-T Situation::Get(const std::vector<T> &from, Id<T> id) {
-  if (!id)
-    return T();
-
-  // We'd use lower_bound but it would require creating special dummy object for holding id.
-  auto lo = from.begin(), hi = from.end();
-  while (hi - lo > 1) {
-    auto mid = lo + (hi - lo) / 2;
-    if (id < mid->id())
-      hi = mid;
-    else
-      lo = mid;
-  }
-
-  if (lo == hi || lo->id() != id)
-    return T();
-  else
-    return *lo;
-}
-
 }  // namespace lss

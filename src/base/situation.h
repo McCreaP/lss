@@ -104,10 +104,10 @@ class Batch {
   explicit operator bool() { return data_ != nullptr; }
 
   Id<Batch> id() const;
-  FloatType reward() const;
-  FloatType timely_reward() const;
   FloatType job_reward() const;
   FloatType job_timely_reward() const;
+  FloatType reward() const;
+  FloatType timely_reward() const;
   Duration duration() const;
   Time due() const;
   Account account() const;
@@ -193,6 +193,7 @@ class Situation {
   Batch operator[](Id<Batch> id) const { return Get(batches_, id); }
   Job operator[](Id<Job> id) const { return Get(jobs_, id); }
 
+  // Objects on the vector are guaranteed to be sorted in ascending order by their ID.
   Machines machines() const { return machines_; }
   MachineSets machine_sets() const { return machine_sets_; }
   FairSets fair_sets() const { return fair_sets_; }
@@ -302,10 +303,10 @@ inline FloatType Account::alloc() const { return data_->alloc; }
 inline Account::Batches Account::batches() const { return data_->batches; }
 
 inline Id<Batch> Batch::id() const { return data_->id; }
-inline FloatType Batch::reward() const { return data_->reward; }
-inline FloatType Batch::timely_reward() const { return data_->timely_reward; }
 inline FloatType Batch::job_reward() const { return data_->job_reward; }
 inline FloatType Batch::job_timely_reward() const { return data_->job_timely_reward; }
+inline FloatType Batch::reward() const { return data_->reward; }
+inline FloatType Batch::timely_reward() const { return data_->timely_reward; }
 inline Duration Batch::duration() const { return data_->duration; }
 inline Time Batch::due() const { return data_->due_time; }
 inline Account Batch::account() const { return data_->account; }
@@ -318,6 +319,27 @@ inline Context Job::context() const { return data_->context; }
 inline Machine Job::machine() const { return data_->machine; }
 inline MachineSet Job::machine_set() const { return data_->machine_set; }
 inline Batch Job::batch() const { return data_->batch; }
+
+template<class T>
+T Situation::Get(const std::vector<T> &from, Id<T> id) {
+  if (!id)
+    return T();
+
+  // We'd use lower_bound but it would require creating special dummy object for holding id.
+  auto lo = from.begin(), hi = from.end();
+  while (hi - lo > 1) {
+    auto mid = lo + (hi - lo) / 2;
+    if (id < mid->id())
+      hi = mid;
+    else
+      lo = mid;
+  }
+
+  if (lo == hi || lo->id() != id)
+    return T();
+  else
+    return *lo;
+}
 
 }  // namespace lss
 
