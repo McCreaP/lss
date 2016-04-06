@@ -9,6 +9,7 @@ namespace {
 template<class T>
 bool IdCmp(T lhs, T rhs)  { return lhs.id() < rhs.id(); }
 
+
 template<class T>
 inline void Sort(std::vector<T> *vec) {
   std::sort(vec->begin(), vec->end(), &IdCmp<T>);

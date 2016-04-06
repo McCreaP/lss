@@ -130,6 +130,7 @@ class Job {
   Duration duration() const;       // Property
   Context context() const;         // Property
   Time start_time() const;         // Property; extra
+  // TODO(kzyla): Make this relation optional.
   Machine machine() const;         // Forward relation; extra
   MachineSet machine_set() const;  // Forward relation
   Batch batch() const;             // Forward relation
