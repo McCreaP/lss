@@ -24,7 +24,7 @@ class BatchWrapper {
   // Returns an evaluation of a batch at given time.
   // It is used to compare two batches by greedy scheduler
   // which favors batches with higher evaluation.
-  // Batches without any jobs evaluate to -INF.
+  // Batches without any jobs Evaluate to -INF.
   double Evaluate(std::time_t time) const;
   // The reward that the objective function would give us
   // for completing the batch in moment 'time'

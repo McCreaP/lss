@@ -19,6 +19,10 @@ class Random {
     std::random_shuffle(std::begin(*v), std::end(*v));
   }
 
+  virtual size_t Rand(size_t range) const {
+    return std::rand() % range;
+  }
+
   virtual ~Random() = default;
 };
 

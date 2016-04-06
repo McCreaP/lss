@@ -45,20 +45,6 @@ class MutatorFake: public Mutator<ChromosomeFake> {
   mutable std::vector<ChromosomeFake> invokedChromosomes_;
 };
 
-template<class T>
-class Iterator {
- public:
-  explicit Iterator(std::vector<T> v) : v_(std::move(v)) {}
-
-  T Next() {
-    return v_[counter_++];
-  }
-
- private:
-  int counter_ = 0;
-  std::vector<T> v_;
-};
-
 class AlgorithmShould : public ::testing::Test {
  protected:
   using Chromosome = ChromosomeFake;
@@ -80,6 +66,7 @@ class AlgorithmShould : public ::testing::Test {
   }
 
   void CrossoverTest(std::shared_ptr<CrosserFake> crosser, std::vector<double> randoms) {
+    Situation situation(rawSituation_, false);
     auto initializer = std::make_shared<InitializerMock<Chromosome>>();
     auto selector = std::make_shared<SelectorMock<Chromosome>>();
     auto mutator = std::make_shared<MutatorMock<Chromosome>>();
@@ -100,7 +87,7 @@ class AlgorithmShould : public ::testing::Test {
         .WillRepeatedly(InvokeWithoutArgs(&it, &Iterator<double>::Next));
 
     GeneticAlgorithm<Chromosome> algorithm = BuildAlgorithm(moves);
-    algorithm.Run(schedule_, situation_);
+    algorithm.Run(schedule_, situation);
   }
 
   int populationSize_ = 5;
@@ -110,10 +97,11 @@ class AlgorithmShould : public ::testing::Test {
   std::shared_ptr<RandomMock> rand_;
   Population<Chromosome> population_;
   Schedule schedule_;
-  Situation situation_;
+  RawSituation rawSituation_;
 };
 
 TEST_F(AlgorithmShould, call_InitPopulation_once_and_RandomShuffle_and_Select_in_each_generation) {
+  Situation situation(rawSituation_, false);
   numberOfGenerations_ = 42;
   EXPECT_CALL(*moves_, InitPopulation(_, populationSize_))
       .WillOnce(Return(Population<Chromosome>()));
@@ -123,7 +111,7 @@ TEST_F(AlgorithmShould, call_InitPopulation_once_and_RandomShuffle_and_Select_in
   EXPECT_CALL(*rand_, RandomShuffle(_)).Times(numberOfGenerations_);
 
   GeneticAlgorithm<Chromosome> algorithm = BuildAlgorithm();
-  algorithm.Run(schedule_, situation_);
+  algorithm.Run(schedule_, situation);
 }
 
 TEST_F(AlgorithmShould, take_chromosomes_to_crossover_according_to_generated_random_number) {
@@ -178,6 +166,7 @@ TEST_F(AlgorithmShould, take_chromosome_to_crossover_in_right_order) {
 }
 
 TEST_F(AlgorithmShould, run_mutator_on_each_chromosome_in_one_generation) {
+  Situation situation(rawSituation_, false);
   EXPECT_CALL(*rand_, RandomShuffle(_));
   auto initializer = std::make_shared<InitializerMock<Chromosome>>();
   auto selector = std::make_shared<SelectorMock<Chromosome>>();
@@ -199,7 +188,7 @@ TEST_F(AlgorithmShould, run_mutator_on_each_chromosome_in_one_generation) {
       .WillRepeatedly(Return(1.));
 
   GeneticAlgorithm<Chromosome> algorithm = BuildAlgorithm(moves);
-  algorithm.Run(schedule_, situation_);
+  algorithm.Run(schedule_, situation);
 
   std::vector<Chromosome> mutatedChromosomes = mutator->GetInvokedChromosomes();
   ASSERT_EQ(populationSize_, mutatedChromosomes.size());

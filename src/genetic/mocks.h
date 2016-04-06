@@ -5,8 +5,25 @@
 
 #include "gmock/gmock.h"
 
+#include "base/schedule_mock.h"
+#include "genetic/algorithm.h"
+
 namespace lss {
 namespace genetic {
+
+template<class T>
+class Iterator {
+ public:
+  explicit Iterator(std::vector<T> v) : v_(std::move(v)) {}
+
+  T Next() {
+    return v_[counter_++];
+  }
+
+ private:
+  int counter_ = 0;
+  std::vector<T> v_;
+};
 
 class ChromosomeMock: public Chromosome {
  public:
