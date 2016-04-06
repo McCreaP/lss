@@ -71,7 +71,7 @@ struct RawMachineSet {
   std::vector<IdType> machines_;
 
   RawMachineSet& id(IdType val) { id_ = val; return *this; }
-  RawMachineSet& add(IdType val) { machines_.push_back(val); return *this; };
+  RawMachineSet& add(IdType val) { machines_.push_back(val); return *this; }
 };
 
 struct RawFairSet {
@@ -79,7 +79,7 @@ struct RawFairSet {
   std::vector<IdType> machines_;
 
   RawFairSet& id(IdType val) { id_ = val; return *this; }
-  RawFairSet& add(IdType val) { machines_.push_back(val); return *this; };
+  RawFairSet& add(IdType val) { machines_.push_back(val); return *this; }
 };
 
 struct RawAccount {
