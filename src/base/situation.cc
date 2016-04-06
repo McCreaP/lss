@@ -10,8 +10,13 @@ template<class T>
 bool IdCmp(T lhs, T rhs)  { return lhs.id() < rhs.id(); }
 
 template<class T>
-void SortAndVerify(std::vector<T> *vec, bool safe) {
+inline void Sort(std::vector<T> *vec) {
   std::sort(vec->begin(), vec->end(), &IdCmp<T>);
+}
+
+template<class T>
+void SortAndVerify(std::vector<T> *vec, bool safe) {
+  Sort(vec);
 
   // We rely on the fact that Id::kNone has the smallest possible value.
   if (safe && !vec->empty() && vec->front().id() == Id<T>())
@@ -52,10 +57,26 @@ Situation::Situation(const RawSituation &raw, bool safe)
     AddAccounts(raw.accounts_, safe);
     AddBatches(raw.batches_, safe);
     AddJobs(raw.jobs_, safe);
-  } catch (std::invalid_argument &) {
+  } catch (...) {
     this->~Situation();
     throw;
   }
+
+  // The general vectors containing all the objects are already sorted by calls to Add*,
+  // so we just sort the vectors inside the objects.
+  for (auto m : machines_)
+    Sort(&m.data_->machine_sets);
+  for (auto s : machine_sets_) {
+    Sort(&s.data_->machines);
+    Sort(&s.data_->jobs);
+  }
+  for (auto f : fair_sets_)
+    Sort(&f.data_->machines);
+  for (auto a : accounts_)
+    Sort(&a.data_->batches);
+  for (auto b : batches_)
+    Sort(&b.data_->jobs);
+  // Only single relations in Job, so no loop for it.
 }
 
 void Situation::AddMachines(const std::vector<RawMachine> &raw, bool safe) {

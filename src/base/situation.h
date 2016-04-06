@@ -1,3 +1,9 @@
+// This header provides Situation class - a convenient representation of input and some
+// additional information about program state. General note: all accessors which return
+// multiple objects return a vector (but you should not rely on the actual type, please
+// use appropriate typedefs instead) where objects are sorted in ascending order in regard
+// to their IDs.
+
 #ifndef LSS_BASE_SITUATION_H_
 #define LSS_BASE_SITUATION_H_
 
@@ -187,7 +193,6 @@ class Situation {
   Batch operator[](Id<Batch> id) const { return Get(batches_, id); }
   Job operator[](Id<Job> id) const { return Get(jobs_, id); }
 
-  // Objects on the vector are guaranteed to be sorted in ascending order by their ID.
   Machines machines() const { return machines_; }
   MachineSets machine_sets() const { return machine_sets_; }
   FairSets fair_sets() const { return fair_sets_; }

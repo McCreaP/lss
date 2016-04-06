@@ -65,6 +65,16 @@ TEST_F(SituationTest, Properties) {
   EXPECT_EQ(Id<Account>(ra.id_), a.id());
   EXPECT_EQ(ra.alloc_, a.alloc());
 
+  const RawBatch &rb = raw_.batches_[1];
+  Batch b = situation.batches()[1];
+  EXPECT_EQ(Id<Batch>(rb.id_), b.id());
+  EXPECT_EQ(rb.job_reward_, b.job_reward());
+  EXPECT_EQ(rb.job_timely_reward_, b.job_timely_reward());
+  EXPECT_EQ(rb.reward_, b.reward());
+  EXPECT_EQ(rb.timely_reward_, b.timely_reward());
+  EXPECT_EQ(rb.duration_, b.duration());
+  EXPECT_EQ(rb.due_, b.due());
+
   const RawJob &rj = raw_.jobs_[0];
   Job j = situation.jobs()[0];
   EXPECT_EQ(Id<Job>(rj.id_), j.id());
