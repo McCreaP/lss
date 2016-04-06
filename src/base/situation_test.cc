@@ -4,9 +4,6 @@
 
 namespace lss {
 
-// Verify that forward relations are correctly represented in situation.
-// Verify that backward relations are correctly represented in situation.
-
 class SituationTest : public testing::Test {
  protected:
   RawSituation raw_ = RawSituation()
@@ -37,6 +34,13 @@ class SituationTest : public testing::Test {
       .add(RawChangeCost().change(Change(1, 1, 0)).cost(54))
       .add(RawChangeCost().change(Change(1, 1, 1)).cost(55));
 };
+
+// Verify that forward relations are correctly represented in situation.
+TEST_F(SituationTest, FordwardRelations) {
+  Situation situation(raw_);
+
+
+}
 
 // Verify that all "property" fields are correctly copied to Situation.
 TEST_F(SituationTest, Properties) {

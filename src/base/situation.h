@@ -21,15 +21,14 @@ class Machine {
   using MachineSets = const std::vector<MachineSet>&;
 
   Machine() = default;
-
   explicit operator bool() { return data_ != nullptr; }
 
-  Id<Machine> id() const;
-  MachineState state() const;
-  Context context() const;
-  MachineSets machine_sets() const;
-  FairSet fair_set() const;
-  Job job() const;
+  Id<Machine> id() const;            // Property
+  MachineState state() const;        // Property
+  Context context() const;           // Property; extra
+  MachineSets machine_sets() const;  // Backward relation
+  FairSet fair_set() const;          // Backward relation
+  Job job() const;                   // Backward relation; extra
 
  private:
   struct Data;
@@ -44,12 +43,11 @@ class MachineSet {
   using Jobs = const std::vector<Job>&;
 
   MachineSet() = default;
-
   explicit operator bool() { return data_ != nullptr; }
 
-  Id<MachineSet> id() const;
-  Machines machines() const;
-  Jobs jobs() const;
+  Id<MachineSet> id() const;  // Property
+  Machines machines() const;  // Forward relation
+  Jobs jobs() const;          // Backward relation
 
  private:
   struct Data;
@@ -63,11 +61,10 @@ class FairSet {
   using Machines = const std::vector<Machine>&;
 
   FairSet() = default;
-
   explicit operator bool() { return data_ != nullptr; }
 
-  Id<FairSet> id() const;
-  Machines machines() const;
+  Id<FairSet> id() const;     // Property
+  Machines machines() const;  // Forward relation
 
  private:
   struct Data;
@@ -81,12 +78,11 @@ class Account {
   using Batches = const std::vector<Batch>&;
 
   Account() = default;
-
   explicit operator bool() { return data_ != nullptr; }
 
-  Id<Account> id() const;
-  FloatType alloc() const;
-  Batches batches() const;
+  Id<Account> id() const;   // Property
+  FloatType alloc() const;  // Property
+  Batches batches() const;  // Backward relation
 
  private:
   struct Data;
@@ -100,18 +96,17 @@ class Batch {
   using Jobs = const std::vector<Job>&;
 
   Batch() = default;
-
   explicit operator bool() { return data_ != nullptr; }
 
-  Id<Batch> id() const;
-  FloatType job_reward() const;
-  FloatType job_timely_reward() const;
-  FloatType reward() const;
-  FloatType timely_reward() const;
-  Duration duration() const;
-  Time due() const;
-  Account account() const;
-  Jobs jobs() const;
+  Id<Batch> id() const;                 // Property
+  FloatType job_reward() const;         // Property
+  FloatType job_timely_reward() const;  // Property
+  FloatType reward() const;             // Property
+  FloatType timely_reward() const;      // Property
+  Duration duration() const;            // Property
+  Time due() const;                     // Property
+  Account account() const;              // Forward relation
+  Jobs jobs() const;                    // Backward relation
 
  private:
   struct Data;
@@ -123,16 +118,15 @@ class Batch {
 class Job {
  public:
   Job() = default;
-
   explicit operator bool() { return data_ != nullptr; }
 
-  Id<Job> id() const;
-  Duration duration() const;
-  Context context() const;
-  Time start_time() const;
-  Machine machine() const;
-  MachineSet machine_set() const;
-  Batch batch() const;
+  Id<Job> id() const;              // Property
+  Duration duration() const;       // Property
+  Context context() const;         // Property
+  Time start_time() const;         // Property; extra
+  Machine machine() const;         // Forward relation; extra
+  MachineSet machine_set() const;  // Forward relation
+  Batch batch() const;             // Forward relation
 
  private:
   struct Data;
