@@ -27,12 +27,13 @@ class BasicReader: public Reader {
   std::string input_path_;
 };
 
-std::istream &operator>>(std::istream &input, RawJob &job);
-std::istream &operator>>(std::istream &input, RawBatch &batch);
-std::istream &operator>>(std::istream &input, RawMachine &machine);
-std::istream &operator>>(std::istream &input, RawMachineSet &set);
-std::istream &operator>>(std::istream &input, RawAccount &account);
-std::istream &operator>>(std::istream &input, RawContextChange &change);
+std::istream &operator>>(std::istream &input, ::lss::RawJob &job);
+std::istream &operator>>(std::istream &input, ::lss::RawBatch &batch);
+std::istream &operator>>(std::istream &input, ::lss::RawMachine &machine);
+std::istream &operator>>(std::istream &input, ::lss::RawMachineSet &set);
+std::istream &operator>>(std::istream &input, ::lss::RawFairSet &set);
+std::istream &operator>>(std::istream &input, ::lss::RawAccount &account);
+std::istream &operator>>(std::istream &input, ::lss::RawChangeCost &change);
 
 }  // namespace io
 }  // namespace lss

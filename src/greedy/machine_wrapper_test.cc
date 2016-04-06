@@ -18,13 +18,13 @@ TEST(MachineWrapper, GetId) {
 TEST(MachineWrapper, AssignJob) {
   static const RawMachine kRawMachine = {1, MachineState::kIdle, {-1, -1, -1}};
   RawJob raw_job_1 = RawJob();
-  raw_job_1.id = 1;
-  raw_job_1.context[0] = 3; raw_job_1.context[1] = 5; raw_job_1.context[2] = 8;
+  raw_job_1.id_ = 1;
+  raw_job_1.context_[0] = 3; raw_job_1.context_[1] = 5; raw_job_1.context_[2] = 8;
   RawJob raw_job_2 = RawJob();
-  raw_job_2.id = 2;
-  raw_job_2.context[0] = 3; raw_job_2.context[1] = 999; raw_job_2.context[2] = 999;
+  raw_job_2.id_ = 2;
+  raw_job_2.context_[0] = 3; raw_job_2.context_[1] = 999; raw_job_2.context_[2] = 999;
   static const int kContextChangeCost = 42;
-  static const RawContextChange kRawContextChange = {0, 1, 1, kContextChangeCost};
+  static const RawChangeCost kRawContextChange = {Change(0, 1, 1), kContextChangeCost};
   std::shared_ptr<ContextChanges> context_changes = std::make_shared<ContextChanges>();
   context_changes->SetContextChanges({kRawContextChange});
 
