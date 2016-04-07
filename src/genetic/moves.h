@@ -33,8 +33,8 @@ class ChromosomeImprover {
  public:
   ChromosomeImprover() = default;
 
-  virtual T GetBestChromosome() const {return *best_chromosome_;}
-  virtual double GetBestFitness() const {return best_fitness_;}
+  virtual T GetBestChromosome() const { return *best_chromosome_; }
+  virtual double GetBestFitness() const { return best_fitness_; }
   virtual void TryImprove(const T &chromosome, double fitness);
   virtual void TryImprove(const ChromosomeImprover<T> &other);
 
@@ -95,7 +95,8 @@ class Moves {
     return initializer_->InitPopulation(situation, populationSize);
   }
 
-  virtual Population<T> Select(const Population<T> &population, ChromosomeImprover<T> *improver) const {
+  virtual Population<T> Select(const Population<T> &population,
+                               ChromosomeImprover<T> *improver) const {
     return selector_->Select(population, improver);
   }
 

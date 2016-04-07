@@ -18,7 +18,7 @@ using ::testing::Return;
 using ::testing::SetArgPointee;
 using ::testing::InvokeWithoutArgs;
 
-class CrosserFake: public Crosser<ChromosomeFake> {
+class CrosserFake : public Crosser<ChromosomeFake> {
  public:
   using CrossoverArgs = std::tuple<ChromosomeFake, ChromosomeFake>;
   void Crossover(ChromosomeFake *lhs, ChromosomeFake *rhs) const override {
@@ -33,13 +33,14 @@ class CrosserFake: public Crosser<ChromosomeFake> {
   mutable std::vector<CrossoverArgs> called_crossover_args_;
 };
 
-class MutatorFake: public Mutator<ChromosomeFake> {
+class MutatorFake : public Mutator<ChromosomeFake> {
  public:
-  void Mutate(__attribute__((unused)) const Situation &situation, ChromosomeFake *chromosome) const override {
+  void Mutate(__attribute__((unused)) const Situation &situation,
+              ChromosomeFake *chromosome) const override {
     invoked_chromosomes_.push_back(*chromosome);
   }
 
-  std::vector<ChromosomeFake> GetInvokedChromosomes() const {return invoked_chromosomes_;}
+  std::vector<ChromosomeFake> GetInvokedChromosomes() const { return invoked_chromosomes_; }
 
  private:
   mutable std::vector<ChromosomeFake> invoked_chromosomes_;
@@ -48,7 +49,7 @@ class MutatorFake: public Mutator<ChromosomeFake> {
 template<class T>
 class Iterator {
  public:
-  explicit Iterator(std::vector<T> v) : v_(std::move(v)) {}
+  explicit Iterator(std::vector<T> v) : v_(std::move(v)) { }
 
   T Next() {
     return v_[counter_++];
@@ -76,7 +77,11 @@ class AlgorithmShould : public ::testing::Test {
   }
 
   GeneticAlgorithm<Chromosome> BuildAlgorithm(std::shared_ptr<Moves<Chromosome>> moves) {
-    return GeneticAlgorithm<Chromosome>(population_size_, number_of_generations_, crossover_probability_, moves, rand_);
+    return GeneticAlgorithm<Chromosome>(population_size_,
+                                        number_of_generations_,
+                                        crossover_probability_,
+                                        moves,
+                                        rand_);
   }
 
   void CrossoverTest(std::shared_ptr<CrosserFake> crosser, std::vector<double> randoms) {
@@ -201,11 +206,11 @@ TEST_F(AlgorithmShould, run_mutator_on_each_chromosome_in_one_generation) {
   GeneticAlgorithm<Chromosome> algorithm = BuildAlgorithm(moves);
   algorithm.Run(schedule_, situation_);
 
-  std::vector<Chromosome> mutated_chromosomes = mutator->GetInvokedChromosomes();
-  ASSERT_EQ(population_size_, mutated_chromosomes.size());
+  std::vector<Chromosome> muated = mutator->GetInvokedChromosomes();
+  ASSERT_EQ(population_size_, muated.size());
   for (const Chromosome &chromosome : population_) {
     bool chromosome_was_mutated =
-      std::find(mutated_chromosomes.begin(), mutated_chromosomes.end(), chromosome) != mutated_chromosomes.end();
+        std::find(muated.begin(), muated.end(), chromosome) != muated.end();
     ASSERT_TRUE(chromosome_was_mutated);
   }
 }

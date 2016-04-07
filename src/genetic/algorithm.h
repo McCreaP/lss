@@ -17,14 +17,12 @@ namespace genetic {
 
 class Chromosome {
  public:
-  Chromosome() = default;
-  virtual Chromosome &operator=(const Chromosome &other) = default;
   virtual Schedule ToSchedule() const = 0;
   virtual ~Chromosome() = default;
 };
 
 template<class T>
-class GeneticAlgorithm: public Algorithm {
+class GeneticAlgorithm : public Algorithm {
  public:
   GeneticAlgorithm(int population_size,
                    int number_of_generations,
@@ -35,9 +33,9 @@ class GeneticAlgorithm: public Algorithm {
         number_of_generations_(number_of_generations),
         crossover_probability_(crossover_probability),
         moves_(moves),
-        rand_(rand) {}
+        rand_(rand) { }
 
-  Schedule Run(const Schedule &prevSchedule, const Situation &situation) override;
+  Schedule Run(const Schedule &prev_schedule, const Situation &new_situation) override;
 
  private:
   void Crossover(Population<T> *population);
@@ -51,13 +49,14 @@ class GeneticAlgorithm: public Algorithm {
 };
 
 template<class T>
-Schedule GeneticAlgorithm<T>::Run(__attribute__((unused)) const Schedule &prevSchedule, const Situation &situation) {
+Schedule GeneticAlgorithm<T>::Run(__attribute__((unused)) const Schedule &prev_schedule,
+                                  const Situation &new_situation) {
   ChromosomeImprover<T> improver;
-  Population<T> population = moves_->InitPopulation(situation, population_size_);
+  Population<T> population = moves_->InitPopulation(new_situation, population_size_);
   for (int generation = 0; generation < number_of_generations_; ++generation) {
     population = moves_->Select(population, &improver);
     Crossover(&population);
-    Mutate(situation, &population);
+    Mutate(new_situation, &population);
   }
   return improver.GetBestChromosome().ToSchedule();
 }

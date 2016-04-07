@@ -13,7 +13,7 @@ namespace lss {
 namespace genetic {
 
 template<class T>
-class SelectorImpl: public Selector<T> {
+class SelectorImpl : public Selector<T> {
  public:
   SelectorImpl(std::shared_ptr<Evaluator<T>> evaluator, std::shared_ptr<Random> rand)
       : kEvaluator(evaluator), rand_(rand) {}
