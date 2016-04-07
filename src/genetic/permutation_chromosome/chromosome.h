@@ -16,6 +16,10 @@ using JobMachine = std::tuple<const lss::Job *, const lss::Machine *>;
 
 class PermutationJobMachine : public Chromosome {
  public:
+  PermutationJobMachine() = default;
+  explicit PermutationJobMachine(const std::vector<JobMachine> &permutation)
+      : permutation_(permutation) {}
+
   virtual std::vector<JobMachine> &permutation() {
     return permutation_;
   }
