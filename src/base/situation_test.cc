@@ -216,17 +216,18 @@ TEST_F(SituationTest, AccessById) {
 
 // TODO(kzyla): Write a test for each of the following cases:
 
-// Verify that ChangeCosts are correctly copied to the situation.
-
 // Verify that Situation constructor throws when multiple objects have the same id.
 // Verify that Situation constructor throws when object has unknown id and safe == true.
 
 // Verify that Situation constructor throws when object has missing relation and safe == true.
 // Verify that null-object is returned when some object has missing relation.
 
+// Verify that ChangeCosts are correctly copied to the situation.
 // Verify that Situation constructor throws when multiple costs are given for one change.
 // Verify that Situation constructor throws when costs are missing and safe == true.
 // Verify that costs default to 0 when they are missing.
+
+// Verify that the optional relations are actually optional.
 
 }  // namespace
 }  // namespace lss

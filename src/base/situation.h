@@ -34,7 +34,7 @@ class Machine {
   Context context() const;           // Property; extra
   MachineSets machine_sets() const;  // Backward relation
   FairSet fair_set() const;          // Backward relation
-  Job job() const;                   // Backward relation; extra
+  Job job() const;                   // Backward relation; extra; optional
 
  private:
   struct Data;
@@ -130,8 +130,7 @@ class Job {
   Duration duration() const;       // Property
   Context context() const;         // Property
   Time start_time() const;         // Property; extra
-  // TODO(kzyla): Make this relation optional.
-  Machine machine() const;         // Forward relation; extra
+  Machine machine() const;         // Forward relation; extra; optional
   MachineSet machine_set() const;  // Forward relation
   Batch batch() const;             // Forward relation
 
@@ -167,14 +166,21 @@ class Situation {
   using Batches = const std::vector<Batch>&;
   using Jobs = const std::vector<Job>&;
 
-  // In `raw` all objects of the same type must have unique, known ids (id != Id::kNone)
-  // and their relations must be valid (other_id references an existing object).
-  // Also change_costs_ must hold exactly one element for each possible Change.
-  // Otherwise std::invalid_argument will be thrown.
+  // TODO(kzyla): Verify that fair sets are disjoint.
+  // TODO(kzyla): Verify that only a single job is assigned to a machine.
+
+  // If `raw` is malformed std::invalid_argument will be thrown. For `raw` to be considered
+  // correct the following conditions must hold:
+  // - All objects must have non-default (!= kIdNone) and unique ids
+  //   (amongst objects of the same type).
+  // - All non-optional relations must be valid (!= kIdNone, the referenced object must exist).
+  // - `change_costs_` must hold exactly one element for each possible Change.
   //
-  // If `safe` is set to false objects are allowed to have id == Id::kNone (such objects cannot
-  // be retrieved with operator[]) or other_id == Id::kNone (the corresponding method returns
-  // default-constructed object). The costs missing from change_costs_ default to 0.
+  // If `safe` is set to false objects some constraints are relaxed:
+  // - Objects are allowed to have id == Id::kNone (such objects cannot be retrieved
+  //   with operator[]).
+  // - All relations are considered optional.
+  // - Missing elements in `change_costs_` default to zero.
   explicit Situation(const RawSituation &raw, bool safe = true);
 
   // Copying is pointless as Situation is immutable. Copy constructor and copy assignment operator

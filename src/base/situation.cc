@@ -181,7 +181,7 @@ void Situation::AddJobs(const std::vector<RawJob> &raw, bool safe) {
     if (Machine m = (*this)[Id<Machine>(rj.machine_)]) {
       j.data_->machine = m;
       m.data_->job = j;
-    } else if (safe || Id<Machine>(rj.machine_)) {
+    } else if (Id<Machine>(rj.machine_) && (safe || Id<Machine>(rj.machine_))) {
       throw std::invalid_argument("Invalid relation.");
     }
     if (MachineSet s = (*this)[Id<MachineSet>(rj.machine_set_)]) {
