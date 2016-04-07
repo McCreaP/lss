@@ -33,14 +33,14 @@ class ChromosomeImprover {
  public:
   ChromosomeImprover() = default;
 
-  virtual T GetBestChromosome() const {return *bestChromosome_;}
-  virtual double GetBestFitness() const {return bestFitness_;}
+  virtual T GetBestChromosome() const {return *best_chromosome_;}
+  virtual double GetBestFitness() const {return best_fitness_;}
   virtual void TryImprove(const T &chromosome, double fitness);
   virtual void TryImprove(const ChromosomeImprover<T> &other);
 
  private:
-  std::shared_ptr<T> bestChromosome_ = std::make_shared<T>();
-  double bestFitness_ = std::numeric_limits<double>::min();
+  std::shared_ptr<T> best_chromosome_ = std::make_shared<T>();
+  double best_fitness_ = std::numeric_limits<double>::min();
 };
 
 template<class T>

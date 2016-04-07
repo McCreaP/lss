@@ -71,15 +71,15 @@ TEST_F(SelectorShould, select_chromosomes_to_new_population_according_to_generat
       .WillOnce(Return(30));
 
   SelectorImpl<ChromosomeMock> selector(evaluator_, rand_);
-  Population<ChromosomeMock> newPopulation = selector.Select(population_, &improver_);
+  Population<ChromosomeMock> new_population = selector.Select(population_, &improver_);
 
-  Population<ChromosomeMock> expectedPopulation = {
+  Population<ChromosomeMock> expected_population = {
       ChromosomeMock(2),
       ChromosomeMock(3),
       ChromosomeMock(0),
       ChromosomeMock(1)
   };
-  EXPECT_EQ(expectedPopulation, newPopulation);
+  EXPECT_EQ(expected_population, new_population);
 }
 
 TEST_F(SelectorShould, take_multiple_times_the_same_chromosome_if_random_number_says_so) {
@@ -97,15 +97,15 @@ TEST_F(SelectorShould, take_multiple_times_the_same_chromosome_if_random_number_
       .WillOnce(Return(45));
 
   SelectorImpl<ChromosomeMock> selector(evaluator_, rand_);
-  Population<ChromosomeMock> newPopulation = selector.Select(population_, &improver_);
+  Population<ChromosomeMock> new_population = selector.Select(population_, &improver_);
 
-  Population<ChromosomeMock> expectedPopulation = {
+  Population<ChromosomeMock> expected_population = {
       ChromosomeMock(2),
       ChromosomeMock(2),
       ChromosomeMock(0),
       ChromosomeMock(2)
   };
-  EXPECT_EQ(expectedPopulation, newPopulation);
+  EXPECT_EQ(expected_population, new_population);
 }
 
 TEST_F(SelectorShould, change_improver_to_return_best_chromosome_from_first_population) {
@@ -118,7 +118,7 @@ TEST_F(SelectorShould, change_improver_to_return_best_chromosome_from_first_popu
   }
 
   SelectorImpl<ChromosomeMock> selector(evaluator_, rand_);
-  Population<ChromosomeMock> newPopulation = selector.Select(population_, &improver);
+  selector.Select(population_, &improver);
 
   EXPECT_EQ(population_[2], improver.GetBestChromosome());
   EXPECT_EQ(120, improver.GetBestFitness());
@@ -140,7 +140,7 @@ TEST_F(SelectorShould, change_improver_if_has_found_better_chromosome) {
   }
 
   SelectorImpl<ChromosomeMock> selector(evaluator_, rand_);
-  Population<ChromosomeMock> newPopulation = selector.Select(population_, &improver);
+  selector.Select(population_, &improver);
 
   EXPECT_EQ(population_[2], improver.GetBestChromosome());
   EXPECT_EQ(120, improver.GetBestFitness());
@@ -162,7 +162,7 @@ TEST_F(SelectorShould, change_improver_to_return_best_chromosome_if_many_in_popu
   }
 
   SelectorImpl<ChromosomeMock> selector(evaluator_, rand_);
-  Population<ChromosomeMock> newPopulation = selector.Select(population_, &improver);
+  selector.Select(population_, &improver);
 
   EXPECT_EQ(population_[2], improver.GetBestChromosome());
   EXPECT_EQ(170, improver.GetBestFitness());
@@ -184,7 +184,7 @@ TEST_F(SelectorShould, not_change_improver_if_has_not_found_better_chromosome) {
   }
 
   SelectorImpl<ChromosomeMock> selector(evaluator_, rand_);
-  Population<ChromosomeMock> newPopulation = selector.Select(population_, &improver);
+  selector.Select(population_, &improver);
 
   EXPECT_EQ(kPrevBestChromosome, improver.GetBestChromosome());
   EXPECT_EQ(kPrevBestFitness, improver.GetBestFitness());
@@ -218,12 +218,12 @@ TEST(ChromosomeImproverShould, take_better_chromosome) {
 }
 
 TEST(ChromosomeImproverShould, not_take_worse_chromosome) {
-  ChromosomeImprover<ChromosomeMock> improver1, improver2, worseImprover;
+  ChromosomeImprover<ChromosomeMock> improver1, improver2, worse_improver;
   static const ChromosomeMock kChromosome1(1);
   static const double kFitness1 = 20;
   static const ChromosomeMock kChromosome2(2);
   static const double kFitness2 = 10;
-  worseImprover.TryImprove(kChromosome2, kFitness2);
+  worse_improver.TryImprove(kChromosome2, kFitness2);
 
   improver1.TryImprove(kChromosome1, kFitness1);
   ASSERT_EQ(kChromosome1, improver1.GetBestChromosome());
@@ -235,7 +235,7 @@ TEST(ChromosomeImproverShould, not_take_worse_chromosome) {
   improver1.TryImprove(kChromosome2, kFitness2);
   ASSERT_EQ(kChromosome1, improver1.GetBestChromosome());
   ASSERT_EQ(kFitness1, improver1.GetBestFitness());
-  improver2.TryImprove(worseImprover);
+  improver2.TryImprove(worse_improver);
   ASSERT_EQ(kChromosome1, improver2.GetBestChromosome());
   ASSERT_EQ(kFitness1, improver2.GetBestFitness());
 }

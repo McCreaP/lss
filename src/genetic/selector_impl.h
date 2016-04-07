@@ -23,59 +23,59 @@ class SelectorImpl: public Selector<T> {
 
  private:
   const std::shared_ptr<Evaluator<T>> kEvaluator;
-  T bestChromosome_;
+  T best_chromosome_;
   std::shared_ptr<Random> rand_;
 
   std::vector<double> CalcCumulativeFitness(const Population<T> &population,
                                             ChromosomeImprover<T> *improver) const;
-  size_t selectChromosomeIndex(const std::vector<double> &cumulativeFitness) const;
+  size_t SelectChromosomeIndex(const std::vector<double> &cumulative_fitness) const;
 };
 
 template<class T>
 Population<T> SelectorImpl<T>::Select(const Population<T> &population,
                                       ChromosomeImprover<T> *improver) const {
-  std::vector<double> cumulativeFitness = CalcCumulativeFitness(population, improver);
-  Population<T> newPopulation;
+  std::vector<double> cumulative_fitness = CalcCumulativeFitness(population, improver);
+  Population<T> new_population;
   for (size_t i = 0; i < population.size(); ++i) {
-    size_t index = selectChromosomeIndex(cumulativeFitness);
-    newPopulation.push_back(population[index]);
+    size_t index = SelectChromosomeIndex(cumulative_fitness);
+    new_population.push_back(population[index]);
   }
-  return newPopulation;
+  return new_population;
 }
 
 template<class T>
 std::vector<double> SelectorImpl<T>::CalcCumulativeFitness(const Population<T> &population,
                                                            ChromosomeImprover<T> *improver) const {
   std::vector<double> fitnesses;
-  ChromosomeImprover<T> populationImprover;
+  ChromosomeImprover<T> population_improver;
   for (const T &chromosome : population) {
     double fitness = kEvaluator->Evaluate(chromosome);
-    populationImprover.TryImprove(chromosome, fitness);
+    population_improver.TryImprove(chromosome, fitness);
     fitnesses.push_back(fitness);
   }
-  improver->TryImprove(populationImprover);
+  improver->TryImprove(population_improver);
 
-  std::vector<double> cumulativeFitness;
+  std::vector<double> cumulative_fitness;
   double accumulator = 0.;
   for (double fitness : fitnesses) {
     accumulator += fitness;
-    cumulativeFitness.push_back(accumulator);
+    cumulative_fitness.push_back(accumulator);
   }
-  return cumulativeFitness;
+  return cumulative_fitness;
 }
 
 template<class T>
-size_t SelectorImpl<T>::selectChromosomeIndex(const std::vector<double> &cumulativeFitness) const {
-  double rand = rand_->GetRealInRange(0, cumulativeFitness.back());
-  auto low = std::lower_bound(std::begin(cumulativeFitness), std::end(cumulativeFitness), rand);
-  return low - std::begin(cumulativeFitness);
+size_t SelectorImpl<T>::SelectChromosomeIndex(const std::vector<double> &cumulative_fitness) const {
+  double rand = rand_->GetRealInRange(0, cumulative_fitness.back());
+  auto low = std::lower_bound(std::begin(cumulative_fitness), std::end(cumulative_fitness), rand);
+  return low - std::begin(cumulative_fitness);
 }
 
 template<class T>
 void ChromosomeImprover<T>::TryImprove(const T &chromosome, double fitness) {
-  if (fitness > bestFitness_) {
-    bestFitness_ = fitness;
-    bestChromosome_ = std::make_shared<T>(chromosome);
+  if (fitness > best_fitness_) {
+    best_fitness_ = fitness;
+    best_chromosome_ = std::make_shared<T>(chromosome);
   }
 }
 
