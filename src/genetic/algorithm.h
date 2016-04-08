@@ -15,12 +15,6 @@
 namespace lss {
 namespace genetic {
 
-class Chromosome {
- public:
-  virtual Schedule ToSchedule() const = 0;
-  virtual ~Chromosome() = default;
-};
-
 template<class T>
 class GeneticAlgorithm : public Algorithm {
  public:
@@ -86,6 +80,32 @@ void GeneticAlgorithm<T>::Mutate(const Situation &situation, Population<T> *popu
     moves_->Mutate(situation, &chromosome);
   }
 }
+
+class Chromosome {
+ public:
+  virtual Schedule ToSchedule() const = 0;
+  virtual ~Chromosome() = default;
+};
+
+class ChromosomeFake : public Chromosome {
+ public:
+  ChromosomeFake() : id_(-1) {}
+  explicit ChromosomeFake(int id) : id_(id) {}
+
+  friend bool operator==(const ChromosomeFake &lhs, const ChromosomeFake &rhs) {
+    return lhs.id_ == rhs.id_;
+  }
+
+  friend std::ostream &operator<<(std::ostream &os, const ChromosomeFake &chromosome) {
+    os << "Chromosome: " << chromosome.id_;
+    return os;
+  }
+
+  Schedule ToSchedule() const override {return Schedule();}
+
+ private:
+  int id_;
+};
 
 }  // namespace genetic
 }  // namespace lss

@@ -7,7 +7,6 @@
 #include "gtest/gtest.h"
 
 #include "genetic/moves.h"
-#include "genetic/mocks.h"
 #include "genetic/selector_impl.h"
 
 namespace lss {
