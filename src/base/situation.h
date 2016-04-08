@@ -166,15 +166,14 @@ class Situation {
   using Batches = const std::vector<Batch>&;
   using Jobs = const std::vector<Job>&;
 
-  // TODO(kzyla): Verify that fair sets are disjoint.
-  // TODO(kzyla): Verify that only a single job is assigned to a machine.
-
   // If `raw` is malformed std::invalid_argument will be thrown. For `raw` to be considered
   // correct the following conditions must hold:
   // - All objects must have non-default (!= kIdNone) and unique ids
   //   (amongst objects of the same type).
   // - All non-optional relations must be valid (!= kIdNone, the referenced object must exist).
   // - `change_costs_` must hold exactly one element for each possible Change.
+  // - Fair sets must be disjoint.
+  // - Each machine must have at most single job assigned to it.
   //
   // If `safe` is set to false objects some constraints are relaxed:
   // - Objects are allowed to have id == Id::kNone (such objects cannot be retrieved
@@ -183,6 +182,7 @@ class Situation {
   // - Missing elements in `change_costs_` default to zero.
   explicit Situation(const RawSituation &raw, bool safe = true);
 
+  // TODO(kzyla): Add copy constructor and copy assignment operator.
   // Copying is pointless as Situation is immutable. Copy constructor and copy assignment operator
   // would be just syntax sugar for keeping std::shared_ptr<Situation>.
   // They might be added in the future.
