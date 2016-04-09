@@ -312,7 +312,6 @@ TEST_P(SituationThrowTest, Invalidrelation) {
   EXPECT_THROW({
     Situation(RawSituation(raw_).add(RawJob().id(0).batch(1).machine_set(0)), GetParam());
   }, std::invalid_argument);
-
 }
 
 // Verify that Situation constructor throws when multiple costs are given for one change.
@@ -363,7 +362,7 @@ TEST(SituationTest, DefaultId) {
 // Verify that the optional relations are actually optional.
 TEST_P(SituationThrowTest, OptionalRelations) {
   raw_.add(RawAccount().id(0)).add(RawBatch().id(0).account(0));
-  raw_.add(RawMachineSet().id(0).add(0));
+  raw_.add(RawMachineSet().id(0));
   raw_.add(RawJob().id(0).batch(0).machine_set(0));
   EXPECT_NO_THROW({
     Situation(raw_, GetParam());

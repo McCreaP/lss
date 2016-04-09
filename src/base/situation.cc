@@ -132,6 +132,7 @@ void Situation::AddFairSets(const std::vector<RawFairSet> &raw, bool safe) {
     f.data_->machines.reserve(rf.machines_.size());
     for (IdType m_id : rf.machines_) {
       if (Machine m = (*this)[Id<Machine>(m_id)]) {
+        if (m.fair_set()) throw std::invalid_argument("Overlapping fair sets.");
         f.data_->machines.push_back(m);
         m.data_->fair_set = f;
       } else if (safe || Id<Machine>(m_id)) {
@@ -187,18 +188,22 @@ void Situation::AddJobs(const std::vector<RawJob> &raw, bool safe) {
     j.data_->duration = rj.duration_;
     j.data_->context = rj.context_;
     j.data_->start_time = rj.start_time_;
+
     if (Machine m = (*this)[Id<Machine>(rj.machine_)]) {
+      if (m.job()) throw std::invalid_argument("Machine with multiple jobs.");
       j.data_->machine = m;
       m.data_->job = j;
     } else if (Id<Machine>(rj.machine_) && (safe || Id<Machine>(rj.machine_))) {
       throw std::invalid_argument("Invalid relation.");
     }
+
     if (MachineSet s = (*this)[Id<MachineSet>(rj.machine_set_)]) {
       j.data_->machine_set = s;
       s.data_->jobs.push_back(j);
     } else if (safe || Id<MachineSet>(rj.machine_set_)) {
       throw std::invalid_argument("Invalid relation.");
     }
+
     if (Batch b = (*this)[Id<Batch>(rj.batch_)]) {
       j.data_->batch = b;
       b.data_->jobs.push_back(j);
