@@ -1,15 +1,15 @@
 #ifndef LSS_GENETIC_ALGORITHM_H_
 #define LSS_GENETIC_ALGORITHM_H_
 
-#include <utility>
-#include <vector>
 #include <algorithm>
 #include <iostream>
+#include <utility>
+#include <vector>
 
 #include "base/algorithm.h"
-#include "base/situation.h"
-#include "base/schedule_mock.h"
 #include "base/random.h"
+#include "base/schedule_mock.h"
+#include "base/situation.h"
 #include "genetic/moves.h"
 
 namespace lss {

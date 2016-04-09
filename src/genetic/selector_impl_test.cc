@@ -6,8 +6,8 @@
 #include "gtest/gtest.h"
 
 #include "base/random.h"
-#include "genetic/moves.h"
 #include "genetic/algorithm.h"
+#include "genetic/moves.h"
 
 namespace lss {
 namespace genetic {

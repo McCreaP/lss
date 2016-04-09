@@ -87,7 +87,7 @@ class AlgorithmShould : public ::testing::Test {
     auto initializer = std::make_shared<InitializerMock<Chromosome>>();
     auto selector = std::make_shared<SelectorMock<Chromosome>>();
     auto mutator = std::make_shared<MutatorMock<Chromosome>>();
-    auto moves = std::make_shared<Moves<Chromosome>>();
+    auto moves = std::make_shared<ConfigurableMoves<Chromosome>>();
     moves->SetInitializer(initializer)
         .SetSelector(selector)
         .SetMutator(mutator)
@@ -187,7 +187,7 @@ TEST_F(AlgorithmShould, run_mutator_on_each_chromosome_in_one_generation) {
   auto selector = std::make_shared<SelectorMock<Chromosome>>();
   auto mutator = std::make_shared<MutatorFake>();
   auto crosser = std::make_shared<CrosserMock<Chromosome>>();
-  auto moves = std::make_shared<Moves<Chromosome>>();
+  auto moves = std::make_shared<ConfigurableMoves<Chromosome>>();
   moves->SetInitializer(initializer)
       .SetSelector(selector)
       .SetMutator(mutator)

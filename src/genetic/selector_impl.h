@@ -4,10 +4,10 @@
 #include <utility>
 #include <vector>
 
-#include "base/schedule_mock.h"
 #include "base/random.h"
-#include "genetic/moves.h"
+#include "base/schedule_mock.h"
 #include "genetic/algorithm.h"
+#include "genetic/moves.h"
 
 namespace lss {
 namespace genetic {

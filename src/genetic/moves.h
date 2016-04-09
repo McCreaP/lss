@@ -2,8 +2,8 @@
 #define LSS_GENETIC_MOVES_H_
 
 #include <limits>
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include "base/situation.h"
 
@@ -71,44 +71,54 @@ class Crosser {
 template<class T>
 class Moves {
  public:
-  Moves<T> &SetInitializer(std::shared_ptr<Initializer<T>> initializer) {
+  virtual Population<T> InitPopulation(const Situation &situation, int populationSize) const = 0;
+  virtual Population<T> Select(const Population<T> &population,
+                               ChromosomeImprover<T> *improver) const = 0;
+  virtual void Mutate(const Situation &situation, T *chromosome) const = 0;
+  virtual void Crossover(T *lhs, T *rhs) const = 0;
+
+  virtual ~Moves() = default;
+};
+
+template<class T>
+class ConfigurableMoves : public Moves<T> {
+ public:
+  ConfigurableMoves<T> &SetInitializer(std::shared_ptr<Initializer<T>> initializer) {
     initializer_ = initializer;
     return *this;
   }
 
-  Moves<T> &SetSelector(std::shared_ptr<Selector<T>> selector) {
+  ConfigurableMoves<T> &SetSelector(std::shared_ptr<Selector<T>> selector) {
     selector_ = selector;
     return *this;
   }
 
-  Moves<T> &SetMutator(std::shared_ptr<Mutator<T>> mutator) {
+  ConfigurableMoves<T> &SetMutator(std::shared_ptr<Mutator<T>> mutator) {
     mutator_ = mutator;
     return *this;
   }
 
-  Moves<T> &SetCrosser(std::shared_ptr<Crosser<T>> crosser) {
+  ConfigurableMoves<T> &SetCrosser(std::shared_ptr<Crosser<T>> crosser) {
     crosser_ = crosser;
     return *this;
   }
 
-  virtual Population<T> InitPopulation(const Situation &situation, int populationSize) const {
+  Population<T> InitPopulation(const Situation &situation, int populationSize) const {
     return initializer_->InitPopulation(situation, populationSize);
   }
 
-  virtual Population<T> Select(const Population<T> &population,
+  Population<T> Select(const Population<T> &population,
                                ChromosomeImprover<T> *improver) const {
     return selector_->Select(population, improver);
   }
 
-  virtual void Mutate(const Situation &situation, T *chromosome) const {
+  void Mutate(const Situation &situation, T *chromosome) const {
     mutator_->Mutate(situation, chromosome);
   }
 
-  virtual void Crossover(T *lhs, T *rhs) const {
+  void Crossover(T *lhs, T *rhs) const {
     crosser_->Crossover(lhs, rhs);
   }
-
-  virtual ~Moves() = default;
 
  private:
   std::shared_ptr<Initializer<T>> initializer_;
@@ -126,8 +136,6 @@ class InitializerMock: public Initializer<T> {
 template<class T>
 class EvaluatorMock: public Evaluator<T> {
  public:
-  EvaluatorMock() {}
-  EvaluatorMock(const EvaluatorMock &) {}
   MOCK_CONST_METHOD1_T(Evaluate, double(const T &));
 };
 
