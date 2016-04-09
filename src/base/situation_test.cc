@@ -252,7 +252,7 @@ TEST_F(SituationSafeThrowTest, DefaultId) {
 }
 
 // Verify that Situation constructor throws when multiple objects have the same id.
-TEST_F(SituationThrowTest, SameId) {
+TEST_P(SituationThrowTest, SameId) {
   EXPECT_THROW({
     Situation(RawSituation(raw_).add(RawMachine().id(1)).add(RawMachine().id(1)), GetParam());
   }, std::invalid_argument);
@@ -295,7 +295,7 @@ TEST_F(SituationSafeThrowTest, MissingRelation) {
 }
 
 // Verify that Situation constructor throws when some relation is invalid.
-TEST_F(SituationThrowTest, Invalidrelation) {
+TEST_P(SituationThrowTest, Invalidrelation) {
   EXPECT_THROW({
     Situation(RawSituation(raw_).add(RawMachineSet().id(0).add(1)), GetParam());
   }, std::invalid_argument);
@@ -316,7 +316,7 @@ TEST_F(SituationThrowTest, Invalidrelation) {
 }
 
 // Verify that Situation constructor throws when multiple costs are given for one change.
-TEST_F(SituationThrowTest, MultipleCosts) {
+TEST_P(SituationThrowTest, MultipleCosts) {
   raw_.change_costs_.push_back(raw_.change_costs_.back());
   EXPECT_THROW({
     Situation(raw_, GetParam());
@@ -332,7 +332,7 @@ TEST_F(SituationSafeThrowTest, MissingCost) {
 }
 
 // Verify that Situation constructor throws when fair sets are not disjoint.
-TEST_F(SituationThrowTest, OverlappingFairSets) {
+TEST_P(SituationThrowTest, OverlappingFairSets) {
   raw_.add(RawMachine().id(0)).add(RawFairSet().id(0).add(0)).add(RawFairSet().id(1).add(0));
   EXPECT_THROW({
     Situation(raw_, GetParam());
@@ -340,7 +340,7 @@ TEST_F(SituationThrowTest, OverlappingFairSets) {
 }
 
 // Verify that Situation constructor throws when a machine has more than one job assigned.
-TEST_F(SituationThrowTest, MachineWithMultipleJobs) {
+TEST_P(SituationThrowTest, MachineWithMultipleJobs) {
   raw_.add(RawMachine().id(0)).add(RawMachineSet().id(0).add(0));
   raw_.add(RawAccount().id(0)).add(RawBatch().id(0).account(0));
   raw_.add(RawJob().id(1).batch(0).machine_set(0).machine(0));
@@ -361,7 +361,7 @@ TEST(SituationTest, DefaultId) {
 }
 
 // Verify that the optional relations are actually optional.
-TEST_F(SituationThrowTest, OptionalRelations) {
+TEST_P(SituationThrowTest, OptionalRelations) {
   raw_.add(RawAccount().id(0)).add(RawBatch().id(0).account(0));
   raw_.add(RawMachineSet().id(0).add(0));
   raw_.add(RawJob().id(0).batch(0).machine_set(0));

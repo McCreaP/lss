@@ -189,7 +189,7 @@ class Situation {
   Situation(const Situation &) = delete;
   Situation& operator=(const Situation &) = delete;
 
-  ~Situation();
+  ~Situation() { FreeMem(); }
 
   Time time_stamp() const { return time_stamp_; }
 
@@ -212,6 +212,8 @@ class Situation {
  private:
   template<class T>
   static T Get(const std::vector<T> &from, Id<T> id);
+
+  void FreeMem();
 
   void AddMachines(const std::vector<RawMachine> &raw, bool safe);
   void AddMachineSets(const std::vector<RawMachineSet> &raw, bool safe);

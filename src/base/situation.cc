@@ -59,7 +59,7 @@ Situation::Situation(const RawSituation &raw, bool safe)
     AddBatches(raw.batches_, safe);
     AddJobs(raw.jobs_, safe);
   } catch (...) {
-    this->~Situation();
+    FreeMem();
     throw;
   }
 
@@ -78,6 +78,15 @@ Situation::Situation(const RawSituation &raw, bool safe)
   for (auto b : batches_)
     Sort(&b.data_->jobs);
   // Only single relations in Job, so no loop for it.
+}
+
+void Situation::FreeMem() {
+  for (auto m : machines_) delete m.data_;
+  for (auto s : machine_sets_) delete s.data_;
+  for (auto f : fair_sets_) delete f.data_;
+  for (auto a : accounts_) delete a.data_;
+  for (auto b : batches_) delete b.data_;
+  for (auto j : jobs_) delete j.data_;
 }
 
 void Situation::AddMachines(const std::vector<RawMachine> &raw, bool safe) {
@@ -198,15 +207,6 @@ void Situation::AddJobs(const std::vector<RawJob> &raw, bool safe) {
     }
   }
   SortAndVerify(&jobs_, safe);
-}
-
-Situation::~Situation() {
-  for (auto m : machines_) delete m.data_;
-  for (auto s : machine_sets_) delete s.data_;
-  for (auto f : fair_sets_) delete f.data_;
-  for (auto a : accounts_) delete a.data_;
-  for (auto b : batches_) delete b.data_;
-  for (auto j : jobs_) delete j.data_;
 }
 
 }  // namespace lss
