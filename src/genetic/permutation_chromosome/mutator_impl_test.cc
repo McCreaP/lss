@@ -56,13 +56,29 @@ TEST_F(MutatorShould, take_job_machine_to_mutation_wrt_generated_random_number) 
 
   std::vector<int> expected_machines_order = {2, 1, 2, 2, 0};
   for (size_t i = 0; i < chromosome.permutation().size(); ++i) {
-    EXPECT_EQ(expected_machines_order[i], (int)std::get<1>(chromosome.permutation()[i]).id());
+    EXPECT_EQ(expected_machines_order[i], static_cast<int>(std::get<1>(chromosome.permutation()[i]).id()));
   }
 }
 
-TEST_F(MutatorShould, select_new_machine_for_jobs_wrt_generated_random_number) {}
+TEST_F(MutatorShould, select_new_machine_for_jobs_wrt_generated_random_number) {
+  Situation situation(raw_situation_);
+  auto permutation = GetPermutation({3, 1, 4, 0, 2}, {0, 0, 0, 0, 0}, situation);
+  auto chromosome = PermutationJobMachine(permutation);
+  EXPECT_CALL(*rand_, GetRealInRange(0., 1.)).Times(kNumberOfJobs).WillRepeatedly(Return(0));
 
-TEST_F(MutatorShould, gen_random_number_for_each_job_machine_pair) {}
+  std::vector<int> expected_machines_order = {1, 2, 0, 1, 2};
+  Iterator<int> it(expected_machines_order);
+  EXPECT_CALL(*rand_, Rand(3))
+      .Times(kNumberOfJobs)
+      .WillRepeatedly(InvokeWithoutArgs(&it, &Iterator<int>::Next));
+
+  MutatorImpl mutator(1., rand_);
+  mutator.Mutate(situation, &chromosome);
+
+  for (size_t i = 0; i < chromosome.permutation().size(); ++i) {
+    EXPECT_EQ(expected_machines_order[i], static_cast<int>(std::get<1>(chromosome.permutation()[i]).id()));
+  }
+}
 
 }  // namespace genetic
 }  // namespace lss
