@@ -11,9 +11,11 @@ RawSituation GetSimpleRawSituation(int numberOfJobs, int numberOfMachines);
 template<class T>
 class Iterator {
  public:
-  explicit Iterator(std::vector<T> v);
+  explicit Iterator(std::vector<T> v) : v_(std::move(v)) {}
 
-  T Next();
+  T Next() {
+    return v_[counter_++];
+  }
 
  private:
   int counter_ = 0;

@@ -6,6 +6,6 @@ foreach (test ${GENETIC_TEST})
 endforeach ()
 
 #add_library(genetic ${GENETIC_SRC})
-add_library(genetic_test STATIC ${GENETIC_TEST})
+add_library(genetic_test STATIC ${GENETIC_TEST} test_utils.cc)
 
 #target_link_libraries(genetic_test genetic)

@@ -50,6 +50,8 @@ class AlgorithmShould : public ::testing::Test {
  protected:
   using Chromosome = ChromosomeFake;
 
+  AlgorithmShould() : situation_(RawSituation(), false) {}
+
   void SetUp() {
     moves_ = std::make_shared<MovesMock<Chromosome>>();
     rand_ = std::make_shared<RandomMock>();
@@ -101,11 +103,10 @@ class AlgorithmShould : public ::testing::Test {
   std::shared_ptr<RandomMock> rand_;
   Population<Chromosome> population_;
   Schedule schedule_;
-  RawSituation rawSituation_;
+  Situation situation_;
 };
 
 TEST_F(AlgorithmShould, call_InitPopulation_once_and_RandomShuffle_and_Select_in_each_generation) {
-  Situation situation(rawSituation_);
   number_of_generations_ = 42;
   EXPECT_CALL(*moves_, InitPopulation(_, population_size_))
       .WillOnce(Return(Population<Chromosome>()));

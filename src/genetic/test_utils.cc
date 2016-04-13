@@ -9,19 +9,20 @@ namespace genetic {
 namespace {
 
 RawBatch InitBatch(int id, int accountId) {
-  RawBatch batch = {0, 0, 0, 0, 0, 0, 0, 0};
+  RawBatch batch;
   return batch.id(id).account(accountId);
 }
 
 RawAccount InitAccount(int id) {
-  RawAccount acc = {id, 0};
-  return acc;
+  RawAccount acc;
+  return acc.id(id);
 }
 
 std::vector<RawChangeCost> InitChangeCosts() {
   std::vector<RawChangeCost> changeCosts;
   for (int i = 0; i < 8; ++i) {
-    RawChangeCost changeCost = {Change(i & 1, i & 2, i & 4), 0};
+    RawChangeCost changeCost;
+    changeCost.change(Change(i & 1, i & 2, i & 4));
     changeCosts.push_back(changeCost);
   }
   return changeCosts;
@@ -30,7 +31,7 @@ std::vector<RawChangeCost> InitChangeCosts() {
 std::vector<RawJob> InitJobs(int kNumberOfJobs, int batchId, int kMachineSetId) {
   std::vector<RawJob> jobs;
   for (int id = 0; id < kNumberOfJobs; ++id) {
-    RawJob job = {0, 0, 0, 0, 0, 0, Context(0, 0, 0)};
+    RawJob job;
     job.id(id)
         .batch(batchId)
         .machine(0)
@@ -43,14 +44,14 @@ std::vector<RawJob> InitJobs(int kNumberOfJobs, int batchId, int kMachineSetId) 
 std::vector<RawMachine> InitMachines(int kNumberOfMachines) {
   std::vector<RawMachine> machines;
   for (int id = 0; id < kNumberOfMachines; ++id) {
-    RawMachine machine = {id, MachineState::kIdle, Context(0, 0, 0)};
-    machines.push_back(machine);
+    RawMachine machine;
+    machines.push_back(machine.id(id));
   }
   return machines;
 }
 
 RawMachineSet InitMachineSet(int kMachineSetId, int kNumberOfMachines) {
-  RawMachineSet machineSet = {0, {}};
+  RawMachineSet machineSet;
   machineSet.id(kMachineSetId);
   for (int id = 0; id < kNumberOfMachines; ++id) {
     machineSet.add(id);
@@ -59,14 +60,6 @@ RawMachineSet InitMachineSet(int kMachineSetId, int kNumberOfMachines) {
 }
 
 }  // namespace
-
-template<class T>
-Iterator<T>::Iterator(std::vector<T> v) : v_(std::move(v)) {}
-
-template<class T>
-T Iterator<T>::Next() {
-  return v_[counter_++];
-}
 
 RawSituation GetSimpleRawSituation(int numberOfJobs, int numberOfMachines) {
   const int batchId = 1;
@@ -79,7 +72,7 @@ RawSituation GetSimpleRawSituation(int numberOfJobs, int numberOfMachines) {
   auto machines = InitMachines(numberOfMachines);
   auto machine_set = InitMachineSet(machineSetId, numberOfMachines);
 
-  RawSituation rawSituation = {0, {}, {}, {}, {}, {}, {}, {}};
+  RawSituation rawSituation;
   rawSituation.jobs_ = std::move(jobs);
   rawSituation.machines_ = std::move(machines);
   rawSituation.change_costs_ = std::move(changeCosts);
