@@ -167,6 +167,9 @@ class Situation {
   using Batches = const std::vector<Batch>&;
   using Jobs = const std::vector<Job>&;
 
+  // Constructs an empty situation (no objects at all) with all change costs equal to 0.
+  Situation();
+
   // If `raw` is malformed std::invalid_argument will be thrown. For `raw` to be considered
   // correct the following conditions must hold:
   // - All objects must have non-default (!= kIdNone) and unique ids
@@ -294,6 +297,12 @@ struct Job::Data {
   MachineSet machine_set;
   Batch batch;
 };
+
+inline  Situation::Situation()
+    : data_(std::make_shared<Data>(std::vector<RawChangeCost>(), false)) {
+  // Possible optimization: make a single empty Data struct and share it across
+  // default-constructed Situation objects.
+}
 
 inline Id<Machine> Machine::id() const { return data_->id; }
 inline MachineState Machine::state() const { return data_->state; }
