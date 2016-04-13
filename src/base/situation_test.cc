@@ -49,60 +49,61 @@ bool IsSorted(const std::vector<Type> &vec) {
   return true;
 }
 
-class SituationTest : public testing::Test {
- protected:
-  RawSituation raw_ = RawSituation()
-      .time_stamp(1)
-      .add(RawMachine().id(2).state(MachineState::kIdle).context(Context(3, 4, 5)))
-      .add(RawMachine().id(6).state(MachineState::kWorking).context(Context(7, 8, 9)))
-      .add(RawMachine().id(10).state(MachineState::kDead).context(Context(11, 12, 13)))
-      .add(RawMachineSet().id(14).add(2).add(6))
-      .add(RawMachineSet().id(15).add(6).add(10))
-      .add(RawFairSet().id(16).add(2).add(6))
-      .add(RawFairSet().id(17).add(10))
-      .add(RawAccount().id(18).alloc(19))
-      .add(RawAccount().id(20).alloc(21))
-      .add(RawBatch().id(22).job_reward(23).job_timely_reward(24).reward(25).timely_reward(26)
-          .duration(27).due(28).account(18))
-      .add(RawBatch().id(29).job_reward(30).job_timely_reward(31).reward(32).timely_reward(33)
-          .duration(34).due(35).account(18))
-      .add(RawJob().id(36).duration(37).context(Context(38, 39, 40)).start_time(41)
-          .machine(2).machine_set(14).batch(22))
-      .add(RawJob().id(42).duration(43).context(Context(44, 45, 46)).start_time(47)
-          .machine(10).machine_set(15).batch(22))
-      .add(RawChangeCost().change(Change(0, 0, 0)).cost(48))
-      .add(RawChangeCost().change(Change(0, 0, 1)).cost(49))
-      .add(RawChangeCost().change(Change(0, 1, 0)).cost(50))
-      .add(RawChangeCost().change(Change(0, 1, 1)).cost(51))
-      .add(RawChangeCost().change(Change(1, 0, 0)).cost(52))
-      .add(RawChangeCost().change(Change(1, 0, 1)).cost(53))
-      .add(RawChangeCost().change(Change(1, 1, 0)).cost(54))
-      .add(RawChangeCost().change(Change(1, 1, 1)).cost(55));
-};
+const RawSituation sample = RawSituation()
+    .time_stamp(1)
+    .add(RawMachine().id(2).state(MachineState::kIdle).context(Context(3, 4, 5)))
+    .add(RawMachine().id(6).state(MachineState::kWorking).context(Context(7, 8, 9)))
+    .add(RawMachine().id(10).state(MachineState::kDead).context(Context(11, 12, 13)))
+    .add(RawMachineSet().id(14).add(2).add(6))
+    .add(RawMachineSet().id(15).add(6).add(10))
+    .add(RawFairSet().id(16).add(2).add(6))
+    .add(RawFairSet().id(17).add(10))
+    .add(RawAccount().id(18).alloc(19))
+    .add(RawAccount().id(20).alloc(21))
+    .add(RawBatch()
+        .id(22).job_reward(23).job_timely_reward(24).reward(25).timely_reward(26)
+        .duration(27).due(28).account(18))
+    .add(RawBatch()
+        .id(29).job_reward(30).job_timely_reward(31).reward(32).timely_reward(33)
+        .duration(34).due(35).account(18))
+    .add(RawJob()
+        .id(36).duration(37).context(Context(38, 39, 40)).start_time(41)
+        .machine(2).machine_set(14).batch(22))
+    .add(RawJob()
+        .id(42).duration(43).context(Context(44, 45, 46)).start_time(47)
+        .machine(10).machine_set(15).batch(22))
+    .add(RawChangeCost().change(Change(0, 0, 0)).cost(48))
+    .add(RawChangeCost().change(Change(0, 0, 1)).cost(49))
+    .add(RawChangeCost().change(Change(0, 1, 0)).cost(50))
+    .add(RawChangeCost().change(Change(0, 1, 1)).cost(51))
+    .add(RawChangeCost().change(Change(1, 0, 0)).cost(52))
+    .add(RawChangeCost().change(Change(1, 0, 1)).cost(53))
+    .add(RawChangeCost().change(Change(1, 1, 0)).cost(54))
+    .add(RawChangeCost().change(Change(1, 1, 1)).cost(55));
 
 // Verify that no object is missing from Situation.
-TEST_F(SituationTest, NothingMissing) {
-  Situation s{raw_};
-  EXPECT_TRUE(IdEqual(raw_.machines_, s.machines()));
-  EXPECT_TRUE(IdEqual(raw_.machine_sets_, s.machine_sets()));
-  EXPECT_TRUE(IdEqual(raw_.fair_sets_, s.fair_sets()));
-  EXPECT_TRUE(IdEqual(raw_.accounts_, s.accounts()));
-  EXPECT_TRUE(IdEqual(raw_.batches_, s.batches()));
-  EXPECT_TRUE(IdEqual(raw_.jobs_, s.jobs()));
+TEST(SituationTest, NothingMissing) {
+  Situation s{sample};
+  EXPECT_TRUE(IdEqual(sample.machines_, s.machines()));
+  EXPECT_TRUE(IdEqual(sample.machine_sets_, s.machine_sets()));
+  EXPECT_TRUE(IdEqual(sample.fair_sets_, s.fair_sets()));
+  EXPECT_TRUE(IdEqual(sample.accounts_, s.accounts()));
+  EXPECT_TRUE(IdEqual(sample.batches_, s.batches()));
+  EXPECT_TRUE(IdEqual(sample.jobs_, s.jobs()));
 }
 
 // Verify that collections returned by Situation are correctly sorted.
-TEST_F(SituationTest, SituationVectorsSorted) {
+TEST(SituationTest, SituationVectorsSorted) {
   // Break order to ensure the elements are actually rearranged.
-  RawSituation copy = raw_;
-  std::swap(copy.machines_[0], copy.machines_[2]);
-  std::swap(copy.machine_sets_[0], copy.machine_sets_[1]);
-  std::swap(copy.fair_sets_[0], copy.fair_sets_[1]);
-  std::swap(copy.accounts_[0], copy.accounts_[1]);
-  std::swap(copy.batches_[0], copy.batches_[1]);
-  std::swap(copy.jobs_[0], copy.jobs_[1]);
+  RawSituation raw = sample;
+  std::swap(raw.machines_[0], raw.machines_[2]);
+  std::swap(raw.machine_sets_[0], raw.machine_sets_[1]);
+  std::swap(raw.fair_sets_[0], raw.fair_sets_[1]);
+  std::swap(raw.accounts_[0], raw.accounts_[1]);
+  std::swap(raw.batches_[0], raw.batches_[1]);
+  std::swap(raw.jobs_[0], raw.jobs_[1]);
 
-  Situation s(copy);
+  Situation s(raw);
   EXPECT_TRUE(IsSorted(s.machines()));
   EXPECT_TRUE(IsSorted(s.machine_sets()));
   EXPECT_TRUE(IsSorted(s.fair_sets()));
@@ -112,8 +113,8 @@ TEST_F(SituationTest, SituationVectorsSorted) {
 }
 
 // Verify that collections returned by objects are correctly sorted.
-TEST_F(SituationTest, ObjectVectorsSorted) {
-  Situation situation{raw_};
+TEST(SituationTest, ObjectVectorsSorted) {
+  Situation situation{sample};
   for (auto m : situation.machines())
     EXPECT_TRUE(IsSorted(m.machine_sets()));
   for (auto s : situation.machine_sets()) {
@@ -128,27 +129,27 @@ TEST_F(SituationTest, ObjectVectorsSorted) {
     EXPECT_TRUE(IsSorted(b.jobs()));
 }
 
-class SituationTestPairwise : public SituationTest {
+class SituationPairwiseTest : public ::testing::Test {
  protected:
-  Situation situation_{raw_};
+  Situation situation_{sample};
 
-  const RawMachine &rm_ = raw_.machines_[1];
+  const RawMachine &rm_ = sample.machines_[1];
   Machine m_ = situation_.machines()[1];
-  const RawMachineSet &rs_ = raw_.machine_sets_[0];
+  const RawMachineSet &rs_ = sample.machine_sets_[0];
   MachineSet s_ = situation_.machine_sets()[0];
-  const RawFairSet &rf_ = raw_.fair_sets_[1];
+  const RawFairSet &rf_ = sample.fair_sets_[1];
   FairSet f_ = situation_.fair_sets()[1];
-  const RawAccount &ra_ = raw_.accounts_[0];
+  const RawAccount &ra_ = sample.accounts_[0];
   Account a_ = situation_.accounts()[0];
-  const RawBatch &rb_ = raw_.batches_[1];
+  const RawBatch &rb_ = sample.batches_[1];
   Batch b_ = situation_.batches()[1];
-  const RawJob &rj_ = raw_.jobs_[0];
+  const RawJob &rj_ = sample.jobs_[0];
   Job j_ = situation_.jobs()[0];
 };
 
 // Verify that all "property" fields are correctly copied to Situation.
-TEST_F(SituationTestPairwise, Properties) {
-  EXPECT_EQ(raw_.time_stamp_, situation_.time_stamp());
+TEST_F(SituationPairwiseTest, Properties) {
+  EXPECT_EQ(sample.time_stamp_, situation_.time_stamp());
 
   EXPECT_EQ(Id<Machine>(rm_.id_), m_.id());
   EXPECT_EQ(rm_.state_, m_.state());
@@ -176,7 +177,7 @@ TEST_F(SituationTestPairwise, Properties) {
 }
 
 // Verify that forward relations are correctly represented in situation.
-TEST_F(SituationTestPairwise, FordwardRelations) {
+TEST_F(SituationPairwiseTest, FordwardRelations) {
   EXPECT_TRUE(IdEqual(rs_.machines_, s_.machines()));
   EXPECT_TRUE(IdEqual(rf_.machines_, f_.machines()));
   EXPECT_EQ(Id<Account>(rb_.account_), b_.account().id());
@@ -186,7 +187,7 @@ TEST_F(SituationTestPairwise, FordwardRelations) {
 }
 
 // Verify that backward relations are correctly represented in situation.
-TEST_F(SituationTestPairwise, BackwardRelations) {
+TEST_F(SituationPairwiseTest, BackwardRelations) {
   EXPECT_TRUE(Contains(s_, s_.machines().front().machine_sets()));
   EXPECT_EQ(f_.id(), f_.machines().front().fair_set().id());
   EXPECT_EQ(j_.id(), j_.machine().job().id());
@@ -196,37 +197,223 @@ TEST_F(SituationTestPairwise, BackwardRelations) {
 }
 
 // Verify that objects are accessible by their id.
-TEST_F(SituationTest, AccessById) {
-  Situation situation(raw_);
+TEST(SituationTest, AccessById) {
+  Situation situation(sample);
 
-  for (auto &m : raw_.machines_)
+  for (auto &m : sample.machines_)
     if (!situation[Id<Machine>(m.id_)]) ADD_FAILURE();
-  for (auto &s : raw_.machine_sets_)
+  for (auto &s : sample.machine_sets_)
     if (!situation[Id<MachineSet>(s.id_)]) ADD_FAILURE();
-  for (auto &f : raw_.fair_sets_)
+  for (auto &f : sample.fair_sets_)
     if (!situation[Id<FairSet>(f.id_)]) ADD_FAILURE();
-  for (auto &a : raw_.accounts_)
+  for (auto &a : sample.accounts_)
     if (!situation[Id<Account>(a.id_)]) ADD_FAILURE();
-  for (auto &b : raw_.batches_)
+  for (auto &b : sample.batches_)
     if (!situation[Id<Batch>(b.id_)]) ADD_FAILURE();
-  for (auto &j : raw_.jobs_)
+  for (auto &j : sample.jobs_)
     if (!situation[Id<Job>(j.id_)]) ADD_FAILURE();
 }
 
+class RawWithCosts : public ::testing::Test {
+ protected:
+  virtual void SetUp() {
+    raw_.change_costs_ = sample.change_costs_;
+  }
 
-// TODO(kzyla): Write a test for each of the following cases:
+  RawSituation raw_;
+};
 
-// Verify that ChangeCosts are correctly copied to the situation.
+class SituationSafeThrowTest : public RawWithCosts {};
+class SituationThrowTest : public RawWithCosts, public ::testing::WithParamInterface<bool> {};
+INSTANTIATE_TEST_CASE_P(SafeUnsafe, SituationThrowTest, ::testing::Bool());
+
+// Verify that Situation constructor throws when some object has default id and safe == true;
+TEST_F(SituationSafeThrowTest, DefaultId) {
+  EXPECT_THROW({
+    Situation(RawSituation(raw_).add(RawMachine()), true);
+  }, std::invalid_argument);
+  EXPECT_THROW({
+    Situation(RawSituation(raw_).add(RawMachineSet()), true);
+  }, std::invalid_argument);
+  EXPECT_THROW({
+    Situation(RawSituation(raw_).add(RawFairSet()), true);
+  }, std::invalid_argument);
+  EXPECT_THROW({
+    Situation(RawSituation(raw_).add(RawAccount()), true);
+  }, std::invalid_argument);
+  raw_.add(RawAccount().id(0));
+  EXPECT_THROW({
+    Situation(RawSituation(raw_).add(RawBatch().account(0)), true);
+  }, std::invalid_argument);
+  raw_.add(RawMachineSet().id(0)).add(RawBatch().id(0).account(0));
+  EXPECT_THROW({
+    Situation(RawSituation(raw_).add(RawJob().batch(0).machine_set(0)), true);
+  }, std::invalid_argument);
+}
 
 // Verify that Situation constructor throws when multiple objects have the same id.
-// Verify that Situation constructor throws when object has unknown id and safe == true.
+TEST_P(SituationThrowTest, SameId) {
+  EXPECT_THROW({
+    Situation(RawSituation(raw_).add(RawMachine().id(1)).add(RawMachine().id(1)), GetParam());
+  }, std::invalid_argument);
+  EXPECT_THROW({
+    auto raw = RawSituation(raw_).add(RawMachineSet().id(7)).add(RawMachineSet().id(7));
+    Situation(raw, GetParam());
+  }, std::invalid_argument);
+  EXPECT_THROW({
+    Situation(RawSituation(raw_).add(RawFairSet().id(2)).add(RawFairSet().id(2)), GetParam());
+  }, std::invalid_argument);
+  EXPECT_THROW({
+    Situation(RawSituation(raw_).add(RawAccount().id(3)).add(RawAccount().id(3)), GetParam());
+  }, std::invalid_argument);
+  raw_.add(RawAccount().id(0));
+  EXPECT_THROW({
+    auto raw = RawSituation(raw_).add(RawBatch().id(4).account(0)).add(RawBatch().id(4).account(0));
+    Situation(raw, GetParam());
+  }, std::invalid_argument);
+  raw_.add(RawMachineSet().id(0)).add(RawBatch().id(0).account(0));
+  EXPECT_THROW({
+    auto raw = RawSituation(raw_)
+        .add(RawJob().id(6).batch(0).machine_set(0))
+        .add(RawJob().id(6).batch(0).machine_set(0));
+    Situation(raw, GetParam());
+  }, std::invalid_argument);
+}
 
-// Verify that Situation constructor throws when object has missing relation and safe == true.
-// Verify that null-object is returned when some object has missing relation.
+// Verify that Situation constructor throws when non-optional relation is missing and safe == true.
+TEST_F(SituationSafeThrowTest, MissingRelation) {
+  EXPECT_THROW({
+    Situation(RawSituation(raw_).add(RawBatch().id(0)));
+  }, std::invalid_argument);
+  raw_.add(RawAccount().id(0)).add(RawBatch().id(0).account(0)).add(RawMachineSet().id(0));
+  EXPECT_THROW({
+    Situation(RawSituation(raw_).add(RawJob().id(0).machine_set(0)));
+  }, std::invalid_argument);
+  EXPECT_THROW({
+    Situation(RawSituation(raw_).add(RawJob().id(0).batch(0)));
+  }, std::invalid_argument);
+}
+
+// Verify that Situation constructor throws when some relation is invalid.
+TEST_P(SituationThrowTest, Invalidrelation) {
+  EXPECT_THROW({
+    Situation(RawSituation(raw_).add(RawMachineSet().id(0).add(1)), GetParam());
+  }, std::invalid_argument);
+  EXPECT_THROW({
+    Situation(RawSituation(raw_).add(RawFairSet().id(0).add(1)), GetParam());
+  }, std::invalid_argument);
+  EXPECT_THROW({
+    Situation(RawSituation(raw_).add(RawBatch().id(0).account(1)), GetParam());
+  }, std::invalid_argument);
+  raw_.add(RawAccount().id(0)).add(RawBatch().id(0).account(0)).add(RawMachine().id(0));
+  EXPECT_THROW({
+    Situation(RawSituation(raw_).add(RawJob().id(0).batch(0).machine_set(1)), GetParam());
+  }, std::invalid_argument);
+  EXPECT_THROW({
+    Situation(RawSituation(raw_).add(RawJob().id(0).batch(1).machine_set(0)), GetParam());
+  }, std::invalid_argument);
+}
 
 // Verify that Situation constructor throws when multiple costs are given for one change.
+TEST_P(SituationThrowTest, MultipleCosts) {
+  raw_.change_costs_.push_back(raw_.change_costs_.back());
+  EXPECT_THROW({
+    Situation(raw_, GetParam());
+  }, std::invalid_argument);
+}
+
 // Verify that Situation constructor throws when costs are missing and safe == true.
-// Verify that costs default to 0 when they are missing.
+TEST_F(SituationSafeThrowTest, MissingCost) {
+  raw_.change_costs_.pop_back();
+  EXPECT_THROW({
+    Situation(raw_, true);
+  }, std::invalid_argument);
+}
+
+// Verify that Situation constructor throws when fair sets are not disjoint.
+TEST_P(SituationThrowTest, OverlappingFairSets) {
+  raw_.add(RawMachine().id(0)).add(RawFairSet().id(0).add(0)).add(RawFairSet().id(1).add(0));
+  EXPECT_THROW({
+    Situation(raw_, GetParam());
+  }, std::invalid_argument);
+}
+
+// Verify that Situation constructor throws when a machine has more than one job assigned.
+TEST_P(SituationThrowTest, MachineWithMultipleJobs) {
+  raw_.add(RawMachine().id(0)).add(RawMachineSet().id(0).add(0));
+  raw_.add(RawAccount().id(0)).add(RawBatch().id(0).account(0));
+  raw_.add(RawJob().id(1).batch(0).machine_set(0).machine(0));
+  raw_.add(RawJob().id(2).batch(0).machine_set(0).machine(0));
+  EXPECT_THROW({
+    Situation(raw_, GetParam());
+  }, std::invalid_argument);
+}
+
+// Verify that object with default id doesn't raise an exception when safe == false.
+TEST(SituationTest, DefaultId) {
+  EXPECT_NO_THROW({
+    Situation(RawSituation().add(RawAccount()), false);
+  });
+  EXPECT_NO_THROW({
+    Situation(RawSituation().add(RawMachine()), false);
+  });
+}
+
+// Verify that the optional relations are actually optional.
+TEST_P(SituationThrowTest, OptionalRelations) {
+  raw_.add(RawAccount().id(0)).add(RawBatch().id(0).account(0));
+  raw_.add(RawMachineSet().id(0));
+  raw_.add(RawJob().id(0).batch(0).machine_set(0));
+  EXPECT_NO_THROW({
+    Situation(raw_, GetParam());
+  });
+}
+
+// Verify that null object is returned when some object has missing relation and safe == false.
+TEST(SituationTest, MissingRelationIsOk) {
+  {
+    Situation s(RawSituation().add(RawMachine().id(0)), false);
+    Machine m = s[Id<Machine>(0)];
+    if (m.fair_set()) ADD_FAILURE();
+    if (m.job()) ADD_FAILURE();
+  }
+  {
+    Situation s(RawSituation().add(RawBatch().id(0)), false);
+    Batch b = s[Id<Batch>(0)];
+    if (b.account()) ADD_FAILURE();
+  }
+  {
+    Situation s(RawSituation().add(RawJob().id(0)), false);
+    Job j = s[Id<Job>(0)];
+    if (j.machine()) ADD_FAILURE();
+    if (j.machine_set()) ADD_FAILURE();
+    if (j.batch()) ADD_FAILURE();
+  }
+}
+
+// Verify that ChangeCosts are correctly copied to the situation.
+TEST(SituationTest, ChangeCosts) {
+  RawSituation raw;
+  raw.change_costs_ = sample.change_costs_;
+  Situation s(raw, true);
+
+  for (auto change_cost : raw.change_costs_) {
+    EXPECT_EQ(change_cost.cost_, s.change_costs().cost(change_cost.change_));
+  }
+}
+
+// Verify that costs default to 0 when they are missing and safe == false.
+TEST(SituationTest, MissingCosts) {
+  Situation s{RawSituation(), false};
+  EXPECT_EQ(0, s.change_costs().cost(Change(0, 0, 0)));
+  EXPECT_EQ(0, s.change_costs().cost(Change(0, 0, 1)));
+  EXPECT_EQ(0, s.change_costs().cost(Change(0, 1, 0)));
+  EXPECT_EQ(0, s.change_costs().cost(Change(0, 1, 1)));
+  EXPECT_EQ(0, s.change_costs().cost(Change(1, 0, 0)));
+  EXPECT_EQ(0, s.change_costs().cost(Change(1, 0, 1)));
+  EXPECT_EQ(0, s.change_costs().cost(Change(1, 1, 0)));
+  EXPECT_EQ(0, s.change_costs().cost(Change(1, 1, 1)));
+}
 
 }  // namespace
 }  // namespace lss

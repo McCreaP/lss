@@ -7,6 +7,7 @@
 #ifndef LSS_BASE_SITUATION_H_
 #define LSS_BASE_SITUATION_H_
 
+#include <memory>
 #include <vector>
 
 #include "base/raw_situation.h"
@@ -34,7 +35,7 @@ class Machine {
   Context context() const;           // Property; extra
   MachineSets machine_sets() const;  // Backward relation
   FairSet fair_set() const;          // Backward relation
-  Job job() const;                   // Backward relation; extra
+  Job job() const;                   // Backward relation; extra; optional
 
  private:
   struct Data;
@@ -130,8 +131,7 @@ class Job {
   Duration duration() const;       // Property
   Context context() const;         // Property
   Time start_time() const;         // Property; extra
-  // TODO(kzyla): Make this relation optional.
-  Machine machine() const;         // Forward relation; extra
+  Machine machine() const;         // Forward relation; extra; optional
   MachineSet machine_set() const;  // Forward relation
   Batch batch() const;             // Forward relation
 
@@ -167,45 +167,65 @@ class Situation {
   using Batches = const std::vector<Batch>&;
   using Jobs = const std::vector<Job>&;
 
-  // In `raw` all objects of the same type must have unique, known ids (id != Id::kNone)
-  // and their relations must be valid (other_id references an existing object).
-  // Also change_costs_ must hold exactly one element for each possible Change.
-  // Otherwise std::invalid_argument will be thrown.
+  // If `raw` is malformed std::invalid_argument will be thrown. For `raw` to be considered
+  // correct the following conditions must hold:
+  // - All objects must have non-default (!= kIdNone) and unique ids
+  //   (amongst objects of the same type).
+  // - All non-optional relations must be valid (!= kIdNone, the referenced object must exist).
+  // - `change_costs_` must hold exactly one element for each possible Change.
+  // - Fair sets must be disjoint.
+  // - Each machine must have at most single job assigned to it.
   //
-  // If `safe` is set to false objects are allowed to have id == Id::kNone (such objects cannot
-  // be retrieved with operator[]) or other_id == Id::kNone (the corresponding method returns
-  // default-constructed object). The costs missing from change_costs_ default to 0.
+  // If `safe` is set to false objects some constraints are relaxed:
+  // - Objects are allowed to have id == Id::kNone (such objects cannot be retrieved
+  //   with operator[]).
+  // - All relations are considered optional.
+  // - Missing elements in `change_costs_` default to zero.
   explicit Situation(const RawSituation &raw, bool safe = true);
 
-  // Copying is pointless as Situation is immutable. Copy constructor and copy assignment operator
-  // would be just syntax sugar for keeping std::shared_ptr<Situation>.
-  // They might be added in the future.
-  Situation(const Situation &) = delete;
-  Situation& operator=(const Situation &) = delete;
+  Situation(const Situation &) = default;
+  Situation& operator=(const Situation &) = default;
 
-  ~Situation();
+  ~Situation() { FreeMem(); }
 
-  Time time_stamp() const { return time_stamp_; }
+  Time time_stamp() const { return data_->time_stamp_; }
 
-  Machine operator[](Id<Machine> id) const { return Get(machines_, id); }
-  MachineSet operator[](Id<MachineSet> id) const { return Get(machine_sets_, id); }
-  FairSet operator[](Id<FairSet> id) const { return Get(fair_sets_, id); }
-  Account operator[](Id<Account> id) const { return Get(accounts_, id); }
-  Batch operator[](Id<Batch> id) const { return Get(batches_, id); }
-  Job operator[](Id<Job> id) const { return Get(jobs_, id); }
+  Machine operator[](Id<Machine> id) const { return Get(data_->machines_, id); }
+  MachineSet operator[](Id<MachineSet> id) const { return Get(data_->machine_sets_, id); }
+  FairSet operator[](Id<FairSet> id) const { return Get(data_->fair_sets_, id); }
+  Account operator[](Id<Account> id) const { return Get(data_->accounts_, id); }
+  Batch operator[](Id<Batch> id) const { return Get(data_->batches_, id); }
+  Job operator[](Id<Job> id) const { return Get(data_->jobs_, id); }
 
-  Machines machines() const { return machines_; }
-  MachineSets machine_sets() const { return machine_sets_; }
-  FairSets fair_sets() const { return fair_sets_; }
-  Accounts accounts() const { return accounts_; }
-  Batches batches() const { return batches_; }
-  Jobs jobs() const { return jobs_; }
+  Machines machines() const { return data_->machines_; }
+  MachineSets machine_sets() const { return data_->machine_sets_; }
+  FairSets fair_sets() const { return data_->fair_sets_; }
+  Accounts accounts() const { return data_->accounts_; }
+  Batches batches() const { return data_->batches_; }
+  Jobs jobs() const { return data_->jobs_; }
 
-  const ChangeCosts& change_costs() const { return change_costs_; }
+  const ChangeCosts& change_costs() const { return data_->change_costs_; }
 
  private:
+  struct Data {
+    Data(const std::vector<RawChangeCost> &raw, bool safe) : change_costs_(raw, safe) {}
+
+    Time time_stamp_;
+
+    std::vector<Machine> machines_;
+    std::vector<MachineSet> machine_sets_;
+    std::vector<FairSet> fair_sets_;
+    std::vector<Account> accounts_;
+    std::vector<Batch> batches_;
+    std::vector<Job> jobs_;
+
+    ChangeCosts change_costs_;
+  };
+
   template<class T>
   static T Get(const std::vector<T> &from, Id<T> id);
+
+  void FreeMem();
 
   void AddMachines(const std::vector<RawMachine> &raw, bool safe);
   void AddMachineSets(const std::vector<RawMachineSet> &raw, bool safe);
@@ -214,16 +234,7 @@ class Situation {
   void AddBatches(const std::vector<RawBatch> &raw, bool safe);
   void AddJobs(const std::vector<RawJob> &raw, bool safe);
 
-  Time time_stamp_;
-
-  std::vector<Machine> machines_;
-  std::vector<MachineSet> machine_sets_;
-  std::vector<FairSet> fair_sets_;
-  std::vector<Account> accounts_;
-  std::vector<Batch> batches_;
-  std::vector<Job> jobs_;
-
-  ChangeCosts change_costs_;
+  std::shared_ptr<Data> data_;
 };
 
 struct Machine::Data {

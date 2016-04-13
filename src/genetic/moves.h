@@ -5,6 +5,8 @@
 #include <memory>
 #include <vector>
 
+#include "gmock/gmock.h"
+
 #include "base/situation.h"
 
 namespace lss {

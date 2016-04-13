@@ -21,10 +21,12 @@ enum class MachineState {
   kDead = 2,
 };
 
+static constexpr IdType kIdNone = std::numeric_limits<IdType>::min();
+
 template<class T>
 class Id {
  public:
-  static constexpr int kNone = std::numeric_limits<int>::min();
+  static constexpr int kNone = kIdNone;
 
   Id() = default;
   explicit Id(int id) : id_(id) {}
@@ -93,8 +95,15 @@ class Change {
   bool& operator[](size_t idx) { return change_[idx]; }
   const bool& operator[](size_t idx) const { return change_[idx]; }
 
+  friend bool operator==(Change lhs, Change rhs) {
+    return lhs.change_ == rhs.change_;
+  }
+  friend bool operator!=(Change lhs, Change rhs) {
+    return lhs.change_ != rhs.change_;
+  }
+
  private:
-  bool change_[kSize];
+  std::array<bool, kSize> change_{{}};
 };
 
 }  // namespace lss

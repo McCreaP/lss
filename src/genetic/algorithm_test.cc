@@ -8,6 +8,7 @@
 
 #include "genetic/moves.h"
 #include "genetic/selector_impl.h"
+#include "genetic/test_utils.h"
 
 namespace lss {
 namespace genetic {
@@ -45,23 +46,11 @@ class MutatorFake : public Mutator<ChromosomeFake> {
   mutable std::vector<ChromosomeFake> invoked_chromosomes_;
 };
 
-template<class T>
-class Iterator {
- public:
-  explicit Iterator(std::vector<T> v) : v_(std::move(v)) {}
-
-  T Next() {
-    return v_[counter_++];
-  }
-
- private:
-  int counter_ = 0;
-  std::vector<T> v_;
-};
-
 class AlgorithmShould : public ::testing::Test {
  protected:
   using Chromosome = ChromosomeFake;
+
+  AlgorithmShould() : situation_(RawSituation(), false) {}
 
   void SetUp() {
     moves_ = std::make_shared<MovesMock<Chromosome>>();

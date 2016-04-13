@@ -35,6 +35,7 @@ class RandomMock: public Random {
  public:
   MOCK_METHOD2(GetRealInRange, double(double, double));
   MOCK_METHOD1_T(RandomShuffle, void(std::vector<size_t> *));
+  MOCK_METHOD1(Rand, size_t(size_t));
 };
 
 #endif  // LSS_BASE_RANDOM_H_
