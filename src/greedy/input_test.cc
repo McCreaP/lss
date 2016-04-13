@@ -36,13 +36,13 @@ TEST(Input, UpdateReturnsFalseOnReaderFailure) {
 
 TEST(Input, GetBatches) {
   RawBatch raw_batch_1 = RawBatch();
-  raw_batch_1.id = 1;
+  raw_batch_1.id_ = 1;
   RawBatch raw_batch_2 = RawBatch();
-  raw_batch_2.id = 2;
+  raw_batch_2.id_ = 2;
   static const BatchWrapper kBatch1 = BatchWrapper(raw_batch_1);
   static const BatchWrapper kBatch2 = BatchWrapper(raw_batch_2);
   RawSituation raw_data = RawSituation();
-  raw_data.batches = {raw_batch_1, raw_batch_2};
+  raw_data.batches_ = {raw_batch_1, raw_batch_2};
   std::unique_ptr<io::ReaderMock> reader = std::make_unique<io::ReaderMock>();
   EXPECT_CALL(*reader, Read(_)).WillOnce(DoAll(SetArgPointee<0>(raw_data), Return(true)));
 
@@ -56,18 +56,18 @@ TEST(Input, GetBatches) {
 
 TEST(Input, GetBatchesAfterUpdate) {
   RawBatch raw_batch_1 = RawBatch();
-  raw_batch_1.id = 1;
+  raw_batch_1.id_ = 1;
   RawBatch raw_batch_2 = RawBatch();
-  raw_batch_2.id = 2;
+  raw_batch_2.id_ = 2;
   RawBatch raw_batch_3 = RawBatch();
-  raw_batch_3.id = 3;
+  raw_batch_3.id_ = 3;
   static const BatchWrapper kBatch1 = BatchWrapper(raw_batch_1);
   static const BatchWrapper kBatch2 = BatchWrapper(raw_batch_2);
   static const BatchWrapper kBatch3 = BatchWrapper(raw_batch_3);
   RawSituation raw_data_1 = RawSituation();
-  raw_data_1.batches = {raw_batch_1, raw_batch_2};
+  raw_data_1.batches_ = {raw_batch_1, raw_batch_2};
   RawSituation raw_data_2 = RawSituation();
-  raw_data_2.batches = {raw_batch_2, raw_batch_3};
+  raw_data_2.batches_ = {raw_batch_2, raw_batch_3};
   std::unique_ptr<io::ReaderMock> reader = std::make_unique<io::ReaderMock>();
   EXPECT_CALL(*reader, Read(_)).WillOnce(DoAll(SetArgPointee<0>(raw_data_1), Return(true)))
       .WillOnce(DoAll(SetArgPointee<0>(raw_data_2), Return(true)));
@@ -87,9 +87,9 @@ TEST(Input, GetBatchesAfterUpdate) {
 }
 
 TEST(Input, EmptyMachineSet) {
-  static const RawMachineSet kRawMachineSet = {1, std::vector<int>()};
+  static const auto kRawMachineSet = RawMachineSet().id(1);
   RawSituation raw_data = RawSituation();
-  raw_data.machine_sets = {kRawMachineSet};
+  raw_data.machine_sets_ = {kRawMachineSet};
   std::unique_ptr<io::ReaderMock> reader = std::make_unique<io::ReaderMock>();
   EXPECT_CALL(*reader, Read(_)).WillOnce(DoAll(SetArgPointee<0>(raw_data), Return(true)));
 
@@ -99,11 +99,11 @@ TEST(Input, EmptyMachineSet) {
 }
 
 TEST(Input, SingleMachineSet) {
-  static const RawMachine kRawMachine = {1, MachineState::kIdle, {-1, -1, -1}};
-  static const RawMachineSet kRawMachineSet = {1, std::vector<int>({1})};
+  static const auto kRawMachine = RawMachine().id(1).state(MachineState::kIdle);
+  static const auto kRawMachineSet = RawMachineSet().id(1).add(1);
   RawSituation raw_data = RawSituation();
-  raw_data.machines = {kRawMachine};
-  raw_data.machine_sets = {kRawMachineSet};
+  raw_data.machines_ = {kRawMachine};
+  raw_data.machine_sets_ = {kRawMachineSet};
   std::unique_ptr<io::ReaderMock> reader = std::make_unique<io::ReaderMock>();
   EXPECT_CALL(*reader, Read(_)).WillOnce(DoAll(SetArgPointee<0>(raw_data), Return(true)));
   static const MachineWrapper kMachine(kRawMachine, std::make_shared<ContextChanges>());
@@ -116,14 +116,14 @@ TEST(Input, SingleMachineSet) {
 }
 
 TEST(Input, MultipleMachineSets) {
-  static const RawMachine kRawMachine1 = {1, MachineState::kIdle, {-1, -1, -1}};
-  static const RawMachine kRawMachine2 = {2, MachineState::kWorking, {-1, -1, -1}};
-  static const RawMachine kRawMachine3 = {3, MachineState::kDead, {-1, -1, -1}};
-  static const RawMachineSet kRawMachineSet1 = {1, std::vector<int>({1, 2})};
-  static const RawMachineSet kRawMachineSet2 = {2, std::vector<int>({3})};
+  static const auto kRawMachine1 = RawMachine().id(1).state(MachineState::kIdle);
+  static const auto kRawMachine2 = RawMachine().id(2).state(MachineState::kWorking);
+  static const auto kRawMachine3 = RawMachine().id(3).state(MachineState::kDead);
+  static const auto kRawMachineSet1 = RawMachineSet().id(1).add(1).add(2);
+  static const auto kRawMachineSet2 = RawMachineSet().id(2).add(3);
   RawSituation raw_data = RawSituation();
-  raw_data.machines = {kRawMachine1, kRawMachine2, kRawMachine3};
-  raw_data.machine_sets = {kRawMachineSet1, kRawMachineSet2};
+  raw_data.machines_ = {kRawMachine1, kRawMachine2, kRawMachine3};
+  raw_data.machine_sets_ = {kRawMachineSet1, kRawMachineSet2};
   std::unique_ptr<io::ReaderMock> reader = std::make_unique<io::ReaderMock>();
   EXPECT_CALL(*reader, Read(_)).WillOnce(DoAll(SetArgPointee<0>(raw_data), Return(true)));
   static const MachineWrapper kMachine1(kRawMachine1, std::make_shared<ContextChanges>());
@@ -142,11 +142,11 @@ TEST(Input, MultipleMachineSets) {
 }
 
 TEST(Input, KeepsOldMachine) {
-  static const RawMachine kRawMachine = {1, MachineState::kIdle, {-1, -1, -1}};
-  static const RawMachineSet kRawMachineSet = {1, std::vector<int>({1})};
+  static const auto kRawMachine = RawMachine().id(1).state(MachineState::kIdle);
+  static const auto kRawMachineSet = RawMachineSet().id(1).add(1);
   RawSituation raw_data = RawSituation();
-  raw_data.machines = {kRawMachine};
-  raw_data.machine_sets = {kRawMachineSet};
+  raw_data.machines_ = {kRawMachine};
+  raw_data.machine_sets_ = {kRawMachineSet};
   std::unique_ptr<io::ReaderMock> reader = std::make_unique<io::ReaderMock>();
   EXPECT_CALL(*reader, Read(_)).WillRepeatedly(DoAll(SetArgPointee<0>(raw_data), Return(true)));
   static const MachineWrapper kMachine(kRawMachine, std::make_shared<ContextChanges>());
@@ -167,8 +167,8 @@ TEST(Input, KeepsOldMachine) {
 TEST(Input, AssignOneJob) {
   static const int kAssignedJobId = 42;
   RawJob kRawJob = RawJob();
-  kRawJob.id = kAssignedJobId;
-  static const RawMachine kRawMachine1 = {10, MachineState::kIdle, {-1, -1, -1}};
+  kRawJob.id_ = kAssignedJobId;
+  static const auto kRawMachine1 = RawMachine().id(10).state(MachineState::kIdle);
   MachineWrapper machine = MachineWrapper(kRawMachine1, std::make_shared<ContextChanges>());
   std::unique_ptr<io::ReaderMock> reader = std::make_unique<io::ReaderMock>();
 
@@ -184,14 +184,14 @@ TEST(Input, AssignedJobsAfterUpdate) {
   static const int kSecondJobId = 20;
   static const RawBatch kRawBatch = RawBatch();
   RawJob raw_job_1 = RawJob();
-  raw_job_1.id = kFirstJobId;
+  raw_job_1.id_ = kFirstJobId;
   RawJob raw_job_2 = RawJob();
-  raw_job_2.id = kSecondJobId;
+  raw_job_2.id_ = kSecondJobId;
   RawSituation raw_data = RawSituation();
-  raw_data.jobs = {raw_job_2};
-  raw_data.batches = {kRawBatch};
-  static const RawMachine kRawMachine1 = {10, MachineState::kIdle, {-1, -1, -1}};
-  static const RawMachine kRawMachine2 = {20, MachineState::kIdle, {-1, -1, -1}};
+  raw_data.jobs_ = {raw_job_2};
+  raw_data.batches_ = {kRawBatch};
+  static const auto kRawMachine1 = RawMachine().id(10).state(MachineState::kIdle);
+  static const auto kRawMachine2 = RawMachine().id(20).state(MachineState::kIdle);
   MachineWrapper machine1 = MachineWrapper(kRawMachine1, std::make_shared<ContextChanges>());
   MachineWrapper machine2 = MachineWrapper(kRawMachine2, std::make_shared<ContextChanges>());
   std::unique_ptr<io::ReaderMock> reader = std::make_unique<io::ReaderMock>();

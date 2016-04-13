@@ -27,31 +27,31 @@ using HeaderReaderPair = std::tuple<const char*, SectionReader>;
 constexpr std::array<HeaderReaderPair, 7> kReaders{
   HeaderReaderPair{
     "machines",
-    &ReadOne<RawMachine, &RawSituation::machines>
+    &ReadOne<RawMachine, &RawSituation::machines_>
   },
   HeaderReaderPair{
     "machine-sets",
-    &ReadOne<RawMachineSet, &RawSituation::machine_sets>
+    &ReadOne<RawMachineSet, &RawSituation::machine_sets_>
   },
   HeaderReaderPair{
     "fair-service-machine-sets",
-    &ReadOne<RawMachineSet, &RawSituation::fair_sets>
+    &ReadOne<RawFairSet, &RawSituation::fair_sets_>
   },
   HeaderReaderPair{
     "jobs",
-    &ReadOne<RawJob, &RawSituation::jobs>
+    &ReadOne<RawJob, &RawSituation::jobs_>
   },
   HeaderReaderPair{
     "batches",
-    &ReadOne<RawBatch, &RawSituation::batches>
+    &ReadOne<RawBatch, &RawSituation::batches_>
   },
   HeaderReaderPair{
     "accounts",
-    &ReadOne<RawAccount, &RawSituation::accounts>
+    &ReadOne<RawAccount, &RawSituation::accounts_>
   },
   HeaderReaderPair{
     "context-changes",
-    &ReadOne<RawContextChange, &RawSituation::context_changes>
+    &ReadOne<RawChangeCost, &RawSituation::change_costs_>
   },
 };
 
