@@ -1,5 +1,5 @@
-#include <set>
 #include <cstdlib>
+#include <set>
 
 #include "genetic/permutation_chromosome/chromosome.h"
 #include "genetic/permutation_chromosome/moves_impl.h"
@@ -8,19 +8,19 @@ namespace lss {
 namespace genetic {
 namespace {
 
-void Merge(std::vector<JobMachine> *to, const std::vector<JobMachine> &from, size_t minBound, size_t maxBound) {
-  std::set<JobMachine> alreadyTaken;
-  for (size_t i = minBound; i < maxBound; ++i) {
-    alreadyTaken.insert((*to)[i]);
+void Merge(std::vector<JobMachine> *to, const std::vector<JobMachine> &from, size_t min_bound, size_t max_bound) {
+  std::set<JobMachine> already_taken;
+  for (size_t i = min_bound; i < max_bound; ++i) {
+    already_taken.insert((*to)[i]);
   }
 
   auto it = from.begin();
-  for (size_t i = 0; i < minBound; ++i) {
-    while (it != from.end() && alreadyTaken.find(*it) != alreadyTaken.end()) ++it;
+  for (size_t i = 0; i < min_bound; ++i) {
+    while (it != from.end() && already_taken.find(*it) != already_taken.end()) ++it;
     (*to)[i] = *it;
   }
-  for (size_t i = maxBound; i < to->size(); ++i) {
-    while (it != from.end() && alreadyTaken.find(*it) != alreadyTaken.end()) ++it;
+  for (size_t i = max_bound; i < to->size(); ++i) {
+    while (it != from.end() && already_taken.find(*it) != already_taken.end()) ++it;
     (*to)[i] = *it;
   }
 }
@@ -28,15 +28,15 @@ void Merge(std::vector<JobMachine> *to, const std::vector<JobMachine> &from, siz
 }  // namespace
 
 void CrosserImpl::Crossover(PermutationJobMachine *lhs, PermutationJobMachine *rhs) const {
-  size_t permutationSize = lhs->permutation().size();
-  size_t firstBound = rand_->Rand(permutationSize);
-  size_t secondBound = rand_->Rand(permutationSize);
-  size_t minBound = std::min(firstBound, secondBound);
-  size_t maxBound = std::max(firstBound, secondBound);
+  size_t permutation_size = lhs->permutation().size();
+  size_t first_bound = rand_->Rand(permutation_size);
+  size_t second_bound = rand_->Rand(permutation_size);
+  size_t min_bound = std::min(first_bound, second_bound);
+  size_t max_bound = std::max(first_bound, second_bound);
 
-  PermutationJobMachine lhsCopy = *lhs;
-  Merge(&lhs->permutation(), rhs->permutation(), minBound, maxBound);
-  Merge(&rhs->permutation(), lhsCopy.permutation(), minBound, maxBound);
+  PermutationJobMachine lhs_copy = *lhs;
+  Merge(&lhs->permutation(), rhs->permutation(), min_bound, max_bound);
+  Merge(&rhs->permutation(), lhs_copy.permutation(), min_bound, max_bound);
 }
 
 }  // namespace genetic

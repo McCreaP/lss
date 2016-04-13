@@ -1,8 +1,10 @@
-#include "gtest/gtest.h"
-#include "gmock/gmock.h"
+#include <memory>
 
-#include "genetic/mocks.h"
-#include "genetic/permutation_chromosome/test_utils.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
+
+#include "base/random.h"
+#include "genetic/test_utils.h"
 
 using ::testing::Test;
 

@@ -32,10 +32,7 @@ std::vector<RawJob> InitJobs(int kNumberOfJobs, int batchId, int kMachineSetId) 
   std::vector<RawJob> jobs;
   for (int id = 0; id < kNumberOfJobs; ++id) {
     RawJob job;
-    job.id(id)
-        .batch(batchId)
-        .machine(0)
-        .machine_set(kMachineSetId);
+    job.id(id).batch(batchId).machine_set(kMachineSetId);
     jobs.push_back(job);
   }
   return jobs;

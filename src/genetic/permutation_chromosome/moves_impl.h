@@ -10,7 +10,7 @@ namespace genetic {
 class InitializerImpl : public Initializer<PermutationJobMachine> {
  public:
   explicit InitializerImpl(std::shared_ptr<Random> rand) : rand_(rand) {}
-  Population<PermutationJobMachine> InitPopulation(const Situation &situation, int populationSize) const override;
+  Population<PermutationJobMachine> InitPopulation(const Situation &situation, int population_size) const override;
 
  private:
   std::shared_ptr<Random> rand_;

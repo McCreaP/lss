@@ -6,8 +6,8 @@
 
 #include "gmock/gmock.h"
 
-#include "genetic/algorithm.h"
 #include "base/situation.h"
+#include "genetic/algorithm.h"
 
 namespace lss {
 namespace genetic {

@@ -3,9 +3,8 @@
 
 #include "base/raw_situation.h"
 #include "base/situation.h"
-#include "genetic/mocks.h"
 #include "genetic/permutation_chromosome/moves_impl.h"
-#include "genetic/permutation_chromosome/test_utils.h"
+#include "genetic/test_utils.h"
 
 namespace lss {
 namespace genetic {
@@ -15,15 +14,15 @@ using ::testing::NiceMock;
 using ::testing::InvokeWithoutArgs;
 using ::testing::Return;
 
-std::vector<JobMachine> GetPermutation(std::vector<int> jobPermutation,
-                                       std::vector<int> machinePermutation,
+std::vector<JobMachine> GetPermutation(std::vector<int> job_permutation,
+                                       std::vector<int> machine_permutation,
                                        const Situation &situation) {
   std::vector<JobMachine> permutation;
-  for (size_t i = 0; i < jobPermutation.size(); ++i) {
-    const Job *j = &situation.jobs()[jobPermutation[i]];
-    const Machine *m = &situation.machines()[machinePermutation[i]];
-    JobMachine jobMachine = std::make_tuple(j, m);
-    permutation.push_back(jobMachine);
+  for (size_t i = 0; i < job_permutation.size(); ++i) {
+    const Job *j = &situation.jobs()[job_permutation[i]];
+    const Machine *m = &situation.machines()[machine_permutation[i]];
+    JobMachine job_machine = std::make_tuple(j, m);
+    permutation.push_back(job_machine);
   }
   return permutation;
 }
@@ -32,17 +31,17 @@ class MutatorShould : public ::testing::Test {
  protected:
   void SetUp() {
     rand_ = std::make_shared<RandomMock>();
-    rawSituation_ = GetSimpleRawSituation(kNumberOfJobs, kNumberOfMachines);
+    raw_situation_ = GetSimpleRawSituation(kNumberOfJobs, kNumberOfMachines);
   }
 
-  RawSituation rawSituation_;
+  RawSituation raw_situation_;
   std::shared_ptr<RandomMock> rand_;
   const int kNumberOfJobs = 5;
   const int kNumberOfMachines = 3;
 };
 
 TEST_F(MutatorShould, take_job_machine_to_mutation_wrt_generated_random_number) {
-  Situation situation(rawSituation_);
+  Situation situation(raw_situation_);
   auto permutation = GetPermutation({3, 1, 4, 0, 2}, {0, 1, 1, 0, 0}, situation);
   auto chromosome = PermutationJobMachine(permutation);
   std::vector<double> randoms = {0.1, 0.6, 0.4, 0.2, 0.6};
@@ -55,9 +54,9 @@ TEST_F(MutatorShould, take_job_machine_to_mutation_wrt_generated_random_number) 
   MutatorImpl mutator(0.5, rand_);
   mutator.Mutate(situation, &chromosome);
 
-  std::vector<int> expectedMachinesOrder = {2, 1, 2, 2, 0};
+  std::vector<int> expected_machines_order = {2, 1, 2, 2, 0};
   for (size_t i = 0; i < chromosome.permutation().size(); ++i) {
-    EXPECT_EQ(expectedMachinesOrder[i], (int)std::get<1>(chromosome.permutation()[i])->id());
+    EXPECT_EQ(expected_machines_order[i], (int)std::get<1>(chromosome.permutation()[i])->id());
   }
 }
 
