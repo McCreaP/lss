@@ -19,8 +19,8 @@ std::vector<JobMachine> GetPermutation(std::vector<int> job_permutation,
                                        const Situation &situation) {
   std::vector<JobMachine> permutation;
   for (size_t i = 0; i < job_permutation.size(); ++i) {
-    const Job *j = &situation.jobs()[job_permutation[i]];
-    const Machine *m = &situation.machines()[machine_permutation[i]];
+    Job j = situation.jobs()[job_permutation[i]];
+    Machine m = situation.machines()[machine_permutation[i]];
     JobMachine job_machine = std::make_tuple(j, m);
     permutation.push_back(job_machine);
   }
@@ -56,7 +56,7 @@ TEST_F(MutatorShould, take_job_machine_to_mutation_wrt_generated_random_number) 
 
   std::vector<int> expected_machines_order = {2, 1, 2, 2, 0};
   for (size_t i = 0; i < chromosome.permutation().size(); ++i) {
-    EXPECT_EQ(expected_machines_order[i], (int)std::get<1>(chromosome.permutation()[i])->id());
+    EXPECT_EQ(expected_machines_order[i], (int)std::get<1>(chromosome.permutation()[i]).id());
   }
 }
 

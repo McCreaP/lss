@@ -11,8 +11,8 @@ void MutatorImpl::Mutate(__attribute__((unused)) const Situation &situation, Per
   for (size_t i = 0; i < chromosome->permutation().size(); ++i) {
     bool take_job_machine_to_mutation = rand_->GetRealInRange(0., 1.) < kMutationProbability;
     if (take_job_machine_to_mutation) {
-      const Job *job = std::get<0>(chromosome->permutation()[i]);
-      const Machine *machine = FindRandomMachineForJob(*job, rand_.get());
+      Job job = std::get<0>(chromosome->permutation()[i]);
+      Machine machine = FindRandomMachineForJob(job, rand_.get());
       chromosome->permutation()[i] = std::make_tuple(job, machine);
     }
   }

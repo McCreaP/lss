@@ -12,7 +12,7 @@
 namespace lss {
 namespace genetic {
 
-using JobMachine = std::tuple<const lss::Job *, const lss::Machine *>;
+using JobMachine = std::tuple<Job, Machine>;
 
 class PermutationJobMachine : public Chromosome {
  public:
@@ -39,5 +39,16 @@ class PermutationJobMachineMock : public PermutationJobMachine {
 
 }  // namespace genetic
 }  // namespace lss
+
+namespace std {
+
+template<>
+struct hash<tuple<lss::Job, lss::Machine>> {
+  size_t operator()(const tuple<lss::Job, lss::Machine> &jm) const {
+    return hash<lss::Job>()(get<0>(jm)) ^ hash<lss::Machine>()(get<1>(jm));
+  }
+};
+
+}
 
 #endif  // LSS_GENETIC_PERMUTATION_CHROMOSOME_CHROMOSOME_H_

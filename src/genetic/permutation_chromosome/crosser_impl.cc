@@ -1,5 +1,5 @@
 #include <cstdlib>
-#include <set>
+#include <unordered_set>
 
 #include "genetic/permutation_chromosome/chromosome.h"
 #include "genetic/permutation_chromosome/moves_impl.h"
@@ -9,18 +9,20 @@ namespace genetic {
 namespace {
 
 void Merge(std::vector<JobMachine> *to, const std::vector<JobMachine> &from, size_t min_bound, size_t max_bound) {
-  std::set<JobMachine> already_taken;
+  std::unordered_set<JobMachine> already_taken;
   for (size_t i = min_bound; i < max_bound; ++i) {
     already_taken.insert((*to)[i]);
   }
 
   auto it = from.begin();
   for (size_t i = 0; i < min_bound; ++i) {
-    while (it != from.end() && already_taken.find(*it) != already_taken.end()) ++it;
+    while (it != from.end() && already_taken.count(*it) > 0)
+      ++it;
     (*to)[i] = *it;
   }
   for (size_t i = max_bound; i < to->size(); ++i) {
-    while (it != from.end() && already_taken.find(*it) != already_taken.end()) ++it;
+    while (it != from.end() && already_taken.count(*it) > 0)
+      ++it;
     (*to)[i] = *it;
   }
 }

@@ -8,10 +8,10 @@
 namespace lss {
 namespace genetic {
 
-const Machine *FindRandomMachineForJob(const Job &job, Random *rand) {
+Machine FindRandomMachineForJob(Job job, Random *rand) {
   const std::vector<Machine> &available_machines = job.machine_set().machines();
   size_t index = rand->Rand(available_machines.size());
-  return &available_machines[index];
+  return available_machines[index];
 }
 
 }  // namespace genetic

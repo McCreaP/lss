@@ -37,6 +37,8 @@ class Machine {
   FairSet fair_set() const;          // Backward relation
   Job job() const;                   // Backward relation; extra; optional
 
+  friend bool operator==(const Machine &m1, const Machine &m2) { return m1.id() == m2.id(); }
+
  private:
   struct Data;
   explicit Machine(Data *data) : data_(data) {}
@@ -134,6 +136,8 @@ class Job {
   Machine machine() const;         // Forward relation; extra; optional
   MachineSet machine_set() const;  // Forward relation
   Batch batch() const;             // Forward relation
+
+  friend bool operator==(const Job &j1, const Job &j2) { return j1.id() == j2.id(); }
 
  private:
   struct Data;
@@ -353,5 +357,23 @@ T Situation::Get(const std::vector<T> &from, Id<T> id) {
 }
 
 }  // namespace lss
+
+namespace std {
+
+template<>
+struct hash<lss::Job> {
+  size_t operator()(const lss::Job &j) const {
+    return hash<int>()(static_cast<int>(j.id()));
+  }
+};
+
+template<>
+struct hash<lss::Machine> {
+  size_t operator()(const lss::Machine &m) const {
+    return hash<int>()(static_cast<int>(m.id()));
+  }
+};
+
+}  // namespace std
 
 #endif  // LSS_BASE_SITUATION_H_

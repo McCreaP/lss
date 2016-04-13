@@ -21,15 +21,15 @@ Population<PermutationJobMachine> InitializerImpl::InitPopulation(const Situatio
 }
 
 PermutationJobMachine InitializerImpl::GenNewChromosome(const Situation &situation) const {
-  std::vector<const Job *> jobs_permutation;
-  for (const Job &job : situation.jobs()) {
-    jobs_permutation.push_back(&job);
+  std::vector<Job> jobs_permutation;
+  for (Job job : situation.jobs()) {
+    jobs_permutation.push_back(job);
   }
   std::random_shuffle(std::begin(jobs_permutation), std::end(jobs_permutation));
 
   PermutationJobMachine chromosome;
-  for (const Job *job : jobs_permutation) {
-    const Machine *machine = FindRandomMachineForJob(*job, rand_.get());
+  for (Job job : jobs_permutation) {
+    Machine machine = FindRandomMachineForJob(job, rand_.get());
     chromosome.permutation().push_back(std::make_tuple(job, machine));
   }
   return chromosome;
