@@ -36,8 +36,7 @@ class Job(Base):
     def __init__(self, id: int, mint: float, maxt: float):
         self.id = id
         self.batch = None
-        self.ready = randf(mint, maxt)
-        self.expected_duration_barring_setup = randf(maxt - self.ready)
+        self.expected_duration_barring_setup = randf(1.3 * maxt)
         self.machine_set = None
         self.context = Context(upper_bound=5)
 
@@ -94,6 +93,8 @@ class Batch(Base):
         self.account = None
         self.A = randf(100)
         self.B = randf(100)
+        self.C = randf(100)
+        self.D = randf(100)
         self.T = randf(100)
         self.due = randf(mint, maxt)
 

@@ -1,12 +1,15 @@
 #ifndef LSS_BASE_TYPES_H_
 #define LSS_BASE_TYPES_H_
 
-#include <bitset>
+#include <cstdlib>
+
+#include <array>
 #include <limits>
 
 namespace lss {
 
 // More adequate types might be substituted in the future.
+using IdType = int;
 using FloatType = double;
 using Time = double;
 using Duration = double;
@@ -18,18 +21,21 @@ enum class MachineState {
   kDead = 2,
 };
 
+static constexpr IdType kIdNone = std::numeric_limits<IdType>::min();
+
 template<class T>
 class Id {
  public:
-  static constexpr int kNone = std::numeric_limits<int>::min();
+  static constexpr int kNone = kIdNone;
 
   Id() = default;
   explicit Id(int id) : id_(id) {}
 
   explicit operator int() const { return id_; }
+  explicit operator bool() const { return id_ != kNone; }
 
   friend bool operator==(Id lhs, Id rhs) { return lhs.id_ == rhs.id_; }
-  friend bool operator!=(Id lhs, Id rhs) { return lhs.Id != rhs.id_; }
+  friend bool operator!=(Id lhs, Id rhs) { return lhs.id_ != rhs.id_; }
   friend bool operator<(Id lhs, Id rhs) { return lhs.id_ < rhs.id_; }
   friend bool operator>(Id lhs, Id rhs) { return lhs.id_ > rhs.id_; }
   friend bool operator<=(Id lhs, Id rhs) { return lhs.id_ <= rhs.id_; }
@@ -47,7 +53,8 @@ class Context {
   Context() = default;
   Context(int c1, int c2, int c3) : context_{c1, c2, c3} {}
 
-  int operator[](size_t idx) const { return context_[idx]; }
+  int& operator[](size_t idx) { return context_[idx]; }
+  const int& operator[](size_t idx) const { return context_[idx]; }
 
   friend bool operator==(const Context &lhs, const Context &rhs) {
     return lhs.context_ == rhs.context_;
@@ -69,22 +76,34 @@ class Context {
   }
 
  private:
-  int context_[kSize] = {kNone, kNone, kNone};
+  std::array<int, kSize> context_{{kNone, kNone, kNone}};
 };
 
 class Change {
  public:
+  static constexpr int kSize = Context::kSize;
+  static constexpr int kNum = 1 << kSize;  // The number of possible changes.
+
   Change() = default;
-  Change(bool c1, bool c2, bool c3) : change_(1*c1 + 2*c2 + 4*c3) {}
+  Change(bool c1, bool c2, bool c3) : change_{c1, c2, c3} {}
   Change(const Context &from, const Context &to)
       : Change(from[0] != to[0], from[1] != to[1], from[2] != to[2]) {}
 
-  bool operator[](size_t idx) const { return change_.test(idx); }
+  // Returns a number with corresponding bits.
+  explicit operator size_t() const { return 1 * change_[0] + 2 * change_[1] + 4 * change_[2]; }
+
+  bool& operator[](size_t idx) { return change_[idx]; }
+  const bool& operator[](size_t idx) const { return change_[idx]; }
+
+  friend bool operator==(Change lhs, Change rhs) {
+    return lhs.change_ == rhs.change_;
+  }
+  friend bool operator!=(Change lhs, Change rhs) {
+    return lhs.change_ != rhs.change_;
+  }
 
  private:
-  std::bitset<Context::kSize> change_;
-
-  friend struct std::hash<Change>;
+  std::array<bool, kSize> change_{{}};
 };
 
 }  // namespace lss
@@ -108,7 +127,7 @@ struct hash<lss::Context> {
 template<>
 struct hash<lss::Change> {
   size_t operator()(const lss::Change &x) const {
-    return hash<bitset<lss::Context::kSize>>()(x.change_);
+    return hash<size_t>()(static_cast<size_t>(x));
   }
 };
 

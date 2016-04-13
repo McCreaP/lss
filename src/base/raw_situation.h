@@ -11,62 +11,111 @@
 namespace lss {
 
 struct RawJob {
-  int id;
-  int batch_id;
-  int machine_id;     // The machine this job is assigned to; not present in the input file.
-  double duration;    // Expected duration barring setup time.
-  double start_time;  // Not present in the input file.
-  int machineset_id;
-  int context[Context::kSize];
+  IdType id_{kIdNone};
+  IdType batch_{kIdNone};
+  IdType machine_{kIdNone};  // The machine this job is assigned to; not present in the input file.
+  Duration duration_{};      // Expected duration barring setup time.
+  Time start_time_{};        // Not present in the input file.
+  IdType machine_set_{kIdNone};
+  Context context_{};
+
+  RawJob& id(IdType val) { id_ = val; return *this; }
+  RawJob& batch(IdType val) { batch_ = val; return *this; }
+  RawJob& machine(IdType val) { machine_ = val; return *this; }
+  RawJob& duration(Duration val) { duration_ = val; return *this; }
+  RawJob& start_time(Time val) { start_time_ = val; return *this; }
+  RawJob& machine_set(IdType val) { machine_set_ = val; return *this; }
+  RawJob& context(Context val) { context_ = val; return *this; }
 
   bool operator==(const RawJob& rhs) const;
 };
 
 // The following fields are not named in objective function definition:
-// - timely_reward (called A in paper),
-// - reward (called B in paper),
-// - expected_time (called T in paper).
+// - timely_reward_ (called A in paper),
+// - reward_ (called B in paper),
+// - duration_ (called T in paper).
 struct RawBatch {
-  int id;
-  int account_id;
-  double timely_reward;
-  double reward;
-  double expected_time;
-  double due;
+  IdType id_{kIdNone};
+  IdType account_{kIdNone};
+  FloatType job_reward_{};
+  FloatType job_timely_reward_{};
+  FloatType reward_{};
+  FloatType timely_reward_{};
+  Duration duration_{};
+  Time due_{};
+
+  RawBatch& id(IdType val) { id_ = val; return *this; }
+  RawBatch& account(IdType val) { account_ = val; return *this; }
+  RawBatch& job_reward(FloatType val) { job_reward_ = val; return *this; }
+  RawBatch& job_timely_reward(FloatType val) { job_timely_reward_ = val; return *this; }
+  RawBatch& reward(FloatType val) { reward_ = val; return *this; }
+  RawBatch& timely_reward(FloatType val) { timely_reward_ = val; return *this; }
+  RawBatch& duration(Duration val) { duration_ = val; return *this; }
+  RawBatch& due(Time val) { due_ = val; return *this; }
 
   bool operator==(const RawBatch& rhs) const;
 };
 
 struct RawMachine {
-  int id;
-  MachineState state;
-  int context[Context::kSize];  // Not present in the input file.
+  IdType id_{kIdNone};
+  MachineState state_{};
+  Context context_{};  // Not present in the input file.
+
+  RawMachine& id(IdType val) { id_ = val; return *this; }
+  RawMachine& state(MachineState val) { state_ = val; return *this; }
+  RawMachine& context(Context val) { context_ = val; return *this; }
 };
 
 struct RawMachineSet {
-  int id;
-  std::vector<int> machines;
+  IdType id_{kIdNone};
+  std::vector<IdType> machines_{};
+
+  RawMachineSet& id(IdType val) { id_ = val; return *this; }
+  RawMachineSet& add(IdType val) { machines_.push_back(val); return *this; }
+};
+
+struct RawFairSet {
+  IdType id_{kIdNone};
+  std::vector<IdType> machines_{};
+
+  RawFairSet& id(IdType val) { id_ = val; return *this; }
+  RawFairSet& add(IdType val) { machines_.push_back(val); return *this; }
 };
 
 struct RawAccount {
-  int id;
-  double alloc;
+  IdType id_{kIdNone};
+  FloatType alloc_{};
+
+  RawAccount& id(IdType val) { id_ = val; return *this; }
+  RawAccount& alloc(FloatType val) { alloc_ = val; return *this; }
 };
 
-struct RawContextChange {
-  bool changed[Context::kSize];
-  int cost;
+struct RawChangeCost {
+  Change change_{};
+  Cost cost_{};
+
+  RawChangeCost& change(Change val) { change_ = val; return *this; }
+  RawChangeCost& cost(Cost val) { cost_ = val; return *this; }
 };
 
 struct RawSituation {
-  double time_stamp;  // Not present in the input file.
-  std::vector<RawMachine> machines;
-  std::vector<RawMachineSet> machine_sets;
-  std::vector<RawMachineSet> fair_sets;
-  std::vector<RawJob> jobs;
-  std::vector<RawBatch> batches;
-  std::vector<RawAccount> accounts;
-  std::vector<RawContextChange> context_changes;
+  Time time_stamp_{};  // Not present in the input file.
+  std::vector<RawMachine> machines_{};
+  std::vector<RawMachineSet> machine_sets_{};
+  std::vector<RawFairSet> fair_sets_{};
+  std::vector<RawJob> jobs_{};
+  std::vector<RawBatch> batches_{};
+  std::vector<RawAccount> accounts_{};
+  std::vector<RawChangeCost> change_costs_{};
+
+  RawSituation& time_stamp(Time val) { time_stamp_ = val; return *this; }
+  RawSituation& add(RawMachine val) { machines_.push_back(val); return *this; }
+  RawSituation& add(RawMachineSet val) { machine_sets_.push_back(val); return *this; }
+  RawSituation& add(RawFairSet val) { fair_sets_.push_back(val); return *this; }
+  RawSituation& add(RawJob val) { jobs_.push_back(val); return *this; }
+  RawSituation& add(RawBatch val) { batches_.push_back(val); return *this; }
+  RawSituation& add(RawAccount val) { accounts_.push_back(val); return *this; }
+  RawSituation& add(RawChangeCost val) { change_costs_.push_back(val); return *this; }
 };
 
 }  // namespace lss

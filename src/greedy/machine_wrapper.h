@@ -11,7 +11,7 @@ namespace greedy {
 
 class ContextChanges {
  public:
-  void SetContextChanges(const std::vector<RawContextChange> raw_changes);
+  void SetContextChanges(const std::vector<RawChangeCost> raw_changes);
   int GetContextChangeCost(bool changed0, bool changed1, bool changed2) const;
 
  private:
