@@ -8,6 +8,7 @@
 
 #include "genetic/moves.h"
 #include "genetic/selector_impl.h"
+#include "genetic/test_utils.h"
 
 namespace lss {
 namespace genetic {
@@ -43,20 +44,6 @@ class MutatorFake : public Mutator<ChromosomeFake> {
 
  private:
   mutable std::vector<ChromosomeFake> invoked_chromosomes_;
-};
-
-template<class T>
-class Iterator {
- public:
-  explicit Iterator(std::vector<T> v) : v_(std::move(v)) { }
-
-  T Next() {
-    return v_[counter_++];
-  }
-
- private:
-  int counter_ = 0;
-  std::vector<T> v_;
 };
 
 class AlgorithmShould : public ::testing::Test {
@@ -114,10 +101,11 @@ class AlgorithmShould : public ::testing::Test {
   std::shared_ptr<RandomMock> rand_;
   Population<Chromosome> population_;
   Schedule schedule_;
-  Situation situation_;
+  RawSituation rawSituation_;
 };
 
 TEST_F(AlgorithmShould, call_InitPopulation_once_and_RandomShuffle_and_Select_in_each_generation) {
+  Situation situation(rawSituation_);
   number_of_generations_ = 42;
   EXPECT_CALL(*moves_, InitPopulation(_, population_size_))
       .WillOnce(Return(Population<Chromosome>()));
