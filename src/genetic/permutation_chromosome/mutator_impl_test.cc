@@ -3,6 +3,7 @@
 
 #include "base/raw_situation.h"
 #include "base/situation.h"
+#include "genetic/permutation_chromosome/common.h"
 #include "genetic/permutation_chromosome/moves_impl.h"
 #include "genetic/test_utils.h"
 
@@ -13,19 +14,6 @@ using ::testing::Test;
 using ::testing::NiceMock;
 using ::testing::InvokeWithoutArgs;
 using ::testing::Return;
-
-std::vector<JobMachine> GetPermutation(std::vector<int> job_permutation,
-                                       std::vector<int> machine_permutation,
-                                       const Situation &situation) {
-  std::vector<JobMachine> permutation;
-  for (size_t i = 0; i < job_permutation.size(); ++i) {
-    Job j = situation.jobs()[job_permutation[i]];
-    Machine m = situation.machines()[machine_permutation[i]];
-    JobMachine job_machine = std::make_tuple(j, m);
-    permutation.push_back(job_machine);
-  }
-  return permutation;
-}
 
 class MutatorShould : public ::testing::Test {
  protected:

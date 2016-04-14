@@ -9,21 +9,23 @@ namespace genetic {
 namespace {
 
 void Merge(std::vector<JobMachine> *to, const std::vector<JobMachine> &from, size_t min_bound, size_t max_bound) {
-  std::unordered_set<JobMachine> already_taken;
+  std::unordered_set<Job> already_taken;
   for (size_t i = min_bound; i < max_bound; ++i) {
-    already_taken.insert((*to)[i]);
+    already_taken.insert(std::get<0>((*to)[i]));
   }
 
   auto it = from.begin();
   for (size_t i = 0; i < min_bound; ++i) {
-    while (it != from.end() && already_taken.count(*it) > 0)
+    while (it != from.end() && already_taken.count(std::get<0>(*it)) > 0)
       ++it;
     (*to)[i] = *it;
+    ++it;
   }
   for (size_t i = max_bound; i < to->size(); ++i) {
-    while (it != from.end() && already_taken.count(*it) > 0)
+    while (it != from.end() && already_taken.count(std::get<0>(*it)) > 0)
       ++it;
     (*to)[i] = *it;
+    ++it;
   }
 }
 
