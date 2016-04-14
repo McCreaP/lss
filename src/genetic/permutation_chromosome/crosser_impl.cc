@@ -8,7 +8,10 @@ namespace lss {
 namespace genetic {
 namespace {
 
-void Merge(std::vector<JobMachine> *to, const std::vector<JobMachine> &from, size_t min_bound, size_t max_bound) {
+void Merge(std::vector<JobMachine> *to,
+           const std::vector<JobMachine> &from,
+           size_t min_bound,
+           size_t max_bound) {
   std::unordered_set<Job> already_taken;
   for (size_t i = min_bound; i < max_bound; ++i) {
     already_taken.insert(std::get<0>((*to)[i]));

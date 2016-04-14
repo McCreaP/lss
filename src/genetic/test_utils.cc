@@ -1,5 +1,4 @@
-#ifndef LSS_GENETIC_PERMUTATION_CHROMOSOME_TEST_UTILS_H_
-#define LSS_GENETIC_PERMUTATION_CHROMOSOME_TEST_UTILS_H_
+#include <vector>
 
 #include "base/raw_situation.h"
 #include "genetic/test_utils.h"
@@ -82,5 +81,3 @@ RawSituation GetSimpleRawSituation(int numberOfJobs, int numberOfMachines) {
 
 }  // namespace genetic
 }  // namespace lss
-
-#endif  // LSS_GENETIC_PERMUTATION_CHROMOSOME_TEST_UTILS_H_

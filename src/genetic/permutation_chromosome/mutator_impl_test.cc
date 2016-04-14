@@ -44,7 +44,8 @@ TEST_F(MutatorShould, take_job_machine_to_mutation_wrt_generated_random_number) 
 
   std::vector<int> expected_machines_order = {2, 1, 2, 2, 0};
   for (size_t i = 0; i < chromosome.permutation().size(); ++i) {
-    EXPECT_EQ(expected_machines_order[i], static_cast<int>(std::get<1>(chromosome.permutation()[i]).id()));
+    EXPECT_EQ(expected_machines_order[i],
+              static_cast<int>(std::get<1>(chromosome.permutation()[i]).id()));
   }
 }
 
@@ -64,7 +65,8 @@ TEST_F(MutatorShould, select_new_machine_for_jobs_wrt_generated_random_number) {
   mutator.Mutate(situation, &chromosome);
 
   for (size_t i = 0; i < chromosome.permutation().size(); ++i) {
-    EXPECT_EQ(expected_machines_order[i], static_cast<int>(std::get<1>(chromosome.permutation()[i]).id()));
+    EXPECT_EQ(expected_machines_order[i],
+              static_cast<int>(std::get<1>(chromosome.permutation()[i]).id()));
   }
 }
 

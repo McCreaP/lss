@@ -26,8 +26,10 @@ TEST(CrosserShould, cross) {
   CrosserImpl crosser(rand);
   crosser.Crossover(&chromosome_1, &chromosome_2);
 
-  auto expected_permutation_1 = GetPermutation({6, 1, 2, 3, 4, 5, 0}, {2, 2, 0, 0, 0, 0, 2}, situation);
-  auto expected_permutation_2 = GetPermutation({0, 5, 4, 3, 2, 1, 6}, {0, 0, 2, 2, 2, 2, 0}, situation);
+  auto expected_permutation_1 =
+      GetPermutation({6, 1, 2, 3, 4, 5, 0}, {2, 2, 0, 0, 0, 0, 2}, situation);
+  auto expected_permutation_2 =
+      GetPermutation({0, 5, 4, 3, 2, 1, 6}, {0, 0, 2, 2, 2, 2, 0}, situation);
   EXPECT_EQ(expected_permutation_1, chromosome_1.permutation());
   EXPECT_EQ(expected_permutation_2, chromosome_2.permutation());
 }

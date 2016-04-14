@@ -1,5 +1,7 @@
-#ifndef LSS_TEST_UTILS_H
-#define LSS_TEST_UTILS_H
+#ifndef LSS_GENETIC_TEST_UTILS_H_
+#define LSS_GENETIC_TEST_UTILS_H_
+
+#include <vector>
 
 #include "base/raw_situation.h"
 
@@ -25,4 +27,4 @@ class Iterator {
 }  // namespace genetic
 }  // namespace lss
 
-#endif //LSS_TEST_UTILS_H
+#endif  // LSS_GENETIC_TEST_UTILS_H_

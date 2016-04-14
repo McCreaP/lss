@@ -3,7 +3,6 @@
 
 #include "base/situation.h"
 #include "genetic/moves.h"
-#include "genetic/moves.h"
 #include "genetic/permutation_chromosome/chromosome.h"
 #include "genetic/permutation_chromosome/common.h"
 #include "genetic/permutation_chromosome/moves_impl.h"
@@ -11,7 +10,8 @@
 namespace lss {
 namespace genetic {
 
-Population<PermutationJobMachine> InitializerImpl::InitPopulation(const Situation &situation, int population_size) const {
+Population<PermutationJobMachine> InitializerImpl::InitPopulation(const Situation &situation,
+                                                                  int population_size) const {
   Population<PermutationJobMachine> population;
   for (int i = 0; i < population_size; ++i) {
     PermutationJobMachine chromosome = GenNewChromosome(situation);
