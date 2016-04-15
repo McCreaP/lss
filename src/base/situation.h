@@ -37,7 +37,7 @@ class Machine {
   FairSet fair_set() const;          // Backward relation
   Job job() const;                   // Backward relation; extra; optional
 
-  friend bool operator==(const Machine &m1, const Machine &m2) { return m1.id() == m2.id(); }
+  friend bool operator==(const Machine &lhs, const Machine &rhs) { return lhs.id() == rhs.id(); }
 
  private:
   struct Data;
@@ -137,7 +137,7 @@ class Job {
   MachineSet machine_set() const;  // Forward relation
   Batch batch() const;             // Forward relation
 
-  friend bool operator==(const Job &j1, const Job &j2) { return j1.id() == j2.id(); }
+  friend bool operator==(const Job &lhs, const Job &rhs) { return lhs.id() == rhs.id(); }
 
  private:
   struct Data;
