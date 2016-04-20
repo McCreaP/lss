@@ -10,7 +10,7 @@
 namespace lss {
 namespace genetic {
 
-Population<PermutationJobMachine> InitializerImpl::InitPopulation(const Situation &situation,
+Population<PermutationJobMachine> InitializerImpl::InitPopulation(Situation situation,
                                                                   int population_size) const {
   Population<PermutationJobMachine> population;
   for (int i = 0; i < population_size; ++i) {
@@ -20,7 +20,7 @@ Population<PermutationJobMachine> InitializerImpl::InitPopulation(const Situatio
   return population;
 }
 
-PermutationJobMachine InitializerImpl::GenNewChromosome(const Situation &situation) const {
+PermutationJobMachine InitializerImpl::GenNewChromosome(Situation situation) const {
   std::vector<Job> jobs_permutation;
   for (Job job : situation.jobs()) {
     jobs_permutation.push_back(job);

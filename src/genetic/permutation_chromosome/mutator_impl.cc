@@ -7,7 +7,7 @@
 namespace lss {
 namespace genetic {
 
-void MutatorImpl::Mutate(__attribute__((unused)) const Situation &situation,
+void MutatorImpl::Mutate(__attribute__((unused)) Situation situation,
                          PermutationJobMachine *chromosome) const {
   for (size_t i = 0; i < chromosome->permutation().size(); ++i) {
     bool take_job_machine_to_mutation = rand_->GetRealInRange(0., 1.) < kMutationProbability;

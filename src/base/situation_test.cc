@@ -81,6 +81,19 @@ const RawSituation sample = RawSituation()
     .add(RawChangeCost().change(Change(1, 1, 0)).cost(54))
     .add(RawChangeCost().change(Change(1, 1, 1)).cost(55));
 
+// Verify that default constructor, copy constructor and assignment operator work fine.
+TEST(SituationTest, Constructors) {
+  Situation s1;
+  Situation s2(s1);
+  s1 = s2;
+}
+
+// Verify the destructor works correctly.
+TEST(SituationTest, Destructor) {
+  Situation s1(RawSituation().add(RawMachine().id(0)), false);
+  Situation s2(s1);
+}
+
 // Verify that no object is missing from Situation.
 TEST(SituationTest, NothingMissing) {
   Situation s{sample};

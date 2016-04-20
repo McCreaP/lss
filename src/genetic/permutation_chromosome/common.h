@@ -12,9 +12,9 @@ namespace genetic {
 
 Machine FindRandomMachineForJob(Job job, Random *rand);
 
-std::vector<JobMachine> GetPermutation(std::vector<int> job_permutation,
-                                       std::vector<int> machine_permutation,
-                                       const Situation &situation);
+std::vector<JobMachine> GetPermutation(const std::vector<int> &job_permutation,
+                                       const std::vector<int> &machines,
+                                       Situation situation);
 
 }  // namespace genetic
 }  // namespace lss

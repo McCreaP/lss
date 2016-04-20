@@ -35,7 +35,7 @@ class CrosserFake : public Crosser<ChromosomeFake> {
 
 class MutatorFake : public Mutator<ChromosomeFake> {
  public:
-  void Mutate(__attribute__((unused)) const Situation &situation,
+  void Mutate(__attribute__((unused)) Situation situation,
               ChromosomeFake *chromosome) const override {
     invoked_chromosomes_.push_back(*chromosome);
   }

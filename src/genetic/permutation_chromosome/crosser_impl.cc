@@ -19,13 +19,16 @@ void Merge(std::vector<JobMachine> *to,
 
   auto it = from.begin();
   for (size_t i = 0; i < min_bound; ++i) {
-    while (it != from.end() && already_taken.count(std::get<0>(*it)) > 0)
+    // I assume vectors '*to' and 'from' have the same size
+    // and are permutations by jobs, thus I don't need to check
+    // that the iterator is valid.
+    while (already_taken.count(std::get<0>(*it)) > 0)
       ++it;
     (*to)[i] = *it;
     ++it;
   }
   for (size_t i = max_bound; i < to->size(); ++i) {
-    while (it != from.end() && already_taken.count(std::get<0>(*it)) > 0)
+    while (already_taken.count(std::get<0>(*it)) > 0)
       ++it;
     (*to)[i] = *it;
     ++it;

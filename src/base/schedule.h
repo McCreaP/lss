@@ -15,7 +15,7 @@ class Schedule {
 
   Schedule() = default;
 
-  Schedule(const Situation &situation) {
+  Schedule(Situation situation) {
     for (Machine m : situation.machines()) {
       schedule_[m] = {};
     }
@@ -35,7 +35,7 @@ class Schedule {
   std::unordered_map<Machine, Jobs> schedule_;
 };
 
-double ObjectiveFunction(const Schedule &schedule, const Situation &situation);
+double ObjectiveFunction(const Schedule &schedule, Situation situation);
 
 }  // namespace lss
 

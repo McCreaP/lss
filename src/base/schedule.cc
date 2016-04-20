@@ -30,7 +30,7 @@ double ChangeCost(const Situation &situation, Job from, Job to) {
 }
 
 double JobsIngredient(const Schedule &schedule,
-                      const Situation &situation,
+                      Situation situation,
                       JobFinishTime *job_finish_time) {
   double result = 0.;
   for (Machine machine : situation.machines()) {
@@ -47,7 +47,7 @@ double JobsIngredient(const Schedule &schedule,
   return result;
 }
 
-double BatchIngredient(const Situation &situation, const JobFinishTime &job_finish_time) {
+double BatchIngredient(Situation situation, const JobFinishTime &job_finish_time) {
   double result = 0.;
   for (Batch batch : situation.batches()) {
     Time batch_finish_time = std::numeric_limits<Time>::min();
@@ -65,7 +65,7 @@ double BatchIngredient(const Situation &situation, const JobFinishTime &job_fini
 
 }  // namespace
 
-double ObjectiveFunction(const Schedule &schedule, const Situation &situation) {
+double ObjectiveFunction(const Schedule &schedule, Situation situation) {
   JobFinishTime job_finish_time;
   double result = JobsIngredient(schedule, situation, &job_finish_time);
   result += BatchIngredient(situation, job_finish_time);

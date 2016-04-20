@@ -18,7 +18,7 @@ class SelectorImpl : public Selector<T> {
   SelectorImpl(std::shared_ptr<Evaluator<T>> evaluator, std::shared_ptr<Random> rand)
       : kEvaluator(evaluator), rand_(rand) {}
 
-  Population<T> Select(const Situation &situation,
+  Population<T> Select(Situation situation,
                        const Population<T> &population,
                        ChromosomeImprover<T> *improver) const override;
 
@@ -27,14 +27,14 @@ class SelectorImpl : public Selector<T> {
   T best_chromosome_;
   std::shared_ptr<Random> rand_;
 
-  std::vector<double> CalcCumulativeFitness(const Situation &situation,
+  std::vector<double> CalcCumulativeFitness(Situation situation,
                                             const Population<T> &population,
                                             ChromosomeImprover<T> *improver) const;
   size_t SelectChromosomeIndex(const std::vector<double> &cumulative_fitness) const;
 };
 
 template<class T>
-Population<T> SelectorImpl<T>::Select(const Situation &situation,
+Population<T> SelectorImpl<T>::Select(Situation situation,
                                       const Population<T> &population,
                                       ChromosomeImprover<T> *improver) const {
   std::vector<double> cumulative_fitness = CalcCumulativeFitness(situation, population, improver);
@@ -47,7 +47,7 @@ Population<T> SelectorImpl<T>::Select(const Situation &situation,
 }
 
 template<class T>
-std::vector<double> SelectorImpl<T>::CalcCumulativeFitness(const Situation &situation,
+std::vector<double> SelectorImpl<T>::CalcCumulativeFitness(Situation situation,
                                                            const Population<T> &population,
                                                            ChromosomeImprover<T> *improver) const {
   std::vector<double> fitnesses;
