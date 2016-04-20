@@ -84,7 +84,7 @@ class AlgorithmShould : public ::testing::Test {
 
     EXPECT_CALL(*initializer, InitPopulation(_, population_size_))
         .WillOnce(Return(population_));
-    EXPECT_CALL(*selector, Select(population_, _))
+    EXPECT_CALL(*selector, Select(_, population_, _))
         .WillOnce(Return(population_));
     EXPECT_CALL(*mutator, Mutate(_, _)).Times(population_size_);
 
@@ -110,7 +110,7 @@ TEST_F(AlgorithmShould, call_InitPopulation_once_and_RandomShuffle_and_Select_in
   number_of_generations_ = 42;
   EXPECT_CALL(*moves_, InitPopulation(_, population_size_))
       .WillOnce(Return(Population<Chromosome>()));
-  EXPECT_CALL(*moves_, Select(_, _))
+  EXPECT_CALL(*moves_, Select(_, _, _))
       .Times(number_of_generations_)
       .WillRepeatedly(Return(Population<Chromosome>()));
   EXPECT_CALL(*rand_, RandomShuffle(_)).Times(number_of_generations_);
@@ -184,7 +184,7 @@ TEST_F(AlgorithmShould, run_mutator_on_each_chromosome_in_one_generation) {
 
   EXPECT_CALL(*initializer, InitPopulation(_, population_size_))
       .WillOnce(Return(population_));
-  EXPECT_CALL(*selector, Select(_, _))
+  EXPECT_CALL(*selector, Select(_, _, _))
       .Times(number_of_generations_)
       .WillRepeatedly(Return(population_));
   EXPECT_CALL(*rand_, GetRealInRange(0., 1.))

@@ -1,7 +1,7 @@
 #ifndef LSS_BASE_ALGORITHM_H_
 #define LSS_BASE_ALGORITHM_H_
 
-#include "base/schedule_mock.h"
+#include "base/schedule.h"
 #include "base/situation.h"
 
 namespace lss {

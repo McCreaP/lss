@@ -8,7 +8,7 @@
 
 #include "base/algorithm.h"
 #include "base/random.h"
-#include "base/schedule_mock.h"
+#include "base/schedule.h"
 #include "base/situation.h"
 #include "genetic/moves.h"
 
@@ -48,11 +48,11 @@ Schedule GeneticAlgorithm<T>::Run(__attribute__((unused)) const Schedule &prev_s
   ChromosomeImprover<T> improver;
   Population<T> population = moves_->InitPopulation(new_situation, population_size_);
   for (int generation = 0; generation < number_of_generations_; ++generation) {
-    population = moves_->Select(population, &improver);
+    population = moves_->Select(new_situation, population, &improver);
     Crossover(&population);
     Mutate(new_situation, &population);
   }
-  return improver.GetBestChromosome().ToSchedule();
+  return improver.GetBestChromosome().ToSchedule(new_situation);
 }
 
 template<class T>
@@ -83,7 +83,7 @@ void GeneticAlgorithm<T>::Mutate(const Situation &situation, Population<T> *popu
 
 class Chromosome {
  public:
-  virtual Schedule ToSchedule() const = 0;
+  virtual Schedule ToSchedule(const Situation &situation) const = 0;
   virtual ~Chromosome() = default;
 };
 
@@ -101,7 +101,7 @@ class ChromosomeFake : public Chromosome {
     return os;
   }
 
-  Schedule ToSchedule() const override {return Schedule();}
+  Schedule ToSchedule(const Situation &situation) const override {return Schedule(situation);}
 
  private:
   int id_;

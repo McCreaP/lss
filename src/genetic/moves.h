@@ -19,13 +19,14 @@ template<class T>
 class Initializer {
  public:
   virtual Population<T> InitPopulation(const Situation &situation, int populationSize) const = 0;
+
   virtual ~Initializer() = default;
 };
 
 template<class T>
 class Evaluator {
  public:
-  virtual double Evaluate(const T &chromosome) const = 0;
+  virtual double Evaluate(const Situation &situation, const T &chromosome) const = 0;
 
   virtual ~Evaluator() = default;
 };
@@ -48,8 +49,9 @@ class ChromosomeImprover {
 template<class T>
 class Selector {
  public:
-  virtual Population<T> Select(const Population<T> &population,
-                               ChromosomeImprover<T> *improver) const = 0;
+  virtual Population <T> Select(const Situation &situation,
+                                  const Population <T> &population,
+                                  ChromosomeImprover <T> *improver) const = 0;
 
   virtual ~Selector() = default;
 };
@@ -74,8 +76,9 @@ template<class T>
 class Moves {
  public:
   virtual Population<T> InitPopulation(const Situation &situation, int populationSize) const = 0;
-  virtual Population<T> Select(const Population<T> &population,
-                               ChromosomeImprover<T> *improver) const = 0;
+  virtual Population <T> Select(const Situation &situation,
+                                  const Population <T> &population,
+                                  ChromosomeImprover <T> *improver) const = 0;
   virtual void Mutate(const Situation &situation, T *chromosome) const = 0;
   virtual void Crossover(T *lhs, T *rhs) const = 0;
 
@@ -105,20 +108,21 @@ class ConfigurableMoves : public Moves<T> {
     return *this;
   }
 
-  Population<T> InitPopulation(const Situation &situation, int populationSize) const {
+  Population<T> InitPopulation(const Situation &situation, int populationSize) const override {
     return initializer_->InitPopulation(situation, populationSize);
   }
 
-  Population<T> Select(const Population<T> &population,
-                               ChromosomeImprover<T> *improver) const {
-    return selector_->Select(population, improver);
+  Population<T> Select(const Situation &situation,
+                       const Population<T> &population,
+                       ChromosomeImprover<T> *improver) const override {
+    return selector_->Select(situation, population, improver);
   }
 
-  void Mutate(const Situation &situation, T *chromosome) const {
+  void Mutate(const Situation &situation, T *chromosome) const override {
     mutator_->Mutate(situation, chromosome);
   }
 
-  void Crossover(T *lhs, T *rhs) const {
+  void Crossover(T *lhs, T *rhs) const override {
     crosser_->Crossover(lhs, rhs);
   }
 
@@ -138,7 +142,7 @@ class InitializerMock: public Initializer<T> {
 template<class T>
 class EvaluatorMock: public Evaluator<T> {
  public:
-  MOCK_CONST_METHOD1_T(Evaluate, double(const T &));
+  MOCK_CONST_METHOD2_T(Evaluate, double(const Situation &, const T &));
 };
 
 template<class T>
@@ -153,7 +157,8 @@ class ImproverMock : public ChromosomeImprover<T> {
 template<class T>
 class SelectorMock: public Selector<T> {
  public:
-  MOCK_CONST_METHOD2_T(Select, Population<T>(const Population<T> &, ChromosomeImprover<T> *));
+  MOCK_CONST_METHOD3_T(Select, Population<T>(const Situation &,
+      const Population<T> &, ChromosomeImprover<T> *));
 };
 
 template<class T>
@@ -173,10 +178,12 @@ template<class T>
 class MovesMock: public Moves<T> {
  public:
   MOCK_CONST_METHOD2_T(InitPopulation, Population<T>(const Situation &, int));
-  MOCK_CONST_METHOD2_T(Select, Population<T>(const Population<T> &, ChromosomeImprover<T> *));
+  MOCK_CONST_METHOD3_T(Select, Population<T>(const Situation &,
+      const Population<T> &, ChromosomeImprover<T> *));
   MOCK_CONST_METHOD2_T(Mutate, void(const Situation &, T *));
   MOCK_CONST_METHOD2_T(Crossover, void(T *, T *));
 };
+
 }  // namespace genetic
 }  // namespace lss
 

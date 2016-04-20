@@ -20,7 +20,10 @@ class InitializerImpl : public Initializer<PermutationJobMachine> {
 
 class EvaluatorImpl : public Evaluator<PermutationJobMachine> {
  public:
-  double Evaluate(const PermutationJobMachine &chromosome) const override;
+  double Evaluate(const Situation &situation,
+                  const PermutationJobMachine &chromosome) const override {
+    return ObjectiveFunction(chromosome.ToSchedule(situation), situation);
+  }
 };
 
 class MutatorImpl : Mutator<PermutationJobMachine> {
