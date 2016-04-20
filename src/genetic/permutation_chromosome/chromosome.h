@@ -20,7 +20,7 @@ class PermutationJobMachine : public Chromosome {
   explicit PermutationJobMachine(const std::vector<JobMachine> &permutation)
       : permutation_(permutation) {}
 
-  virtual std::vector<JobMachine> &permutation() {
+  std::vector<JobMachine> &permutation() {
     return permutation_;
   }
 
@@ -32,11 +32,6 @@ class PermutationJobMachine : public Chromosome {
   std::vector<JobMachine> permutation_;
 };
 
-class PermutationJobMachineMock : public PermutationJobMachine {
- public:
-  MOCK_METHOD0(permutation, std::vector<JobMachine> &());
-};
-
 }  // namespace genetic
 }  // namespace lss
 
@@ -45,10 +40,11 @@ namespace std {
 template<>
 struct hash<tuple<lss::Job, lss::Machine>> {
   size_t operator()(const tuple<lss::Job, lss::Machine> &jm) const {
-    return hash<lss::Job>()(get<0>(jm)) ^ hash<lss::Machine>()(get<1>(jm));
+    size_t seed = hash<lss::Job>()(get<0>(jm));
+    return  seed ^ (hash<lss::Machine>()(get<1>(jm)) + 0xCafeBabe + (seed << 6) + (seed >> 2));
   }
 };
 
-}
+}  // namespace std
 
 #endif  // LSS_GENETIC_PERMUTATION_CHROMOSOME_CHROMOSOME_H_

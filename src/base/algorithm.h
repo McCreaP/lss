@@ -8,7 +8,7 @@ namespace lss {
 
 class Algorithm {
  public:
-  virtual Schedule Run(const Schedule &prev_schedule, const Situation &new_situation) = 0;
+  virtual Schedule Run(const Schedule &prev_schedule, Situation new_situation) = 0;
 
   virtual ~Algorithm() = default;
 };

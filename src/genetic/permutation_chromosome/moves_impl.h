@@ -10,12 +10,12 @@ namespace genetic {
 class InitializerImpl : public Initializer<PermutationJobMachine> {
  public:
   explicit InitializerImpl(std::shared_ptr<Random> rand) : rand_(rand) {}
-  Population<PermutationJobMachine> InitPopulation(const Situation &situation,
+  Population<PermutationJobMachine> InitPopulation(Situation situation,
                                                    int population_size) const override;
 
  private:
   std::shared_ptr<Random> rand_;
-  PermutationJobMachine GenNewChromosome(const Situation &situation) const;
+  PermutationJobMachine GenNewChromosome(Situation situation) const;
 };
 
 class EvaluatorImpl : public Evaluator<PermutationJobMachine> {
@@ -27,7 +27,7 @@ class MutatorImpl : Mutator<PermutationJobMachine> {
  public:
   MutatorImpl(double mutationProbability, std::shared_ptr<Random> rand)
       : kMutationProbability(mutationProbability), rand_(rand) {}
-  void Mutate(const Situation &situation, PermutationJobMachine *chromosome) const override;
+  void Mutate(Situation situation, PermutationJobMachine *chromosome) const override;
 
  private:
   double kMutationProbability;

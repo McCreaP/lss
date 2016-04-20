@@ -29,11 +29,11 @@ class GeneticAlgorithm : public Algorithm {
         moves_(moves),
         rand_(rand) { }
 
-  Schedule Run(const Schedule &prev_schedule, const Situation &new_situation) override;
+  Schedule Run(const Schedule &prev_schedule, Situation new_situation) override;
 
  private:
   void Crossover(Population<T> *population);
-  void Mutate(const Situation &situation, Population<T> *population);
+  void Mutate(Situation situation, Population<T> *population);
 
   int population_size_;
   int number_of_generations_;
@@ -44,7 +44,7 @@ class GeneticAlgorithm : public Algorithm {
 
 template<class T>
 Schedule GeneticAlgorithm<T>::Run(__attribute__((unused)) const Schedule &prev_schedule,
-                                  const Situation &new_situation) {
+                                  Situation new_situation) {
   ChromosomeImprover<T> improver;
   Population<T> population = moves_->InitPopulation(new_situation, population_size_);
   for (int generation = 0; generation < number_of_generations_; ++generation) {
@@ -75,7 +75,7 @@ void GeneticAlgorithm<T>::Crossover(Population<T> *population) {
 }
 
 template<class T>
-void GeneticAlgorithm<T>::Mutate(const Situation &situation, Population<T> *population) {
+void GeneticAlgorithm<T>::Mutate(Situation situation, Population<T> *population) {
   for (T &chromosome : *population) {
     moves_->Mutate(situation, &chromosome);
   }
