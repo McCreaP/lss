@@ -189,7 +189,7 @@ class Situation {
   Situation(const Situation &) = default;
   Situation& operator=(const Situation &) = default;
 
-  ~Situation() { FreeMem(); }
+  ~Situation() { if (data_.unique()) FreeMem(); }
 
   Time time_stamp() const { return data_->time_stamp_; }
 
