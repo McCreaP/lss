@@ -8,6 +8,8 @@
 
 #include "gmock/gmock.h"
 
+namespace lss {
+
 class Random {
  public:
   Random() : gen_(std::random_device()()) {}
@@ -37,5 +39,7 @@ class RandomMock: public Random {
   MOCK_METHOD1_T(RandomShuffle, void(std::vector<size_t> *));
   MOCK_METHOD1(Rand, size_t(size_t));
 };
+
+}  // namespace lss
 
 #endif  // LSS_BASE_RANDOM_H_

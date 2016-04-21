@@ -20,7 +20,7 @@ class Initializer {
  public:
   virtual Population<T> InitPopulation(Situation situation, int populationSize) const = 0;
 
-  virtual ~Initializer() = default;
+  virtual ~Initializer() {}
 };
 
 template<class T>

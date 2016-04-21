@@ -26,7 +26,7 @@ class EvaluatorImpl : public Evaluator<PermutationJobMachine> {
   }
 };
 
-class MutatorImpl : Mutator<PermutationJobMachine> {
+class MutatorImpl : public Mutator<PermutationJobMachine> {
  public:
   MutatorImpl(double mutationProbability, std::shared_ptr<Random> rand)
       : kMutationProbability(mutationProbability), rand_(rand) {}
