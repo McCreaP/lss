@@ -27,7 +27,7 @@ class PermutationJobMachine : public Chromosome {
   Schedule ToSchedule(Situation situation) const override {
     Schedule schedule(situation);
     for (JobMachine jobMachine : permutation_) {
-      schedule.AssignJob(std::get<0>(jobMachine), std::get<1>(jobMachine));
+      schedule.AssignJob(std::get<1>(jobMachine), std::get<0>(jobMachine));
     }
     return schedule;
   }

@@ -78,6 +78,7 @@ int main(int argc, char **argv) {
 
   lss::io::BasicReader reader(config["input"].as<string>());
   lss::io::BasicWriter writer(config["assignments"].as<string>());
+  lss::AssignmentsHandler driver(&writer);
   lss::Situation situation;
   lss::Schedule schedule;
 
@@ -87,15 +88,10 @@ int main(int argc, char **argv) {
     if (reader.Read(&raw))
       situation = lss::Situation(raw);
 
+    VLOG(2) << "Run next iteration";
     schedule = algorithm.Run(schedule, situation);
 
-    for (auto m : situation.machines()) {
-      auto m_schedule = schedule.GetJobsAssignedToMachine(m);
-      if (!m_schedule.empty()) {
-        writer.Unassign(static_cast<int>(m.id()));
-        writer.Assign(static_cast<int>(m.id()), static_cast<int>(m_schedule.front().id()));
-      }
-    }
+    driver.AdjustAssignments(schedule, situation);
   }
 
   LOG(INFO) << "Scheduler stop";

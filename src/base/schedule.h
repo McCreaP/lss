@@ -3,6 +3,7 @@
 
 #include <map>
 #include <unordered_map>
+#include <io/basic_output.h>
 #include "situation.h"
 
 namespace lss {
@@ -23,7 +24,7 @@ class Schedule {
 
   // Does not check whether machine is valid
   // or job can be executed on a given machine.
-  void AssignJob(Job job, Machine machine) {
+  void AssignJob(Machine machine, Job job) {
     schedule_[machine].push_back(job);
   }
 
@@ -33,6 +34,35 @@ class Schedule {
 
  private:
   std::unordered_map<Machine, Jobs> schedule_;
+};
+
+class AssignmentsHandler {
+ public:
+  AssignmentsHandler(io::Writer *writer) : writer_(writer) { }
+
+  void AdjustAssignments(const Schedule &schedule, Situation situation);
+
+ private:
+  enum class JobAssignmentState {
+    kUnassigned = 0,
+    kTaken = 1
+  };
+
+  using JobsAssignments = std::unordered_map<Job, Machine>;
+  using MachinesAssignments = std::unordered_map<Machine, Job>;
+  using JobsStates = std::unordered_map<Job, JobAssignmentState>;
+
+  void RemoveNotPresentMachines(Situation situation);
+  void RemoveNotPresentJobs(Situation situation);
+  Job FindJobToAssign(const Schedule &schedule, Machine machine);
+  bool CanBeAssigned(Job job);
+  bool TryAssign(Machine machine, Job job);
+  bool TryUnassign(MachinesAssignments::iterator assignment);
+
+  io::Writer *writer_;
+  JobsAssignments jobs_assignments_;
+  MachinesAssignments machines_assignments_;
+  JobsStates jobs_states_;
 };
 
 double ObjectiveFunction(const Schedule &schedule, Situation situation);
