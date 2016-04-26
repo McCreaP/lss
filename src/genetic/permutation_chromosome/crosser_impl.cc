@@ -39,6 +39,9 @@ void Merge(std::vector<JobMachine> *to,
 
 void CrosserImpl::Crossover(PermutationJobMachine *lhs, PermutationJobMachine *rhs) const {
   size_t permutation_size = lhs->permutation().size();
+  if (permutation_size == 0) {
+    return;
+  }
   size_t first_bound = rand_->Rand(permutation_size);
   size_t second_bound = rand_->Rand(permutation_size);
   size_t min_bound = std::min(first_bound, second_bound);
