@@ -15,6 +15,7 @@ Population<PermutationJobMachine> InitializerImpl::InitPopulation(Situation situ
   Population<PermutationJobMachine> population;
   for (int i = 0; i < population_size; ++i) {
     PermutationJobMachine chromosome = GenNewChromosome(situation);
+    VLOG(3) << "Chromosome size: " << chromosome.permutation().size();
     population.push_back(std::move(chromosome));
   }
   return population;

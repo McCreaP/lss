@@ -34,5 +34,22 @@ TEST(CrosserShould, cross) {
   EXPECT_EQ(expected_permutation_2, chromosome_2.permutation());
 }
 
+TEST(CrosserShould, workWithEmptyChromosome) {
+  const int kNumberOfJobs = 0;
+  const int numberOfMachines = 3;
+  RawSituation rawSituation = GetSimpleRawSituation(kNumberOfJobs, numberOfMachines);
+  Situation situation(rawSituation);
+
+  auto permutation_1 = GetPermutation({}, {}, situation);
+  auto permutation_2 = GetPermutation({}, {}, situation);
+  auto chromosome_1 = PermutationJobMachine(permutation_1);
+  auto chromosome_2 = PermutationJobMachine(permutation_2);
+  CrosserImpl crosser(std::make_shared<Random>());
+  crosser.Crossover(&chromosome_1, &chromosome_2);
+
+  EXPECT_EQ(permutation_1, chromosome_1.permutation());
+  EXPECT_EQ(permutation_2, chromosome_2.permutation());
+}
+
 }  // namespace genetic
 }  // namespace lss
