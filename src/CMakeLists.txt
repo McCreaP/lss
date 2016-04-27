@@ -12,7 +12,11 @@ add_subdirectory(greedy)
 add_subdirectory(io)
 add_subdirectory(local_search)
 
-target_link_libraries(lss base genetic greedy io local_search permutation_chromosome glog ${Boost_LIBRARIES})
+target_link_libraries(
+        lss
+        base genetic greedy io local_search permutation_chromosome
+        glog ${Boost_LIBRARIES}
+)
 
 # Gtest doesn't find tests from separate compilation units.
 # unit_tests contains no references to anything in the library that contains test definitions
@@ -20,7 +24,11 @@ target_link_libraries(lss base genetic greedy io local_search permutation_chromo
 # Put your test libraries between "-Wl,--whole-archive" and "-Wl,--no-whole-archive"
 # to prevent linker optimization
 target_link_libraries(unit_tests -Wl,--whole-archive)
-target_link_libraries(unit_tests base_test io_test greedy_test genetic_test permutation_chromosome_test ${CXX_COVERAGE_LINK_FLAGS})
+target_link_libraries(
+        unit_tests
+        base_test io_test local_search_test greedy_test genetic_test permutation_chromosome_test
+        ${CXX_COVERAGE_LINK_FLAGS}
+)
 target_link_libraries(unit_tests -Wl,--no-whole-archive)
 
 find_library(gtest gmock)

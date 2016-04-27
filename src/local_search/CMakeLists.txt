@@ -8,4 +8,4 @@ endforeach ()
 add_library(local_search ${SRC})
 add_library(local_search_test STATIC ${TEST})
 
-target_link_libraries(local_search local_search_test)
+target_link_libraries(local_search_test local_search)

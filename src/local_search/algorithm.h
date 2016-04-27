@@ -1,6 +1,8 @@
 #ifndef LSS_LOCAL_SEARCH_ALGORITHM_H_
 #define LSS_LOCAL_SEARCH_ALGORITHM_H_
 
+#include <random>
+
 #include "base/algorithm.h"
 #include "base/schedule.h"
 
@@ -12,13 +14,14 @@ class LocalSearchAlgorithm : public Algorithm {
   LocalSearchAlgorithm(const LocalSearchAlgorithm &) = delete;
   LocalSearchAlgorithm &operator=(const LocalSearchAlgorithm &) = delete;
 
-  // `n` is the number of iterations per call to Run.
-  explicit LocalSearchAlgorithm(int) {}
+  // `iterations` is the total number of move attempts per Run() call.
+  explicit LocalSearchAlgorithm(int iterations, int seed);
 
-  Schedule Run(const Schedule &, Situation) override { return Schedule(); }
+  Schedule Run(const Schedule &, Situation situation) override;
 
  private:
-  Situation s;
+  const int iterations_;
+  std::default_random_engine random_;
 };
 
 }  // namespace local_search

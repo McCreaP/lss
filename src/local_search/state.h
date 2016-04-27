@@ -22,11 +22,17 @@ class State {
 
   double Evaluate() const { return double(); }
   Schedule ToSchedule() const { return Schedule(); }
+
+  Machine GetMachine(Job) const { return Machine(); }
   size_t GetPos(Job) const { return size_t(); }
+
   size_t QueueSize(Machine) const { return size_t(); }
   Job QueueBack(Machine) const { return Job(); }
 
+  void Assign(Machine, Job) {}
   void Assign(Machine, Job, size_t) {}
+
+  template<class URNG>
   void Shuffle(Machine) {}
 };
 
