@@ -59,7 +59,9 @@ class MachineSet {
   Machines machines() const;  // Forward relation
   Jobs jobs() const;          // Backward relation
 
-  friend bool operator==(const MachineSet &lhs, const MachineSet &rhs) { return lhs.data_ == rhs.data_; }
+  friend bool operator==(const MachineSet &lhs, const MachineSet &rhs) {
+    return lhs.data_ == rhs.data_;
+  }
 
  private:
   struct Data;

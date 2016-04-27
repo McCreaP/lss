@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
 
   lss::io::BasicReader reader(config["input"].as<string>());
   lss::io::BasicWriter writer(config["assignments"].as<string>());
-  lss::AssignmentsHandler driver(&writer);
+  lss::AssignmentsHandler assignments_handler(&writer);
   lss::Situation situation;
   lss::Schedule schedule;
 
@@ -91,7 +91,7 @@ int main(int argc, char **argv) {
     VLOG(2) << "Run next iteration";
     schedule = algorithm.Run(schedule, situation);
 
-    driver.AdjustAssignments(schedule, situation);
+    assignments_handler.AdjustAssignments(schedule, situation);
   }
 
   LOG(INFO) << "Scheduler stop";

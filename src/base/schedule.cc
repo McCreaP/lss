@@ -1,4 +1,6 @@
+#include <algorithm>
 #include <cmath>
+#include <limits>
 #include <set>
 #include <unordered_set>
 
@@ -84,18 +86,24 @@ void AssignmentsHandler::AdjustAssignments(const Schedule &schedule, Situation s
 
 void AssignmentsHandler::RemoveNotPresentMachines(Situation situation) {
   std::unordered_set<Machine> machines(situation.machines().begin(), situation.machines().end());
-  for (auto mj = machines_assignments_.begin(); mj != machines_assignments_.end(); ++mj) {
-    if (machines.count(mj->first) == 0) {
-      TryUnassign(mj);
+  auto machine_assignment = machines_assignments_.begin();
+  while (machine_assignment != machines_assignments_.end()) {
+    if (machines.count(machine_assignment->first) == 0) {
+      TryUnassign(machine_assignment++);
+    } else {
+      ++machine_assignment;
     }
   }
 }
 
 void AssignmentsHandler::RemoveNotPresentJobs(Situation situation) {
   std::unordered_set<Job> jobs(situation.jobs().begin(), situation.jobs().end());
-  for (auto job_state = jobs_states_.begin(); job_state != jobs_states_.end(); ++job_state) {
+  auto job_state = jobs_states_.begin();
+  while (job_state != jobs_states_.end()) {
     if (jobs.count(job_state->first) == 0) {
-      jobs_states_.erase(job_state);
+      jobs_states_.erase(job_state++);
+    } else {
+      ++job_state;
     }
   }
 }
@@ -114,9 +122,12 @@ Job AssignmentsHandler::FindJobToAssign(const Schedule &schedule, Machine machin
 
 
 bool AssignmentsHandler::CanBeAssigned(Job job) {
-  auto assignment = machines_assignments_.find(jobs_assignments_[job]);
-  if (assignment != machines_assignments_.end()) {
-    return TryUnassign(assignment);
+  auto jm = jobs_assignments_.find(job);
+  if (jm != jobs_assignments_.end()) {
+    auto assignment = machines_assignments_.find(jm->second);
+    if (assignment != machines_assignments_.end()) {
+      return TryUnassign(assignment);
+    }
   }
 
   auto job_state = jobs_states_.find(job);
@@ -146,6 +157,7 @@ bool AssignmentsHandler::TryAssign(Machine machine, Job job) {
   if (writer_->Assign(machine_id, job_id)) {
     machines_assignments_.insert(std::make_pair(machine, job));
     jobs_assignments_.insert(std::make_pair(job, machine));
+    jobs_states_.erase(job);
     return true;
   }
   return false;
