@@ -1,24 +1,24 @@
 #ifndef LSS_LOCAL_SEARCH_ALGORITHM_H_
 #define LSS_LOCAL_SEARCH_ALGORITHM_H_
 
-#include "local_search/base.h"
+#include "base/algorithm.h"
+#include "base/schedule.h"
 
 namespace lss {
 namespace local_search {
 
-class LocalSearchAlgorithm : public BaseAlgorithm {
+class LocalSearchAlgorithm : public Algorithm {
  public:
-  // Parameters meaning:
-  // - n: maximum number of iterators per call to Run().
-  // - k: maximum number of non-improving iterations till the state is reset.
-  LocalSearchAlgorithm(int n, int k);
+  LocalSearchAlgorithm(const LocalSearchAlgorithm &) = delete;
+  LocalSearchAlgorithm &operator=(const LocalSearchAlgorithm &) = delete;
 
-  void UpdateSituation(Situation s) override;
-  BaseSchedule Run() override;
+  // `n` is the number of iterations per call to Run.
+  explicit LocalSearchAlgorithm(int) {}
+
+  Schedule Run(const Schedule &, Situation) override { return Schedule(); }
 
  private:
   Situation s;
-  int n_, k_;
 };
 
 }  // namespace local_search

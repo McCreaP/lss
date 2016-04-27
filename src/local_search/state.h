@@ -1,34 +1,36 @@
 #ifndef LSS_LOCAL_SEARCH_STATE_H_
 #define LSS_LOCAL_SEARCH_STATE_H_
 
+#include <cstddef>
+#include <tuple>
+#include <unordered_map>
+#include <vector>
+
 #include "base/situation.h"
-#include "local_search/evaluator.h"
+#include "base/schedule.h"
 
 namespace lss {
 namespace local_search {
 
-// To be replaced with `::lss::Schedule`.
-class BaseSchedule {};
-
 class State {
  public:
-  State();
-  State(const State &);
-  State& operator=(const State&);
+  State() = default;
+  State(const State &) = default;
+  State& operator=(const State&) = default;
 
-  State(Situation s);
+  explicit State(Situation) {}
 
-  Situation GetSituation() const;
-  BaseSchedule ToSchedule() const;
+  double Evaluate() const { return double(); }
+  Schedule ToSchedule() const { return Schedule(); }
+  size_t GetPos(Job) const { return size_t(); }
+  size_t QueueSize(Machine) const { return size_t(); }
+  Job QueueBack(Machine) const { return Job(); }
 
-  // Schedules `j` as the first job for `m` to execute. Has no effect if `j` is null.
-  // Moves `j` to list of unassigned jobs if `m` is null.
-  void Assign(Job j, Machine m);
+  void Assign(Machine, Job, size_t) {}
+  void Shuffle(Machine) {}
 };
 
-
-
-}  // local_search
-}  // lss
+}  // namespace local_search
+}  // namespace lss
 
 #endif  // LSS_LOCAL_SEARCH_STATE_H_

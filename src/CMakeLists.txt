@@ -7,11 +7,12 @@ add_executable(lss main.cc)
 add_executable(unit_tests main_test.cc)
 
 add_subdirectory(base)
+add_subdirectory(genetic)
 add_subdirectory(greedy)
 add_subdirectory(io)
-add_subdirectory(genetic)
+add_subdirectory(local_search)
 
-target_link_libraries(lss base greedy permutation_chromosome io glog ${Boost_LIBRARIES})
+target_link_libraries(lss base genetic greedy io local_search permutation_chromosome glog ${Boost_LIBRARIES})
 
 # Gtest doesn't find tests from separate compilation units.
 # unit_tests contains no references to anything in the library that contains test definitions
