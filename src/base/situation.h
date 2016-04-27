@@ -37,11 +37,14 @@ class Machine {
   FairSet fair_set() const;          // Backward relation
   Job job() const;                   // Backward relation; extra; optional
 
+  friend bool operator==(const Machine &lhs, const Machine &rhs) { return lhs.data_ == rhs.data_; }
+
  private:
   struct Data;
   explicit Machine(Data *data) : data_(data) {}
   Data *data_ = nullptr;
   friend class Situation;
+  friend struct std::hash<Machine>;
 };
 
 class MachineSet {
@@ -56,11 +59,14 @@ class MachineSet {
   Machines machines() const;  // Forward relation
   Jobs jobs() const;          // Backward relation
 
+  friend bool operator==(const MachineSet &lhs, const MachineSet &rhs) { return lhs.data_ == rhs.data_; }
+
  private:
   struct Data;
   explicit MachineSet(Data *data) : data_(data) {}
   Data *data_ = nullptr;
   friend class Situation;
+  friend struct std::hash<MachineSet>;
 };
 
 class FairSet {
@@ -73,11 +79,14 @@ class FairSet {
   Id<FairSet> id() const;     // Property
   Machines machines() const;  // Forward relation
 
+  friend bool operator==(const FairSet &lhs, const FairSet &rhs) { return lhs.data_ == rhs.data_; }
+
  private:
   struct Data;
   explicit FairSet(Data *data) : data_(data) {}
   Data *data_ = nullptr;
   friend class Situation;
+  friend struct std::hash<FairSet>;
 };
 
 class Account {
@@ -91,11 +100,14 @@ class Account {
   FloatType alloc() const;  // Property
   Batches batches() const;  // Backward relation
 
+  friend bool operator==(const Account &lhs, const Account &rhs) { return lhs.data_ == rhs.data_; }
+
  private:
   struct Data;
   explicit Account(Data *data) : data_(data) {}
   Data *data_ = nullptr;
   friend class Situation;
+  friend struct std::hash<Account>;
 };
 
 class Batch {
@@ -115,11 +127,14 @@ class Batch {
   Account account() const;              // Forward relation
   Jobs jobs() const;                    // Backward relation
 
+  friend bool operator==(const Batch &lhs, const Batch &rhs) { return lhs.data_ == rhs.data_; }
+
  private:
   struct Data;
   explicit Batch(Data *data) : data_(data) {}
   Data *data_ = nullptr;
   friend class Situation;
+  friend struct std::hash<Batch>;
 };
 
 class Job {
@@ -135,11 +150,14 @@ class Job {
   MachineSet machine_set() const;  // Forward relation
   Batch batch() const;             // Forward relation
 
+  friend bool operator==(const Job &lhs, const Job &rhs) { return lhs.data_ == rhs.data_; }
+
  private:
   struct Data;
   explicit Job(Data *data) : data_(data) {}
   Data *data_ = nullptr;
   friend class Situation;
+  friend struct std::hash<Job>;
 };
 
 class ChangeCosts {
@@ -189,7 +207,7 @@ class Situation {
   Situation(const Situation &) = default;
   Situation& operator=(const Situation &) = default;
 
-  ~Situation() { FreeMem(); }
+  ~Situation() { if (data_.unique()) FreeMem(); }
 
   Time time_stamp() const { return data_->time_stamp_; }
 
@@ -362,5 +380,51 @@ T Situation::Get(const std::vector<T> &from, Id<T> id) {
 }
 
 }  // namespace lss
+
+namespace std {
+
+template<>
+struct hash<lss::Machine> {
+  size_t operator()(const lss::Machine &m) const {
+    return hash<lss::Machine::Data *>()(m.data_);
+  }
+};
+
+template<>
+struct hash<lss::MachineSet> {
+  size_t operator()(const lss::MachineSet &ms) const {
+    return hash<lss::MachineSet::Data *>()(ms.data_);
+  }
+};
+
+template<>
+struct hash<lss::FairSet> {
+  size_t operator()(const lss::FairSet &fs) const {
+    return hash<lss::FairSet::Data *>()(fs.data_);
+  }
+};
+
+template<>
+struct hash<lss::Account> {
+  size_t operator()(const lss::Account &acc) const {
+    return hash<lss::Account::Data *>()(acc.data_);
+  }
+};
+
+template<>
+struct hash<lss::Batch> {
+  size_t operator()(const lss::Batch &b) const {
+    return hash<lss::Batch::Data *>()(b.data_);
+  }
+};
+
+template<>
+struct hash<lss::Job> {
+  size_t operator()(const lss::Job &j) const {
+    return hash<lss::Job::Data *>()(j.data_);
+  }
+};
+
+}  // namespace std
 
 #endif  // LSS_BASE_SITUATION_H_

@@ -1,5 +1,4 @@
-#ifndef LSS_GENETIC_PERMUTATION_CHROMOSOME_TEST_UTILS_H_
-#define LSS_GENETIC_PERMUTATION_CHROMOSOME_TEST_UTILS_H_
+#include <vector>
 
 #include "base/raw_situation.h"
 #include "genetic/test_utils.h"
@@ -32,10 +31,7 @@ std::vector<RawJob> InitJobs(int kNumberOfJobs, int batchId, int kMachineSetId) 
   std::vector<RawJob> jobs;
   for (int id = 0; id < kNumberOfJobs; ++id) {
     RawJob job;
-    job.id(id)
-        .batch(batchId)
-        .machine(0)
-        .machine_set(kMachineSetId);
+    job.id(id).batch(batchId).machine_set(kMachineSetId);
     jobs.push_back(job);
   }
   return jobs;
@@ -85,5 +81,3 @@ RawSituation GetSimpleRawSituation(int numberOfJobs, int numberOfMachines) {
 
 }  // namespace genetic
 }  // namespace lss
-
-#endif  // LSS_GENETIC_PERMUTATION_CHROMOSOME_TEST_UTILS_H_

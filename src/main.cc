@@ -2,11 +2,21 @@
 #include <glog/logging.h>
 #include <iostream>
 #include <string>
-#include "greedy/scheduler.h"
+
+#include "base/schedule.h"
+#include "genetic/algorithm.h"
+#include "genetic/selector_impl.h"
+#include "genetic/permutation_chromosome/moves_impl.h"
+#include "io/basic_input.h"
+#include "io/basic_output.h"
 
 namespace program_opt = boost::program_options;
-using std::string;
+
 using std::cout;
+using std::string;
+using GeneticPermutationAlgorithm
+    = lss::genetic::GeneticAlgorithm<lss::genetic::PermutationJobMachine>;
+
 
 void ConfigLogger(char *argv[], int verbose) {
   FLAGS_v = verbose;
@@ -35,13 +45,59 @@ program_opt::variables_map ProcessCommandLine(int argc, char **argv) {
   return variables_map;
 }
 
+GeneticPermutationAlgorithm BuildGeneticAlgorithm() {
+  using namespace lss::genetic;
+
+  int population_size = 50;
+  int number_of_generations = 1000;
+  double crossover_probability = 0.1;
+  double mutation_probability = 0.01;
+
+  auto rand = std::make_shared<lss::Random>();
+  auto initializer = std::make_shared<InitializerImpl>(rand);
+  auto evaluator = std::make_shared<EvaluatorImpl>();
+  auto selector = std::make_shared<SelectorImpl<PermutationJobMachine>>(evaluator, rand);
+  auto crosser = std::make_shared<CrosserImpl>(rand);
+  auto mutator = std::make_shared<MutatorImpl>(mutation_probability, rand);
+  auto moves = std::make_shared<ConfigurableMoves<PermutationJobMachine>>();
+  (*moves)
+      .SetInitializer(initializer)
+      .SetSelector(selector)
+      .SetCrosser(crosser)
+      .SetSelector(selector)
+      .SetMutator(mutator);
+
+  return GeneticAlgorithm<PermutationJobMachine>(population_size, number_of_generations,
+                                                 crossover_probability, moves, rand);
+}
+
 int main(int argc, char **argv) {
   program_opt::variables_map config = ProcessCommandLine(argc, argv);
   ConfigLogger(argv, config["verbose"].as<int>());
   LOG(INFO) << "Scheduler start";
-  lss::greedy::Scheduler scheduler(config["input"].as<string>(),
-                                   config["assignments"].as<string>());
-  scheduler.Schedule();
+
+  lss::io::BasicReader reader(config["input"].as<string>());
+  lss::io::BasicWriter writer(config["assignments"].as<string>());
+  lss::Situation situation;
+  lss::Schedule schedule;
+
+  auto algorithm = BuildGeneticAlgorithm();
+  while (true) {
+    lss::RawSituation raw;
+    if (reader.Read(&raw))
+      situation = lss::Situation(raw);
+
+    schedule = algorithm.Run(schedule, situation);
+
+    for (auto m : situation.machines()) {
+      auto m_schedule = schedule.GetJobsAssignedToMachine(m);
+      if (!m_schedule.empty()) {
+        writer.Unassign(static_cast<int>(m.id()));
+        writer.Assign(static_cast<int>(m.id()), static_cast<int>(m_schedule.front().id()));
+      }
+    }
+  }
+
   LOG(INFO) << "Scheduler stop";
   return 0;
 }

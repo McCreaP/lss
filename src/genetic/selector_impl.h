@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "base/random.h"
-#include "base/schedule_mock.h"
+#include "base/schedule.h"
 #include "genetic/algorithm.h"
 #include "genetic/moves.h"
 
@@ -18,7 +18,8 @@ class SelectorImpl : public Selector<T> {
   SelectorImpl(std::shared_ptr<Evaluator<T>> evaluator, std::shared_ptr<Random> rand)
       : kEvaluator(evaluator), rand_(rand) {}
 
-  Population<T> Select(const Population<T> &population,
+  Population<T> Select(Situation situation,
+                       const Population<T> &population,
                        ChromosomeImprover<T> *improver) const override;
 
  private:
@@ -26,15 +27,17 @@ class SelectorImpl : public Selector<T> {
   T best_chromosome_;
   std::shared_ptr<Random> rand_;
 
-  std::vector<double> CalcCumulativeFitness(const Population<T> &population,
+  std::vector<double> CalcCumulativeFitness(Situation situation,
+                                            const Population<T> &population,
                                             ChromosomeImprover<T> *improver) const;
   size_t SelectChromosomeIndex(const std::vector<double> &cumulative_fitness) const;
 };
 
 template<class T>
-Population<T> SelectorImpl<T>::Select(const Population<T> &population,
+Population<T> SelectorImpl<T>::Select(Situation situation,
+                                      const Population<T> &population,
                                       ChromosomeImprover<T> *improver) const {
-  std::vector<double> cumulative_fitness = CalcCumulativeFitness(population, improver);
+  std::vector<double> cumulative_fitness = CalcCumulativeFitness(situation, population, improver);
   Population<T> new_population;
   for (size_t i = 0; i < population.size(); ++i) {
     size_t index = SelectChromosomeIndex(cumulative_fitness);
@@ -44,12 +47,13 @@ Population<T> SelectorImpl<T>::Select(const Population<T> &population,
 }
 
 template<class T>
-std::vector<double> SelectorImpl<T>::CalcCumulativeFitness(const Population<T> &population,
+std::vector<double> SelectorImpl<T>::CalcCumulativeFitness(Situation situation,
+                                                           const Population<T> &population,
                                                            ChromosomeImprover<T> *improver) const {
   std::vector<double> fitnesses;
   ChromosomeImprover<T> population_improver;
   for (const T &chromosome : population) {
-    double fitness = kEvaluator->Evaluate(chromosome);
+    double fitness = kEvaluator->Evaluate(situation, chromosome);
     population_improver.TryImprove(chromosome, fitness);
     fitnesses.push_back(fitness);
   }

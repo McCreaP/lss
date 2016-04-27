@@ -88,6 +88,12 @@ TEST(SituationTest, Constructors) {
   s1 = s2;
 }
 
+// Verify the destructor works correctly.
+TEST(SituationTest, Destructor) {
+  Situation s1(RawSituation().add(RawMachine().id(0)), false);
+  Situation s2(s1);
+}
+
 // Verify that no object is missing from Situation.
 TEST(SituationTest, NothingMissing) {
   Situation s{sample};

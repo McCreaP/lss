@@ -8,7 +8,7 @@
 
 #include "base/algorithm.h"
 #include "base/random.h"
-#include "base/schedule_mock.h"
+#include "base/schedule.h"
 #include "base/situation.h"
 #include "genetic/moves.h"
 
@@ -29,11 +29,11 @@ class GeneticAlgorithm : public Algorithm {
         moves_(moves),
         rand_(rand) { }
 
-  Schedule Run(const Schedule &prev_schedule, const Situation &new_situation) override;
+  Schedule Run(const Schedule &prev_schedule, Situation new_situation) override;
 
  private:
   void Crossover(Population<T> *population);
-  void Mutate(const Situation &situation, Population<T> *population);
+  void Mutate(Situation situation, Population<T> *population);
 
   int population_size_;
   int number_of_generations_;
@@ -44,15 +44,15 @@ class GeneticAlgorithm : public Algorithm {
 
 template<class T>
 Schedule GeneticAlgorithm<T>::Run(__attribute__((unused)) const Schedule &prev_schedule,
-                                  const Situation &new_situation) {
+                                  Situation new_situation) {
   ChromosomeImprover<T> improver;
   Population<T> population = moves_->InitPopulation(new_situation, population_size_);
   for (int generation = 0; generation < number_of_generations_; ++generation) {
-    population = moves_->Select(population, &improver);
+    population = moves_->Select(new_situation, population, &improver);
     Crossover(&population);
     Mutate(new_situation, &population);
   }
-  return improver.GetBestChromosome().ToSchedule();
+  return improver.GetBestChromosome().ToSchedule(new_situation);
 }
 
 template<class T>
@@ -75,7 +75,7 @@ void GeneticAlgorithm<T>::Crossover(Population<T> *population) {
 }
 
 template<class T>
-void GeneticAlgorithm<T>::Mutate(const Situation &situation, Population<T> *population) {
+void GeneticAlgorithm<T>::Mutate(Situation situation, Population<T> *population) {
   for (T &chromosome : *population) {
     moves_->Mutate(situation, &chromosome);
   }
@@ -83,7 +83,7 @@ void GeneticAlgorithm<T>::Mutate(const Situation &situation, Population<T> *popu
 
 class Chromosome {
  public:
-  virtual Schedule ToSchedule() const = 0;
+  virtual Schedule ToSchedule(Situation situation) const = 0;
   virtual ~Chromosome() = default;
 };
 
@@ -101,7 +101,7 @@ class ChromosomeFake : public Chromosome {
     return os;
   }
 
-  Schedule ToSchedule() const override {return Schedule();}
+  Schedule ToSchedule(Situation situation) const override {return Schedule(situation);}
 
  private:
   int id_;

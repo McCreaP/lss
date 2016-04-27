@@ -30,27 +30,28 @@ class SelectorShould : public ::testing::Test {
   ImproverMock<ChromosomeFake> improver_;
   std::shared_ptr<EvaluatorMock<ChromosomeFake>> evaluator_;
   std::shared_ptr<RandomMock> rand_;
+  Situation situation_{RawSituation(), false};
 };
 
 TEST_F(SelectorShould, evaluate_each_chromosome) {
   EXPECT_CALL(*rand_, GetRealInRange(_, _)).Times(kPopulationSize);
   EXPECT_CALL(improver_, TryImprove(_));
   for (const auto &chromosome : population_) {
-    EXPECT_CALL(*evaluator_, Evaluate(chromosome));
+    EXPECT_CALL(*evaluator_, Evaluate(_, chromosome));
   }
 
   SelectorImpl<ChromosomeFake> selector(evaluator_, rand_);
-  selector.Select(population_, &improver_);
+  selector.Select(situation_, population_, &improver_);
 }
 
 TEST_F(SelectorShould, return_population_with_the_same_size) {
   EXPECT_CALL(*rand_, GetRealInRange(_, _)).Times(kPopulationSize);
   EXPECT_CALL(improver_, TryImprove(_));
-  EXPECT_CALL(*evaluator_, Evaluate(_))
+  EXPECT_CALL(*evaluator_, Evaluate(_, _))
       .Times(kPopulationSize);
 
   SelectorImpl<ChromosomeFake> selector(evaluator_, rand_);
-  Population<ChromosomeFake> newPopulation = selector.Select(population_, &improver_);
+  Population<ChromosomeFake> newPopulation = selector.Select(situation_, population_, &improver_);
 
   EXPECT_EQ(kPopulationSize, newPopulation.size());
 }
@@ -58,7 +59,7 @@ TEST_F(SelectorShould, return_population_with_the_same_size) {
 TEST_F(SelectorShould, select_chromosomes_to_new_population_according_to_generated_random_numbers) {
   EXPECT_CALL(improver_, TryImprove(_));
   // Cumulative Fitness: 20, 30, 55, 70
-  EXPECT_CALL(*evaluator_, Evaluate(_))
+  EXPECT_CALL(*evaluator_, Evaluate(_, _))
       .WillOnce(Return(20))
       .WillOnce(Return(10))
       .WillOnce(Return(25))
@@ -70,7 +71,7 @@ TEST_F(SelectorShould, select_chromosomes_to_new_population_according_to_generat
       .WillOnce(Return(30));
 
   SelectorImpl<ChromosomeFake> selector(evaluator_, rand_);
-  Population<ChromosomeFake> new_population = selector.Select(population_, &improver_);
+  Population<ChromosomeFake> new_population = selector.Select(situation_, population_, &improver_);
 
   Population<ChromosomeFake> expected_population = {
       ChromosomeFake(2),
@@ -84,7 +85,7 @@ TEST_F(SelectorShould, select_chromosomes_to_new_population_according_to_generat
 TEST_F(SelectorShould, take_multiple_times_the_same_chromosome_if_random_number_says_so) {
   EXPECT_CALL(improver_, TryImprove(_));
   // Cumulative Fitness: 20, 30, 55, 70
-  EXPECT_CALL(*evaluator_, Evaluate(_))
+  EXPECT_CALL(*evaluator_, Evaluate(_, _))
       .WillOnce(Return(20))
       .WillOnce(Return(10))
       .WillOnce(Return(25))
@@ -96,7 +97,7 @@ TEST_F(SelectorShould, take_multiple_times_the_same_chromosome_if_random_number_
       .WillOnce(Return(45));
 
   SelectorImpl<ChromosomeFake> selector(evaluator_, rand_);
-  Population<ChromosomeFake> new_population = selector.Select(population_, &improver_);
+  Population<ChromosomeFake> new_population = selector.Select(situation_, population_, &improver_);
 
   Population<ChromosomeFake> expected_population = {
       ChromosomeFake(2),
@@ -112,12 +113,12 @@ TEST_F(SelectorShould, change_improver_to_return_best_chromosome_from_first_popu
   ChromosomeImprover<ChromosomeFake> improver;
   std::vector<double> evaluations = {40, 30, 120, 70};
   for (size_t i = 0; i < population_.size(); ++i) {
-    EXPECT_CALL(*evaluator_, Evaluate(population_[i]))
+    EXPECT_CALL(*evaluator_, Evaluate(_, population_[i]))
         .WillOnce(Return(evaluations[i]));
   }
 
   SelectorImpl<ChromosomeFake> selector(evaluator_, rand_);
-  selector.Select(population_, &improver);
+  selector.Select(situation_, population_, &improver);
 
   EXPECT_EQ(population_[2], improver.GetBestChromosome());
   EXPECT_EQ(120, improver.GetBestFitness());
@@ -134,12 +135,12 @@ TEST_F(SelectorShould, change_improver_if_has_found_better_chromosome) {
 
   std::vector<double> evaluations = {40, 30, 120, 70};
   for (size_t i = 0; i < population_.size(); ++i) {
-    EXPECT_CALL(*evaluator_, Evaluate(population_[i]))
+    EXPECT_CALL(*evaluator_, Evaluate(_, population_[i]))
         .WillOnce(Return(evaluations[i]));
   }
 
   SelectorImpl<ChromosomeFake> selector(evaluator_, rand_);
-  selector.Select(population_, &improver);
+  selector.Select(situation_, population_, &improver);
 
   EXPECT_EQ(population_[2], improver.GetBestChromosome());
   EXPECT_EQ(120, improver.GetBestFitness());
@@ -156,12 +157,12 @@ TEST_F(SelectorShould, change_improver_to_return_best_chromosome_if_many_in_popu
 
   std::vector<double> evaluations = {90, 120, 170, 130};
   for (size_t i = 0; i < population_.size(); ++i) {
-    EXPECT_CALL(*evaluator_, Evaluate(population_[i]))
+    EXPECT_CALL(*evaluator_, Evaluate(_, population_[i]))
         .WillOnce(Return(evaluations[i]));
   }
 
   SelectorImpl<ChromosomeFake> selector(evaluator_, rand_);
-  selector.Select(population_, &improver);
+  selector.Select(situation_, population_, &improver);
 
   EXPECT_EQ(population_[2], improver.GetBestChromosome());
   EXPECT_EQ(170, improver.GetBestFitness());
@@ -178,12 +179,12 @@ TEST_F(SelectorShould, not_change_improver_if_has_not_found_better_chromosome) {
 
   std::vector<double> evaluations = {40, 30, 90, 70};
   for (size_t i = 0; i < population_.size(); ++i) {
-    EXPECT_CALL(*evaluator_, Evaluate(population_[i]))
+    EXPECT_CALL(*evaluator_, Evaluate(_, population_[i]))
         .WillOnce(Return(evaluations[i]));
   }
 
   SelectorImpl<ChromosomeFake> selector(evaluator_, rand_);
-  selector.Select(population_, &improver);
+  selector.Select(situation_, population_, &improver);
 
   EXPECT_EQ(kPrevBestChromosome, improver.GetBestChromosome());
   EXPECT_EQ(kPrevBestFitness, improver.GetBestFitness());
