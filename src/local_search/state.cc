@@ -1,6 +1,9 @@
 #include "local_search/state.h"
 
 #include <cmath>
+#include <exception>
+
+#include "glog/logging.h"
 
 namespace lss {
 namespace local_search {
@@ -10,8 +13,13 @@ State::State(Situation s) : situation_(s) {
   for (auto m : situation_.machines()) queue_[m];
   for (auto j : situation_.jobs()) {
     queue_[Machine()].push_back(Entry(j));
-    job_machine_[j] = Machine();
+    assignment_[j] = Machine();
   }
+
+  for (auto j : situation_.jobs())
+    if (!j.batch()) throw std::invalid_argument("All jobs must have a batch set.");
+  for (auto b : situation_.batches())
+    if (!b.account()) throw std::invalid_argument("All batches must have an account set.");
 }
 
 Schedule State::ToSchedule() const {
@@ -23,58 +31,52 @@ Schedule State::ToSchedule() const {
 }
 
 Machine State::GetMachine(Job j) const {
-  auto it = job_machine_.find(j);
-  if (it != job_machine_.end())
-    return it->second;
-  return Machine();
+  auto it = assignment_.find(j);
+  if (it == assignment_.end()) throw std::invalid_argument("Invalid job.");
+  return it->second;
 }
 
 size_t State::GetPos(Job j) const {
-  auto it = job_machine_.find(j);
-  if (it == job_machine_.end())
-    return std::numeric_limits<size_t>::max();
-
-  Machine m = it->second;
-  auto schedule = queue_.at(m);
-  for (size_t pos = schedule.size() - 1; ; --pos) {
-    if (schedule[pos].job == j)
-      return pos;
-  }
+  auto it = assignment_.find(j);
+  if (it == assignment_.end()) throw std::invalid_argument("Invalid job.");
+  return JobPos(queue_.at(it->second), j);
 }
 
 size_t State::QueueSize(Machine m) const {
   auto it = queue_.find(m);
-  if (it != queue_.end())
-    return it->second.size();
-  return 0;
+  if (it == queue_.end()) throw std::invalid_argument("Invalid machine.");
+  return it->second.size();
 }
 
 Job State::QueueBack(Machine m) const {
   auto it = queue_.find(m);
-  if (it != queue_.end())
-    return it->second.back().job;
-  return Job();
+  if (it == queue_.end()) throw std::invalid_argument("Invalid machine.");
+  return it->second.back().job;
 }
 
-void State::Assign(Machine m, Job j, size_t pos) {
-  if (queue_.find(m) == queue_.end() || job_machine_.find(j) == job_machine_.end())
-    return;
+void State::Assign(Machine new_machine, Job job, size_t new_pos) {
+  auto new_queue_it = queue_.find(new_machine);
+  if (new_queue_it == queue_.end()) throw std::invalid_argument("Invalid machine.");
+  auto assignment_it = assignment_.find(job);
+  if (assignment_it == assignment_.end()) throw std::invalid_argument("Invalid job.");
 
-  auto old_queue = queue_.at(job_machine_.at(j));
-  auto old_it = FindJob(&old_queue, j);
-  eval_ -= old_it->eval;
-  old_queue.erase(old_it);
-  RecomputeTail(job_machine_.at(j), old_it - old_queue.begin());
+  auto &assignment = assignment_it->second;
+  auto &old_queue = queue_.at(assignment);
+  auto &new_queue = new_queue_it->second;
 
-  auto new_queue = queue_.at(m);
-  auto new_it = std::min(new_queue.end(), new_queue.begin() + pos);
-  new_queue.insert(new_it, Entry(j));
-  RecomputeTail(m, new_it - new_queue.begin());
+  size_t old_pos = JobPos(old_queue, job);
+  eval_ -= old_queue[old_pos].eval_contribution;
+  old_queue.erase(old_queue.begin() + old_pos);
+  RecomputeTail(&old_queue, old_pos);
 
-  job_machine_.at(j) = m;
+  new_pos = std::min(new_pos, new_queue.size());
+  new_queue.insert(new_queue.begin() + new_pos, Entry(job));
+  RecomputeTail(&new_queue, new_pos);
+
+  assignment = new_machine;
 }
 
-double State::JobEval(Job j, Time start_time) {
+double State::JobEval(Job j, Time start_time) const {
   Batch b = j.batch();
 
   Time complete_time = start_time + j.duration();
@@ -85,23 +87,33 @@ double State::JobEval(Job j, Time start_time) {
   return job_reward + batch_reward / b.jobs().size();
 }
 
-void State::RecomputeTail(Machine m, size_t pos) {
-  if (!m) return;
+Time State::EstimatedStartTime(const MachineQueue &queue, size_t pos) const {
+  // TODO: Take into account the job currently being executed by given machine.
+  if (pos == 0) return situation_.time_stamp();
+  else return queue[pos - 1].finish_time;
+}
 
-  auto queue = queue_.at(m);
-  Time time = pos == 0 ? situation_.time_stamp() : queue[pos - 1].finish_time;
-  for (size_t i = pos; i < queue.size(); ++i) {
-    eval_ -= queue[i].eval;
-    queue[i].eval = JobEval(queue[i].job, time);
-    eval_ += queue[i].eval;
-    time += queue[i].job.duration();
-    queue[i].finish_time = time;
+void State::RecomputeTail(MachineQueue *queue, size_t pos) {
+  CHECK_NOTNULL(queue);
+  // Unassigned jobs are not taken into account by `Evaluate()`.
+  if (queue == &queue_.at(Machine())) return;
+
+  Time time = EstimatedStartTime(*queue, pos);
+  for (size_t i = pos; i < queue->size(); ++i) {
+    eval_ -= (*queue)[i].eval_contribution;
+
+    (*queue)[i].eval_contribution = JobEval((*queue)[i].job, time);
+    eval_ += (*queue)[i].eval_contribution;
+
+    time += (*queue)[i].job.duration();
+    (*queue)[i].finish_time = time;
   }
 }
 
-State::MachineQueue::iterator State::FindJob(MachineQueue *queue, Job j) {
-  for (auto it = queue->end() - 1; ; --it)
-    if (it->job == j) return it;
+size_t State::JobPos(const MachineQueue &queue, Job j) const {
+  for (auto it = queue.end() - 1; it >= queue.begin(); --it)
+    if (it->job == j) return it - queue.begin();
+  LOG(FATAL) << "JobPos(queue, j): job not found in queue.";
 }
 
 }  // namespace local_search
