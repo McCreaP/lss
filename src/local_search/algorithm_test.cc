@@ -1,6 +1,7 @@
 #include "local_search/algorithm.h"
 
 #include <algorithm>
+#include <vector>
 
 #include "gtest/gtest.h"
 
@@ -46,7 +47,7 @@ TEST(LocalSearchAlgorithm, CanImprove) {
   schedule = algorithm.Run(schedule, situation);
 
   auto machine = situation[Id<Machine>(0)];
-  auto job = [&](int id) { return situation[Id<Job>(id)]; };
+  auto job = [&situation](int id) { return situation[Id<Job>(id)]; };
   std::vector<Job> expected{job(0), job(2), job(3), job(1)};
   EXPECT_EQ(expected, schedule.GetJobsAssignedToMachine(machine));
 }

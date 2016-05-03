@@ -1,5 +1,6 @@
 #include "local_search/state.h"
 
+#include <algorithm>
 #include <cmath>
 #include <exception>
 
@@ -87,9 +88,11 @@ double State::JobEval(Job j, Time finish_time) const {
 }
 
 Time State::EstimatedStartTime(const MachineQueue &queue, size_t pos) const {
-  // TODO: Take into account the job currently being executed by given machine.
-  if (pos == 0) return situation_.time_stamp();
-  else return queue[pos - 1].finish_time;
+  // TODO(kzyla): Take into account the job currently being executed by given machine.
+  if (pos == 0)
+    return situation_.time_stamp();
+  else
+    return queue[pos - 1].finish_time;
 }
 
 void State::RecomputeTail(MachineQueue *queue, size_t pos) {

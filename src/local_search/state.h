@@ -60,7 +60,7 @@ class State {
  private:
   struct Entry {
     Entry() {}
-    Entry(Job job) : job(job) {}
+    explicit Entry(Job job) : job(job) {}
 
     Job job;
     Time finish_time{};

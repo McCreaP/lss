@@ -14,10 +14,10 @@ Schedule LocalSearchAlgorithm::Run(const Schedule &, Situation situation) {
     return Schedule(situation);
 
   using range = std::uniform_int_distribution<size_t>;
-  auto rand_job = [&]() {
+  auto rand_job = [this, &situation]() {
     return situation.jobs()[range(0, situation.jobs().size() - 1)(random_)];
   };
-  auto rand_machine = [&](Job j) {
+  auto rand_machine = [this, &situation](Job j) {
     auto machines = j.machine_set().machines();
     if (machines.empty()) return Machine();
     return machines[range(0, machines.size() - 1)(random_)];
@@ -30,7 +30,7 @@ Schedule LocalSearchAlgorithm::Run(const Schedule &, Situation situation) {
     if (machine) {
       state.Assign(rand_machine(job), job);
     } else {
-      // TODO: Handle jobs with empty machine sets.
+      // TODO(kzyla): Handle jobs with empty machine sets.
       // This shouldn't happen for "normal" data so it's OK to handle it this way for now.
       LOG(WARNING) << "Found job with empty machine set - returning poor schedule.";
       return state.ToSchedule();

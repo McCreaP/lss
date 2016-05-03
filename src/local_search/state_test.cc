@@ -51,7 +51,7 @@ TEST_F(StateTest, ZeroEvaluation) {
 // Verify that evaluation of state grows when scheduling previously unassigned jobs.
 TEST_F(StateTest, EvaluationGrows) {
   auto raw = kSample;
-  auto test = [&]() {
+  auto test = [this, &raw]() {
     BuildSituation(raw);
     State state(situation_);
     state.Assign(machine_, job0_);
@@ -106,7 +106,7 @@ TEST_F(StateTest, SimpleEvaluation) {
   Situation situation(raw, false);
 
   int permutation[3] = {0, 1, 2};
-  auto get_eval = [&]() {
+  auto get_eval = [&situation, &permutation]() {
     State state(situation);
     for (int i = 0; i < 3; ++i)
       state.Assign(situation[Id<Machine>(0)], situation[Id<Job>(permutation[i])]);
