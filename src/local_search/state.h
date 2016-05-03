@@ -68,7 +68,7 @@ class State {
   };
   using MachineQueue = std::vector<Entry>;
 
-  double JobEval(Job j, Time start_time) const;
+  double JobEval(Job j, Time finish_time) const;
   Time EstimatedStartTime(const MachineQueue &queue, size_t pos) const;
   void RecomputeTail(MachineQueue *queue, size_t pos);
 

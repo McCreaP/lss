@@ -76,14 +76,13 @@ void State::Assign(Machine new_machine, Job job, size_t new_pos) {
   assignment = new_machine;
 }
 
-double State::JobEval(Job j, Time start_time) const {
+double State::JobEval(Job j, Time finish_time) const {
   Batch b = j.batch();
 
-  Time complete_time = start_time + j.duration();
-  double r = (complete_time - j.batch().due()) / b.duration();
+  double r = (finish_time - j.batch().due()) / b.duration();
+  double job_reward = b.job_reward() + b.job_timely_reward() / (1 + exp(r));
+  double batch_reward = b.reward() + b.timely_reward() / (1 + exp(r));
 
-  double job_reward = b.job_timely_reward() + b.job_reward() / (1 + exp(r));
-  double batch_reward = b.timely_reward() + b.reward() / (1 + exp(r));
   return job_reward + batch_reward / b.jobs().size();
 }
 
@@ -100,13 +99,12 @@ void State::RecomputeTail(MachineQueue *queue, size_t pos) {
 
   Time time = EstimatedStartTime(*queue, pos);
   for (size_t i = pos; i < queue->size(); ++i) {
-    eval_ -= (*queue)[i].eval_contribution;
-
-    (*queue)[i].eval_contribution = JobEval((*queue)[i].job, time);
-    eval_ += (*queue)[i].eval_contribution;
-
     time += (*queue)[i].job.duration();
     (*queue)[i].finish_time = time;
+
+    eval_ -= (*queue)[i].eval_contribution;
+    (*queue)[i].eval_contribution = JobEval((*queue)[i].job, time);
+    eval_ += (*queue)[i].eval_contribution;
   }
 }
 

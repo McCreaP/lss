@@ -1,5 +1,7 @@
 #include "local_search/state.h"
 
+#include <algorithm>
+
 #include "gtest/gtest.h"
 
 #include "base/raw_situation.h"
@@ -8,7 +10,7 @@ namespace lss {
 namespace local_search {
 namespace {
 
-const auto sample = RawSituation()
+const auto kSample = RawSituation()
     .add(RawMachine().id(0))
     .add(RawMachineSet().id(0).add(0))
     .add(RawAccount().id(0))
@@ -19,7 +21,7 @@ const auto sample = RawSituation()
 
 class StateTest : public ::testing::Test {
  protected:
-  void SetUp() override { BuildSituation(sample); }
+  void SetUp() override { BuildSituation(kSample); }
 
   void BuildSituation(const RawSituation &raw) {
     situation_ = Situation(raw, false);
@@ -48,7 +50,7 @@ TEST_F(StateTest, ZeroEvaluation) {
 
 // Verify that evaluation of state grows when scheduling previously unassigned jobs.
 TEST_F(StateTest, EvaluationGrows) {
-  auto raw = sample;
+  auto raw = kSample;
   auto test = [&]() {
     BuildSituation(raw);
     State state(situation_);
@@ -59,23 +61,23 @@ TEST_F(StateTest, EvaluationGrows) {
     EXPECT_LT(old_eval, new_eval);
   };
 
-  raw.batches_[0] = RawBatch(sample.batches_[0]).job_reward(1);
-  raw.batches_[1] = RawBatch(sample.batches_[1]).job_reward(1);
+  raw.batches_[0] = RawBatch(kSample.batches_[0]).job_reward(1);
+  raw.batches_[1] = RawBatch(kSample.batches_[1]).job_reward(1);
   test();
-  raw.batches_[0] = RawBatch(sample.batches_[0]).job_timely_reward(1);
-  raw.batches_[1] = RawBatch(sample.batches_[1]).job_timely_reward(1);
+  raw.batches_[0] = RawBatch(kSample.batches_[0]).job_timely_reward(1);
+  raw.batches_[1] = RawBatch(kSample.batches_[1]).job_timely_reward(1);
   test();
-  raw.batches_[0] = RawBatch(sample.batches_[0]).reward(1);
-  raw.batches_[1] = RawBatch(sample.batches_[1]).reward(1);
+  raw.batches_[0] = RawBatch(kSample.batches_[0]).reward(1);
+  raw.batches_[1] = RawBatch(kSample.batches_[1]).reward(1);
   test();
-  raw.batches_[0] = RawBatch(sample.batches_[0]).timely_reward(1);
-  raw.batches_[1] = RawBatch(sample.batches_[1]).timely_reward(1);
+  raw.batches_[0] = RawBatch(kSample.batches_[0]).timely_reward(1);
+  raw.batches_[1] = RawBatch(kSample.batches_[1]).timely_reward(1);
   test();
 }
 
 // Verify that reverting State to previous state preserves its evaluation.
 TEST_F(StateTest, EveluationReverts) {
-  auto raw = sample;
+  auto raw = kSample;
   raw.batches_[0].reward_ = 1;
   BuildSituation(raw);
   State state(situation_);
@@ -86,6 +88,35 @@ TEST_F(StateTest, EveluationReverts) {
   state.Assign(Machine(), job1_);
   double new_eval = state.Evaluate();
   EXPECT_NEAR(old_eval, new_eval, 1e-9);
+}
+
+// Verify that evaluation correctly discerns the best state in a simple case.
+TEST_F(StateTest, SimpleEvaluation) {
+  auto raw = RawSituation()
+      .time_stamp(0)
+      .add(RawMachine().id(0))
+      .add(RawMachineSet().id(0).add(0))
+      .add(RawAccount().id(0))
+      .add(RawBatch().id(0).account(0).duration(0.1).timely_reward(1).due(2))
+      .add(RawBatch().id(1).account(0).duration(0.1).timely_reward(1).due(3))
+      .add(RawBatch().id(2).account(0).duration(0.1).timely_reward(1).due(4))
+      .add(RawJob().id(0).batch(0).machine_set(0).duration(1))
+      .add(RawJob().id(1).batch(1).machine_set(0).duration(1))
+      .add(RawJob().id(2).batch(2).machine_set(0).duration(1));
+  Situation situation(raw, false);
+
+  int permutation[3] = {0, 1, 2};
+  auto get_eval = [&]() {
+    State state(situation);
+    for (int i = 0; i < 3; ++i)
+      state.Assign(situation[Id<Machine>(0)], situation[Id<Job>(permutation[i])]);
+    return state.Evaluate();
+  };
+
+  double best_eval = get_eval();
+  while (std::next_permutation(permutation, permutation + 3)) {
+    EXPECT_LT(get_eval(), best_eval);
+  }
 }
 
 TEST_F(StateTest, ToSchedule) {

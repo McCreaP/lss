@@ -1,6 +1,8 @@
 #include "local_search/algorithm.h"
 #include "local_search/state.h"
 
+#include "glog/logging.h"
+
 namespace lss {
 namespace local_search {
 
@@ -22,9 +24,22 @@ Schedule LocalSearchAlgorithm::Run(const Schedule &, Situation situation) {
   };
 
   State state(situation);
+  while (state.QueueSize(Machine()) > 0) {
+    Job job = state.QueueBack(Machine());
+    Machine machine = rand_machine(job);
+    if (machine) {
+      state.Assign(rand_machine(job), job);
+    } else {
+      // TODO: Handle jobs with empty machine sets.
+      // This shouldn't happen for "normal" data so it's OK to handle it this way for now.
+      LOG(WARNING) << "Found job with empty machine set - returning poor schedule.";
+      return state.ToSchedule();
+    }
+  }
+
   for (int i = 0; i < iterations_; ++i) {
     double eval = state.Evaluate();
-    Job job = state.QueueSize(Machine()) > 0 ? state.QueueBack(Machine()) : rand_job();
+    Job job = rand_job();
 
     Machine old_machine = state.GetMachine(job);
     size_t old_pos = state.GetPos(job);
