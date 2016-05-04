@@ -1,3 +1,5 @@
+#include "base/schedule.h"
+
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -5,7 +7,6 @@
 #include <set>
 #include <unordered_set>
 
-#include "base/schedule.h"
 #include "base/situation.h"
 
 namespace lss {

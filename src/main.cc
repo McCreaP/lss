@@ -1,12 +1,16 @@
-#include <boost/program_options.hpp>
-#include <glog/logging.h>
 #include <iostream>
+#include <memory>
 #include <string>
 
+#include "boost/program_options.hpp"
+#include "glog/logging.h"
+
+#include "base/algorithm.h"
 #include "base/schedule.h"
 #include "genetic/algorithm.h"
-#include "genetic/selector_impl.h"
 #include "genetic/permutation_chromosome/moves_impl.h"
+#include "genetic/selector_impl.h"
+#include "local_search/algorithm.h"
 #include "io/basic_input.h"
 #include "io/basic_output.h"
 
@@ -14,10 +18,10 @@ namespace program_opt = boost::program_options;
 
 using std::cout;
 using std::string;
-using GeneticPermutationAlgorithm
-    = lss::genetic::GeneticAlgorithm<lss::genetic::PermutationJobMachine>;
+using lss::local_search::LocalSearchAlgorithm;
+using GeneticAlgorithm = lss::genetic::GeneticAlgorithm<lss::genetic::PermutationJobMachine>;
 
-
+static
 void ConfigLogger(char *argv[], int verbose) {
   FLAGS_v = verbose;
   FLAGS_log_dir = "logs";
@@ -27,6 +31,7 @@ void ConfigLogger(char *argv[], int verbose) {
   google::InitGoogleLogging(argv[0]);
 }
 
+static
 program_opt::variables_map ProcessCommandLine(int argc, char **argv) {
   program_opt::variables_map variables_map;
   program_opt::options_description desc("Scheduler options");
@@ -34,7 +39,8 @@ program_opt::variables_map ProcessCommandLine(int argc, char **argv) {
       ("help,h", "produce help message")
       ("input,i", program_opt::value<string>()->required(), "Set input file path")
       ("assignments,a", program_opt::value<string>()->required(), "Set assignments directory path")
-      ("verbose,v", program_opt::value<int>(), "Set verbosity level");
+      ("verbose,v", program_opt::value<int>(), "Set verbosity level")
+      ("algorithm", program_opt::value<string>(), "Choose algorithm to run (genetic/local_search)");
   program_opt::store(program_opt::parse_command_line(argc, argv, desc), variables_map);
 
   if (variables_map.count("help")) {
@@ -45,8 +51,15 @@ program_opt::variables_map ProcessCommandLine(int argc, char **argv) {
   return variables_map;
 }
 
-GeneticPermutationAlgorithm BuildGeneticAlgorithm() {
-  using namespace lss::genetic;
+static
+std::unique_ptr<GeneticAlgorithm> BuildGeneticAlgorithm() {
+  using lss::genetic::PermutationJobMachine;
+  using lss::genetic::InitializerImpl;
+  using lss::genetic::EvaluatorImpl;
+  using lss::genetic::SelectorImpl;
+  using lss::genetic::CrosserImpl;
+  using lss::genetic::MutatorImpl;
+  using lss::genetic::ConfigurableMoves;
 
   int population_size = 50;
   int number_of_generations = 1000;
@@ -67,8 +80,14 @@ GeneticPermutationAlgorithm BuildGeneticAlgorithm() {
       .SetSelector(selector)
       .SetMutator(mutator);
 
-  return GeneticAlgorithm<PermutationJobMachine>(population_size, number_of_generations,
-                                                 crossover_probability, moves, rand);
+  return std::make_unique<GeneticAlgorithm>(population_size, number_of_generations,
+                                            crossover_probability, moves, rand);
+}
+
+static
+std::unique_ptr<LocalSearchAlgorithm> BuildLocalSearchAlgorithm() {
+  static const int kIterations = 1e6;
+  return std::make_unique<LocalSearchAlgorithm>(kIterations, time(nullptr));
 }
 
 int main(int argc, char **argv) {
@@ -82,14 +101,23 @@ int main(int argc, char **argv) {
   lss::Situation situation;
   lss::Schedule schedule;
 
-  auto algorithm = BuildGeneticAlgorithm();
+  std::unique_ptr<lss::Algorithm> algorithm;
+  if (config["input"].as<string>() == "local_search") {
+    algorithm = BuildLocalSearchAlgorithm();
+  } else if (config["input"].as<string>() == "genetic") {
+    algorithm = BuildGeneticAlgorithm();
+  } else {
+    cout << "Unknown algorithm (valid values for algorithm flag are: genetic, local_search)\n";
+    exit(1);
+  }
+
   while (true) {
     lss::RawSituation raw;
     if (reader.Read(&raw))
       situation = lss::Situation(raw);
 
     VLOG(2) << "Run next iteration";
-    schedule = algorithm.Run(schedule, situation);
+    schedule = algorithm->Run(schedule, situation);
 
     assignments_handler.AdjustAssignments(schedule, situation);
   }
