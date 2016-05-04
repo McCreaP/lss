@@ -1,8 +1,8 @@
 import logging
 from queue import PriorityQueue
 from internals import timer
-from internals.events import JobReady
-from internals.events import UseIdleMachines
+from internals.events import JobReady, MachineEvent, MachineSetEvent, FairSetEvent, UseIdleMachines
+from internals.machine import MachineState
 from internals.skipper_api import SkipperApi
 from threading import Condition
 
@@ -21,6 +21,9 @@ class EventLoop:
 
     def run(self):
         self.__add_jobs_ready_events()
+        self.__add_machines_events()
+        self.__add_machine_sets_events()
+        self.__add_fair_sets_events()
         self.add_event(UseIdleMachines(timer.now(), self, self.__state))
         while timer.now() < self.__story.get_raw('maxt'):
             event = self.__events.get()
@@ -46,6 +49,29 @@ class EventLoop:
     def __add_jobs_ready_events(self):
         for job in self.__story.get_raw('jobs'):
             self.add_event(JobReady(job, self.__state))
+
+    def __add_machines_events(self):
+        for m_id, events in self.__story.get_raw('machine_events').items():
+            self.__add_machine_events(m_id, events)
+
+    def __add_machine_events(self, m_id, events):
+        prev_dead = None
+        for time, new_state in events:
+            new_dead = (new_state == int(MachineState.MACHINE_DEAD))
+            if new_dead != prev_dead:
+                # In raw state there is an artificial machine state == 3
+                new_state = MachineState.MACHINE_DEAD if new_dead else MachineState.MACHINE_IDLE
+                self.add_event(MachineEvent(m_id, time, new_state, self.__state))
+
+    def __add_machine_sets_events(self):
+        for ms_id, events in self.__story.get_raw('machine_set_events').items():
+            for time, changes in events:
+                self.add_event(MachineSetEvent(ms_id, time, changes, self.__state))
+
+    def __add_fair_sets_events(self):
+        for fs_id, events in self.__story.get_raw('fair_service_machine_set_events').items():
+            for time, changes in events:
+                self.add_event(FairSetEvent(fs_id, time, changes, self.__state))
 
 
 class ProgressBar:

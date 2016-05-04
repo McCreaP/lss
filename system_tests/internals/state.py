@@ -2,6 +2,7 @@ import os
 import pickle
 import json
 import logging
+from collections import defaultdict
 
 from internals import utils
 from internals import timer
@@ -17,12 +18,10 @@ class State:
     def __init__(self, story, lss_input_path, lss_assignments_dir):
         self.__story = story
         self.__input_writer = InputWriter(lss_input_path, story)
-
-        self.__machines = {
-            m['id']: Machine(m['id'], lss_assignments_dir, story.get_raw('context_changes'))
-            for m in story.get_raw('machines')
-        }
-
+        self.__lss_assignment_dir = lss_assignments_dir
+        self.__machines = {}
+        self.__machine_sets = defaultdict(set)
+        self.__fair_sets = defaultdict(set)
         self.__ready_jobs = {}
         self.__finished_jobs = {}
 
@@ -69,8 +68,46 @@ class State:
         story = {k: for_one(k, v) for k, v in self.__story.get_items()}
         return story
 
+    def machine_event_idle(self, machine_id):
+        if machine_id in self.__machines.keys():
+            self.__machines[machine_id].bring_to_life()
+        else:
+            self.__machines[machine_id] = Machine(
+                machine_id,
+                self.__lss_assignment_dir,
+                self.__story.get_raw('context_changes')
+            )
+
+    def machine_event_dead(self, machine_id):
+        if machine_id in self.__machines.keys():
+            self.__machines[machine_id].kill()
+        else:
+            self.__machines[machine_id] = Machine(
+                machine_id,
+                self.__lss_assignment_dir,
+                self.__story.get_raw('context_changes')
+            )
+            self.__machines[machine_id].kill()
+
+    def add_machines_to_machine_set(self, ms_id, machines):
+        self.__machine_sets[ms_id] |= set(machines)
+
+    def remove_machines_form_machine_set(self, ms_id, machines):
+        self.__machine_sets[ms_id] -= set(machines)
+
+    def add_machines_to_fair_set(self, ms_id, machines):
+        self.__fair_sets[ms_id] |= set(machines)
+
+    def remove_machines_from_fair_ser(self, ms_id, machines):
+        self.__fair_sets[ms_id] -= set(machines)
+
     def __update_input(self):
-        self.__input_writer.write(self.__machines, self.__ready_jobs.values())
+        self.__input_writer.write(
+            self.__machines,
+            self.__ready_jobs.values(),
+            self.__machine_sets,
+            self.__fair_sets
+        )
 
 #     def try_to_take_job(self, machine_id):
 # return self.__machines[machine_id].try_to_take_job(timer.now(),
