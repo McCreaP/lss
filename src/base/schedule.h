@@ -1,9 +1,11 @@
-#ifndef LSS_BASE_SCHEDULE_MOCK_H_
-#define LSS_BASE_SCHEDULE_MOCK_H_
+#ifndef LSS_BASE_SCHEDULE_H_
+#define LSS_BASE_SCHEDULE_H_
 
 #include <map>
 #include <unordered_map>
-#include "situation.h"
+#include <vector>
+
+#include "base/situation.h"
 
 namespace lss {
 
@@ -15,7 +17,7 @@ class Schedule {
 
   Schedule() = default;
 
-  Schedule(Situation situation) {
+  explicit Schedule(Situation situation) {
     for (Machine m : situation.machines()) {
       schedule_[m] = {};
     }
@@ -39,4 +41,4 @@ double ObjectiveFunction(const Schedule &schedule, Situation situation);
 
 }  // namespace lss
 
-#endif  // LSS_BASE_SCHEDULE_MOCK_H_
+#endif  // LSS_BASE_SCHEDULE_H_

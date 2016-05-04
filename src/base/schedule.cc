@@ -1,6 +1,9 @@
-#include <cmath>
-
 #include "base/schedule.h"
+
+#include <algorithm>
+#include <cmath>
+#include <limits>
+
 #include "base/situation.h"
 
 namespace lss {
