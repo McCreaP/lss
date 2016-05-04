@@ -50,9 +50,9 @@ class AssignmentsHandler {
     kTaken = 1
   };
 
-  using JobsAssignments = std::unordered_map<Job, Machine>;
-  using MachinesAssignments = std::unordered_map<Machine, Job>;
-  using JobsStates = std::unordered_map<Job, JobAssignmentState>;
+  using JobsAssignments = std::unordered_map<Id<Job>, Id<Machine>>;
+  using MachinesAssignments = std::unordered_map<Id<Machine>, Id<Job>>;
+  using JobsStates = std::unordered_map<Id<Job>, JobAssignmentState>;
 
   void RemoveNotPresentMachines(Situation situation);
   void RemoveNotPresentJobs(Situation situation);

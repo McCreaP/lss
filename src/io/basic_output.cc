@@ -17,10 +17,9 @@ void BasicWriter::SetOutputPath(const std::string &output_path) {
 }
 
 bool BasicWriter::Assign(int machine_id, int job_id) {
-  VLOG(1) << "An attempt to assign job: " << job_id
+  VLOG(2) << "An attempt to assign job: " << job_id
     << " to the machine: " << machine_id << " is being made" << std::endl;
   const std::string path = output_path_ + std::to_string(machine_id);
-  VLOG(2) << path;
   const std::string tmp_path = path + "_tmp";
   const std::string content = std::to_string(job_id);
 
@@ -50,7 +49,7 @@ bool BasicWriter::Assign(int machine_id, int job_id) {
     PLOG_IF(WARNING, !ok) << "Rename failed";
   }
   if (ok) {
-    VLOG(1) << "Assignment succeed";
+    VLOG(1) << "Job: " << job_id << " assigned to machine: " << machine_id;
     return true;
   }
 
@@ -63,7 +62,11 @@ bool BasicWriter::Unassign(int machine_id) {
   const std::string path = output_path_ + std::to_string(machine_id);
   int result;
   PLOG_IF(WARNING, result = remove(path.c_str())) << "Unassign failed";
-  return result == 0;
+  if (result == 0) {
+    VLOG(1) << "Job unassigned from machine: " << machine_id;
+    return true;
+  }
+  return false;
 }
 
 }  // namespace io

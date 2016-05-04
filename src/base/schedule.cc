@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 #include <limits>
 #include <set>
 #include <unordered_set>
@@ -75,7 +76,7 @@ void AssignmentsHandler::AdjustAssignments(const Schedule &schedule, Situation s
   for (auto machine : situation.machines()) {
     Job job_to_assign = FindJobToAssign(schedule, machine);
     if (job_to_assign) {
-      auto pending_assignment = machines_assignments_.find(machine);
+      auto pending_assignment = machines_assignments_.find(machine.id());
       if (pending_assignment != machines_assignments_.end()) {
         TryUnassign(pending_assignment);
       }
@@ -85,7 +86,10 @@ void AssignmentsHandler::AdjustAssignments(const Schedule &schedule, Situation s
 }
 
 void AssignmentsHandler::RemoveNotPresentMachines(Situation situation) {
-  std::unordered_set<Machine> machines(situation.machines().begin(), situation.machines().end());
+  std::unordered_set<Id<Machine>> machines;
+  for (Machine machine : situation.machines()) {
+    machines.insert(machine.id());
+  }
   auto machine_assignment = machines_assignments_.begin();
   while (machine_assignment != machines_assignments_.end()) {
     if (machines.count(machine_assignment->first) == 0) {
@@ -97,7 +101,10 @@ void AssignmentsHandler::RemoveNotPresentMachines(Situation situation) {
 }
 
 void AssignmentsHandler::RemoveNotPresentJobs(Situation situation) {
-  std::unordered_set<Job> jobs(situation.jobs().begin(), situation.jobs().end());
+  std::unordered_set<Id<Job>> jobs;
+  for (Job job : situation.jobs()) {
+    jobs.insert(job.id());
+  }
   auto job_state = jobs_states_.begin();
   while (job_state != jobs_states_.end()) {
     if (jobs.count(job_state->first) == 0) {
@@ -122,7 +129,7 @@ Job AssignmentsHandler::FindJobToAssign(const Schedule &schedule, Machine machin
 
 
 bool AssignmentsHandler::CanBeAssigned(Job job) {
-  auto jm = jobs_assignments_.find(job);
+  auto jm = jobs_assignments_.find(job.id());
   if (jm != jobs_assignments_.end()) {
     auto assignment = machines_assignments_.find(jm->second);
     if (assignment != machines_assignments_.end()) {
@@ -130,7 +137,7 @@ bool AssignmentsHandler::CanBeAssigned(Job job) {
     }
   }
 
-  auto job_state = jobs_states_.find(job);
+  auto job_state = jobs_states_.find(job.id());
   if (job_state == jobs_states_.end()) {
     return true;
   }
@@ -139,14 +146,13 @@ bool AssignmentsHandler::CanBeAssigned(Job job) {
 }
 
 bool AssignmentsHandler::TryUnassign(MachinesAssignments::iterator assignment) {
-  Machine machine = assignment->first;
-  Job job = assignment->second;
-  int machine_id = static_cast<int>(machine.id());
+  Id<Machine> machine_id = assignment->first;
+  Id<Job> job_id = assignment->second;
 
   machines_assignments_.erase(assignment);
-  jobs_assignments_.erase(job);
-  bool successful_unassigned = writer_->Unassign(machine_id);
-  jobs_states_[job] =
+  jobs_assignments_.erase(job_id);
+  bool successful_unassigned = writer_->Unassign(static_cast<int>(machine_id));
+  jobs_states_[job_id] =
       successful_unassigned ? JobAssignmentState::kUnassigned : JobAssignmentState::kTaken;
   return successful_unassigned;
 }
@@ -155,9 +161,9 @@ bool AssignmentsHandler::TryAssign(Machine machine, Job job) {
   int machine_id = static_cast<int>(machine.id());
   int job_id = static_cast<int>(job.id());
   if (writer_->Assign(machine_id, job_id)) {
-    machines_assignments_.insert(std::make_pair(machine, job));
-    jobs_assignments_.insert(std::make_pair(job, machine));
-    jobs_states_.erase(job);
+    machines_assignments_.insert(std::make_pair(machine.id(), job.id()));
+    jobs_assignments_.insert(std::make_pair(job.id(), machine.id()));
+    jobs_states_.erase(job.id());
     return true;
   }
   return false;
