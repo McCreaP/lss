@@ -1,7 +1,6 @@
 #include "greedy/scheduler.h"
 
 #include <glog/logging.h>
-#include <pstreams/pstream.h>
 
 #include <algorithm>
 #include <iostream>
@@ -9,18 +8,12 @@
 #include <memory>
 
 #include "io/basic_input.h"
+#include "io/basic_output.h"
 #include "greedy/batch_wrapper.h"
 #include "greedy/machine_wrapper.h"
 
 namespace lss {
 namespace greedy {
-namespace {
-
-void NotifyDriverIFinishedCompute() {
-  redi::ipstream proc("curl localhost:8000 > /dev/null", redi::pstreams::pstderr);
-}
-
-}  // namespace
 
 static constexpr double kMaxContextChangeCost = std::numeric_limits<double>::infinity();
 
@@ -40,7 +33,7 @@ void Scheduler::Schedule() {
       AssignJobsFromBatch(*batch);
     }
     VLOG(1) << "Finished scheduling iteration";
-    NotifyDriverIFinishedCompute();
+    io::NotifyDriverIFinishedCompute();
   }
 }
 

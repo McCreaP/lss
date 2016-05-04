@@ -4,6 +4,7 @@
 #include <string>
 
 #include "gmock/gmock.h"
+#include "pstreams/pstream.h"
 
 namespace lss {
 namespace io {
@@ -38,6 +39,8 @@ class WriterMock : public Writer {
   MOCK_METHOD2(Assign, bool(int, int));
   MOCK_METHOD1(Unassign, bool(int));
 };
+
+void NotifyDriverIFinishedCompute();
 
 }  // namespace io
 }  // namespace lss

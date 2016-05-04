@@ -69,5 +69,9 @@ bool BasicWriter::Unassign(int machine_id) {
   return false;
 }
 
+void NotifyDriverIFinishedCompute() {
+  redi::ipstream proc("curl localhost:8000 > /dev/null", redi::pstreams::pstderr);
+}
+
 }  // namespace io
 }  // namespace lss
