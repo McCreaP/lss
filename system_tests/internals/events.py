@@ -5,6 +5,7 @@ from internals.machine import MachineState
 LOGGER = logging.getLogger('test_runner')
 
 USE_IDLE_MACHINES_INTERVAL = 3
+UPDATE_INPUT_INTERVAL = 3
 
 
 class Event:
@@ -128,3 +129,21 @@ class FairSetEvent(Event):
     def _execute_impl(self):
         self.__state.add_machines_to_fair_set(self.__new_machines)
         self.__state.remove_machines_from_fair_set(self.__old_machines)
+
+
+class UpdateInput(Event):
+    def __init__(self, execution_time, event_loop, state):
+        super(UpdateInput, self).__init__(execution_time)
+        self.__event_loop = event_loop
+        self.__state = state
+
+    def __str__(self):
+        return "Update input"
+
+    def _execute_impl(self):
+        self.__state.update_input()
+        self.__event_loop.add_event(UpdateInput(
+            self._execution_time + UPDATE_INPUT_INTERVAL,
+            self.__event_loop,
+            self.__state
+        ))

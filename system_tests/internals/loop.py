@@ -1,7 +1,7 @@
 import logging
 from queue import PriorityQueue
 from internals import timer
-from internals.events import JobReady, MachineEvent, MachineSetEvent, FairSetEvent, UseIdleMachines
+from internals.events import JobReady, MachineEvent, MachineSetEvent, FairSetEvent, UseIdleMachines, UpdateInput
 from internals.machine import MachineState
 from internals.skipper_api import SkipperApi
 from threading import Condition
@@ -25,15 +25,14 @@ class EventLoop:
         self.__add_machine_sets_events()
         self.__add_fair_sets_events()
         self.add_event(UseIdleMachines(timer.now(), self, self.__state))
+        self.add_event(UpdateInput(timer.now(), self, self.__state))
         while timer.now() < self.__story.get_raw('maxt'):
             event = self.__events.get()
             now = timer.now()
             if now < event.get_execution_time():
-                time_left = event.get_execution_time() - now
-                LOGGER.debug("Will wait for scheduler for %s s", str(time_left))
-                self.__condition.acquire()
-                self.__condition.wait(time_left)
-                self.__condition.release()
+                if type(event) is UpdateInput:
+                    time_left = event.get_execution_time() - now
+                    self.__wait_for(time_left)
                 timer.setup(event.get_execution_time())
             event.execute()
             self.__progress_bar.show_progress(now)
@@ -72,6 +71,12 @@ class EventLoop:
         for fs_id, events in self.__story.get_raw('fair_service_machine_set_events').items():
             for time, changes in events:
                 self.add_event(FairSetEvent(fs_id, time, changes, self.__state))
+
+    def __wait_for(self, time):
+        LOGGER.debug("Will wait for scheduler for %s s", str(time))
+        self.__condition.acquire()
+        self.__condition.wait(time)
+        self.__condition.release()
 
 
 class ProgressBar:
