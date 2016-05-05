@@ -1,14 +1,27 @@
 #include "base/situation.h"
 
 #include <algorithm>
+#include <sstream>
 #include <stdexcept>
 
 namespace lss {
 namespace {
 
+struct Throw {};
+
+class Exception {
+ public:
+  template<class T>
+  Exception& operator<<(T val) { what_ << val; return *this; }
+
+  void operator<<(Throw) { throw std::invalid_argument(what_.str()); }
+
+ private:
+  std::ostringstream what_;
+};
+
 template<class T>
 bool IdCmp(T lhs, T rhs)  { return lhs.id() < rhs.id(); }
-
 
 template<class T>
 inline void Sort(std::vector<T> *vec) {
@@ -21,24 +34,25 @@ void SortAndVerify(std::vector<T> *vec, bool safe) {
 
   // We rely on the fact that Id::kNone has the smallest possible value.
   if (safe && !vec->empty() && !vec->front().id())
-    throw std::invalid_argument("Object with id == kNone.");
+    Exception() << "Object with id == kNone" << Throw();
 
   for (size_t i = 1; i < vec->size(); ++i)
     if ((*vec)[i-1].id() == (*vec)[i].id() && (*vec)[i].id())
-      throw std::invalid_argument("Multiple objects with the same id.");
+      Exception() << "Multiple objects with the same id (" << static_cast<int>((*vec)[i].id())
+          << ")" << Throw();
 }
 
 }  // namespace
 
 ChangeCosts::ChangeCosts(const std::vector<RawChangeCost> &raw, bool safe) {
   if (safe && raw.size() != Change::kNum)
-    throw std::invalid_argument("Missing costs for changes.");
+    Exception() << "Missing costs for changes" << Throw();
 
   bool found[Change::kNum] = {};
   for (auto &change : raw) {
     size_t idx = static_cast<size_t>(change.change_);
     if (found[idx])
-      throw std::invalid_argument("Multiple costs for single change.");
+      Exception() << "Multiple costs for single change" << Throw();
 
     found[idx] = true;
     cost_[idx] = change.cost_;
@@ -114,8 +128,9 @@ void Situation::AddMachineSets(const std::vector<RawMachineSet> &raw, bool safe)
       if (Machine m = (*this)[Id<Machine>(m_id)]) {
         s.data_->machines.push_back(m);
         m.data_->machine_sets.push_back(s);
-      } else if (safe || Id<Machine>(m_id)) {
-        throw std::invalid_argument("Invalid relation.");
+      } else if (safe || m_id != kIdNone) {
+        Exception() << "Invalid relation: MachineSet " << rs.id_
+            << " refers to nonexistent Machine " << m_id << Throw();
       }
     }
   }
@@ -132,11 +147,14 @@ void Situation::AddFairSets(const std::vector<RawFairSet> &raw, bool safe) {
     f.data_->machines.reserve(rf.machines_.size());
     for (IdType m_id : rf.machines_) {
       if (Machine m = (*this)[Id<Machine>(m_id)]) {
-        if (m.fair_set()) throw std::invalid_argument("Overlapping fair sets.");
+        if (m.fair_set())
+          Exception() << "FairSets " << rf.id_ << " and " << static_cast<IdType>(m.fair_set().id())
+              << " overlap on Machine " << m_id << Throw();
         f.data_->machines.push_back(m);
         m.data_->fair_set = f;
-      } else if (safe || Id<Machine>(m_id)) {
-        throw std::invalid_argument("Invalid relation.");
+      } else if (safe || m_id != kIdNone) {
+        Exception() << "Invalid relation: FairSet " << static_cast<IdType>(f.id())
+            << " refers to nonexistent Machine " << m_id << Throw();
       }
     }
   }
@@ -171,8 +189,9 @@ void Situation::AddBatches(const std::vector<RawBatch> &raw, bool safe) {
     if (Account a = (*this)[Id<Account>(rb.account_)]) {
       b.data_->account = a;
       a.data_->batches.push_back(b);
-    } else if (safe || Id<Account>(rb.account_)) {
-      throw std::invalid_argument("Invalid relation.");
+    } else if (safe || rb.account_ != kIdNone) {
+      Exception() << "Invalid relation: Batch " << rb.id_ << " refers to nonexistent Account "
+          << rb.account_ << Throw();
     }
   }
   SortAndVerify(&data_->batches_, safe);
@@ -190,25 +209,30 @@ void Situation::AddJobs(const std::vector<RawJob> &raw, bool safe) {
     j.data_->start_time = rj.start_time_;
 
     if (Machine m = (*this)[Id<Machine>(rj.machine_)]) {
-      if (m.job()) throw std::invalid_argument("Machine with multiple jobs.");
+      if (m.job())
+        Exception() << "Machine " << rj.machine_ << " has multiple jobs (" << rj.id_
+            << " and " << static_cast<IdType>(m.job().id()) << ")" << Throw();
       j.data_->machine = m;
       m.data_->job = j;
-    } else if (Id<Machine>(rj.machine_) && (safe || Id<Machine>(rj.machine_))) {
-      throw std::invalid_argument("Invalid relation.");
+    } else if (rj.machine_ != kIdNone) {
+      Exception() << "Invalid relation: Job " << static_cast<IdType>(j.id())
+          << " refers to nonexistent Machine " << rj.machine_ << Throw();
     }
 
     if (MachineSet s = (*this)[Id<MachineSet>(rj.machine_set_)]) {
       j.data_->machine_set = s;
       s.data_->jobs.push_back(j);
-    } else if (safe || Id<MachineSet>(rj.machine_set_)) {
-      throw std::invalid_argument("Invalid relation.");
+    } else if (safe || rj.machine_set_ != kIdNone) {
+      Exception() << "Invalid relation: Job " << static_cast<IdType>(j.id())
+          << " refers to nonexistent MachineSet " << rj.machine_set_ << Throw();
     }
 
     if (Batch b = (*this)[Id<Batch>(rj.batch_)]) {
       j.data_->batch = b;
       b.data_->jobs.push_back(j);
-    } else if (safe || Id<MachineSet>(rj.batch_)) {
-      throw std::invalid_argument("Invalid relation.");
+    } else if (safe || rj.batch_ != kIdNone) {
+      Exception() << "Invalid relation: Job " << static_cast<IdType>(j.id())
+          << " refers to nonexistent Batch " << rj.batch_ << Throw();
     }
   }
   SortAndVerify(&data_->jobs_, safe);
