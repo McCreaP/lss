@@ -88,7 +88,7 @@ class MachineEvent(Event):
         self.__state = state
 
     def __str__(self):
-        return "Machine %s changes state to %s" % self.__machine_id, self.__new_machine_state
+        return "Machine %s changes state to %s" % (self.__machine_id, self.__new_machine_state)
 
     def _execute_impl(self):
         if self.__new_machine_state == MachineState.MACHINE_IDLE:
@@ -107,11 +107,11 @@ class MachineSetEvent(Event):
 
     def __str__(self):
         return "Machine set: %s, add machines: %s, remove machines: %s" % \
-               self.__machine_set_id, self.__new_machines, self.__old_machines
+               (self.__machine_set_id, self.__new_machines, self.__old_machines)
 
     def _execute_impl(self):
-        self.__state.add_machines_to_machine_set(self.__new_machines)
-        self.__state.remove_machines_from_machine_set(self.__old_machines)
+        self.__state.add_machines_to_machine_set(self.__machine_set_id, self.__new_machines)
+        self.__state.remove_machines_from_machine_set(self.__machine_set_id, self.__old_machines)
 
 
 class FairSetEvent(Event):
@@ -124,11 +124,11 @@ class FairSetEvent(Event):
 
     def __str__(self):
         return "%s, add machines: %s, remove machines: %s" % \
-               self.__machine_set_id, self.__new_machines, self.__old_machines
+               (self.__machine_set_id, self.__new_machines, self.__old_machines)
 
     def _execute_impl(self):
-        self.__state.add_machines_to_fair_set(self.__new_machines)
-        self.__state.remove_machines_from_fair_set(self.__old_machines)
+        self.__state.add_machines_to_fair_set(self.__machine_set_id, self.__new_machines)
+        self.__state.remove_machines_from_fair_set(self.__machine_set_id, self.__old_machines)
 
 
 class UpdateInput(Event):

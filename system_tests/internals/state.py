@@ -93,14 +93,14 @@ class State:
     def add_machines_to_machine_set(self, ms_id, machines):
         self.__machine_sets[ms_id] |= set(machines)
 
-    def remove_machines_form_machine_set(self, ms_id, machines):
+    def remove_machines_from_machine_set(self, ms_id, machines):
         self.__machine_sets[ms_id] -= set(machines)
 
     def add_machines_to_fair_set(self, ms_id, machines):
         self.fair_sets_events.append((ms_id, timer.now(), machines, []))
         self.__fair_sets[ms_id] |= set(machines)
 
-    def remove_machines_from_fair_ser(self, ms_id, machines):
+    def remove_machines_from_fair_set(self, ms_id, machines):
         self.fair_sets_events.append((ms_id, timer.now(), [], machines))
         self.__fair_sets[ms_id] -= set(machines)
 

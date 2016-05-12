@@ -42,7 +42,7 @@ def show_machines(machines):
 
 
 def show_machine_sets(raw_machine_sets):
-    return [show_machine_set(ms_id, content) for ms_id, content in raw_machine_sets]
+    return [show_machine_set(ms_id, content) for ms_id, content in raw_machine_sets.items()]
 
 
 def show_machine_set(ms_id, content):

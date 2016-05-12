@@ -23,7 +23,7 @@ LSS_INPUT_NAME = 'input'
 
 
 class Test: #pylint: disable=R0903
-    def __init__(self, test_data_path, run_dir, lss_executable_path, log_dir, verbose):
+    def __init__(self, test_data_path, run_dir, lss_executable_path, log_dir, verbose, algorithm="genetic"):
         self.has_failed = False
         self.__lss_input_dir = os.path.join(run_dir, LSS_INPUT_DIR)
         self.__lss_input_path = os.path.join(self.__lss_input_dir, LSS_INPUT_NAME)
@@ -31,6 +31,8 @@ class Test: #pylint: disable=R0903
         self.__lss_executable_path = lss_executable_path
         self.__log_dir = log_dir
         self.__verbose = verbose
+        self.__state = None
+        self.__algorithm = algorithm
         self.result = None
         self.quasi_optimal_result = None
         with open(test_data_path, 'rb') as f:
@@ -43,10 +45,15 @@ class Test: #pylint: disable=R0903
 
     def run(self):
         self.__prepare_for_running()
-        run_lss_command = "{executable} --input={input} --assignments={assignments} --verbose={verbose}".format(**{
+        run_lss_command = "{executable} " \
+                          "--input={input} " \
+                          "--assignments={assignments} " \
+                          "--algorithm={algorithm} " \
+                          "--verbose={verbose} ".format(**{
             "executable": self.__lss_executable_path,
             "input": os.path.abspath(self.__lss_input_path),
             "assignments": os.path.abspath(self.__lss_assignments_dir),
+            "algorithm": self.__algorithm,
             "verbose": self.__verbose})
         LOGGER.info("Run scheduler with the command: %s", run_lss_command)
         scheduler = subprocess.Popen(run_lss_command, shell=True, preexec_fn=os.setsid)
