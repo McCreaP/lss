@@ -11,10 +11,12 @@ LOGGER = logging.getLogger("test_runner")
 
 class EventLoop:
 
-    def __init__(self, story, state):
+    def __init__(self, story, state, machines_events_desc, fair_sets_events):
         self.__story = story
-        self.__events = PriorityQueue()
         self.__state = state
+        self.__machines_events_desc = machines_events_desc
+        self.__fair_sets_events_desc = fair_sets_events
+        self.__events = PriorityQueue()
         self.__progress_bar = ProgressBar(self.__story.get_raw('mint'), self.__story.get_raw('maxt'))
         self.__condition = Condition()
         self.__api_skipper = SkipperApi(self.stop_waiting)
@@ -50,17 +52,8 @@ class EventLoop:
             self.add_event(JobReady(job, self.__state))
 
     def __add_machines_events(self):
-        for m_id, events in self.__story.get_raw('machine_events').items():
-            self.__add_machine_events(m_id, events)
-
-    def __add_machine_events(self, m_id, events):
-        prev_dead = None
-        for time, new_state in events:
-            new_dead = (new_state == int(MachineState.MACHINE_DEAD))
-            if new_dead != prev_dead:
-                # In raw state there is an artificial machine state == 3
-                new_state = MachineState.MACHINE_DEAD if new_dead else MachineState.MACHINE_IDLE
-                self.add_event(MachineEvent(m_id, time, new_state, self.__state))
+        for m_id, time, new_state in self.__machines_events_desc:
+            self.add_event(MachineEvent(m_id, time, new_state, self.__state))
 
     def __add_machine_sets_events(self):
         for ms_id, events in self.__story.get_raw('machine_set_events').items():
@@ -68,9 +61,8 @@ class EventLoop:
                 self.add_event(MachineSetEvent(ms_id, time, changes, self.__state))
 
     def __add_fair_sets_events(self):
-        for fs_id, events in self.__story.get_raw('fair_service_machine_set_events').items():
-            for time, changes in events:
-                self.add_event(FairSetEvent(fs_id, time, changes, self.__state))
+        for fs_id, time, new_machines, old_machines in self.__fair_sets_events_desc:
+            self.add_event(FairSetEvent(fs_id, time, new_machines, old_machines, self.__state))
 
     def __wait_for(self, time):
         LOGGER.debug("Will wait for scheduler for %s s", str(time))

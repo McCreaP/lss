@@ -24,6 +24,8 @@ class State:
         self.__fair_sets = defaultdict(set)
         self.__ready_jobs = {}
         self.__finished_jobs = {}
+        self.machine_events = []
+        self.fair_sets_events = []
 
     def add_ready_job(self, job):
         self.__ready_jobs[job['id']] = job
@@ -66,6 +68,7 @@ class State:
         return story
 
     def machine_event_idle(self, machine_id):
+        self.machine_events.append((machine_id, timer.now(), MachineState.MACHINE_IDLE))
         if machine_id in self.__machines.keys():
             self.__machines[machine_id].bring_to_life()
         else:
@@ -76,6 +79,7 @@ class State:
             )
 
     def machine_event_dead(self, machine_id):
+        self.machine_events.append((machine_id, timer.now(), MachineState.MACHINE_DEAD))
         if machine_id in self.__machines.keys():
             self.__machines[machine_id].kill()
         else:
@@ -93,9 +97,11 @@ class State:
         self.__machine_sets[ms_id] -= set(machines)
 
     def add_machines_to_fair_set(self, ms_id, machines):
+        self.fair_sets_events.append((ms_id, timer.now(), machines, []))
         self.__fair_sets[ms_id] |= set(machines)
 
     def remove_machines_from_fair_ser(self, ms_id, machines):
+        self.fair_sets_events.append((ms_id, timer.now(), [], machines))
         self.__fair_sets[ms_id] -= set(machines)
 
     def update_input(self):

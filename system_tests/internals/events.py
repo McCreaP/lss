@@ -115,15 +115,15 @@ class MachineSetEvent(Event):
 
 
 class FairSetEvent(Event):
-    def __init__(self, fs_id, execution_time, changes, state):
+    def __init__(self, fs_id, execution_time, new_machines, old_machines, state):
         super(FairSetEvent, self).__init__(execution_time)
         self.__machine_set_id = fs_id
-        self.__new_machines = changes[0]
-        self.__old_machines = changes[1]
+        self.__new_machines = new_machines
+        self.__old_machines = old_machines
         self.__state = state
 
     def __str__(self):
-        return "Fair set: %s, add machines: %s, remove machines: %s" % \
+        return "%s, add machines: %s, remove machines: %s" % \
                self.__machine_set_id, self.__new_machines, self.__old_machines
 
     def _execute_impl(self):
