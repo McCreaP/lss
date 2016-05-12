@@ -115,7 +115,7 @@ int main(int argc, char **argv) {
     lss::RawSituation raw;
     while (!reader.Read(&raw))
       lss::io::NotifyDriverIFinishedCompute();
-    situation = lss::Situation(raw);
+    situation = lss::Situation(raw, lss::Situation::BuildMode::kDropInvalid);
 
     VLOG(2) << "Run next iteration";
     schedule = algorithm->Run(schedule, situation);
