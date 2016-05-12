@@ -102,12 +102,12 @@ int main(int argc, char **argv) {
   lss::Schedule schedule;
 
   std::unique_ptr<lss::Algorithm> algorithm;
-  if (config["input"].as<string>() == "local_search") {
+  if (config["algorithm"].as<string>() == "local_search") {
     algorithm = BuildLocalSearchAlgorithm();
-  } else if (config["input"].as<string>() == "genetic") {
+  } else if (config["algorithm"].as<string>() == "genetic") {
     algorithm = BuildGeneticAlgorithm();
   } else {
-    cout << "Unknown algorithm (valid values for algorithm flag are: genetic, local_search)\n";
+    LOG(ERROR) << "Unknown algorithm (valid values for algorithm flag are: genetic, local_search)\n";
     exit(1);
   }
 
