@@ -1,9 +1,9 @@
 class Job:
 
-    def __init__(self, raw_job, batch, fair_machine_set):
+    def __init__(self, raw_job, batch, machine):
         self.__raw_job = raw_job
         self.__batch = batch
-        self.__fair_machine_set = fair_machine_set
+        self.__machine = machine
 
     def __str__(self):
         return "Job %s" % str(self.__raw_job['id'])
@@ -12,7 +12,7 @@ class Job:
         return self.__batch.get_raw('account')
 
     def get_fair_machine_set(self):
-        return self.__fair_machine_set
+        return self.__machine.fair_machine_set
 
     def get_batch(self):
         return self.__batch

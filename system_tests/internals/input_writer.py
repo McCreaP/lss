@@ -9,11 +9,11 @@ class InputWriter:
         self.__lss_input_path = lss_input_path
         self.__story = story
 
-    def write(self, machines, ready_jobs):
+    def write(self, machines, ready_jobs, machine_sets, fair_sets):
         pieces = [
             ('machines', show_machines(machines)),
-            ('machine-sets', show_machine_sets(self.__story.get_raw('machine_sets'))),
-            ('fair-service-machine-sets', show_machine_sets(self.__story.get_raw('fair_service_machine_sets'))),
+            ('machine-sets', show_machine_sets(machine_sets)),
+            ('fair-service-machine-sets', show_machine_sets(fair_sets)),
             ('jobs', show_jobs(ready_jobs)),
             ('batches', show_batches(self.__story.get_raw('batches'))),
             ('accounts', show_accounts(self.__story.get_raw('accounts'))),
@@ -42,11 +42,11 @@ def show_machines(machines):
 
 
 def show_machine_sets(raw_machine_sets):
-    return [show_machine_set(raw_machine_set) for raw_machine_set in raw_machine_sets]
+    return [show_machine_set(ms_id, content) for ms_id, content in raw_machine_sets]
 
 
-def show_machine_set(machine_set):
-    return '%s %s' % (machine_set['id'], ' '.join([str(machine_id) for machine_id in machine_set['initial_contents']]))
+def show_machine_set(ms_id, content):
+    return '%s %s' % (ms_id, ' '.join([str(machine_id) for machine_id in content]))
 
 
 def show_jobs(raw_jobs):
