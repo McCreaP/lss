@@ -29,11 +29,11 @@ inline void Sort(std::vector<T> *vec) {
 }
 
 template<class T>
-void SortAndVerify(std::vector<T> *vec, bool safe) {
+void SortAndVerify(std::vector<T> *vec, Situation::BuildMode mode) {
   Sort(vec);
 
   // We rely on the fact that Id::kNone has the smallest possible value.
-  if (safe && !vec->empty() && !vec->front().id())
+  if (mode != Situation::BuildMode::kIgnoreMissing && !vec->empty() && !vec->front().id())
     Exception() << "Object with id == kNone" << Throw();
 
   for (size_t i = 1; i < vec->size(); ++i)
@@ -44,8 +44,8 @@ void SortAndVerify(std::vector<T> *vec, bool safe) {
 
 }  // namespace
 
-ChangeCosts::ChangeCosts(const std::vector<RawChangeCost> &raw, bool safe) {
-  if (safe && raw.size() != Change::kNum)
+ChangeCosts::ChangeCosts(const std::vector<RawChangeCost> &raw, bool allow_missing) {
+  if (!allow_missing && raw.size() != Change::kNum)
     Exception() << "Missing costs for changes" << Throw();
 
   bool found[Change::kNum] = {};
@@ -59,19 +59,19 @@ ChangeCosts::ChangeCosts(const std::vector<RawChangeCost> &raw, bool safe) {
   }
 }
 
-Situation::Situation(const RawSituation &raw, bool safe)
-    : data_(std::make_shared<Data>(raw.change_costs_, safe)) {
+Situation::Situation(const RawSituation &raw, BuildMode mode)
+    : data_(std::make_shared<Data>(raw.change_costs_, mode)) {
   data_->time_stamp_ = raw.time_stamp_;
 
   // The order of adding is important - we rely on the fact, that the (one-way) relations
   // form an acyclic graph.
   try {
-    AddMachines(raw.machines_, safe);
-    AddMachineSets(raw.machine_sets_, safe);
-    AddFairSets(raw.fair_sets_, safe);
-    AddAccounts(raw.accounts_, safe);
-    AddBatches(raw.batches_, safe);
-    AddJobs(raw.jobs_, safe);
+    AddMachines(raw.machines_, mode);
+    AddMachineSets(raw.machine_sets_, mode);
+    AddFairSets(raw.fair_sets_, mode);
+    AddAccounts(raw.accounts_, mode);
+    AddBatches(raw.batches_, mode);
+    AddJobs(raw.jobs_, mode);
   } catch (...) {
     FreeMem();
     throw;
@@ -94,6 +94,9 @@ Situation::Situation(const RawSituation &raw, bool safe)
   // Only single relations in Job, so no loop for it.
 }
 
+Situation::Situation(const RawSituation &raw, bool safe)
+    : Situation(raw, safe ? BuildMode::kSafe : BuildMode::kIgnoreMissing) {}
+
 void Situation::FreeMem() {
   for (auto m : data_->machines_) delete m.data_;
   for (auto s : data_->machine_sets_) delete s.data_;
@@ -103,7 +106,7 @@ void Situation::FreeMem() {
   for (auto j : data_->jobs_) delete j.data_;
 }
 
-void Situation::AddMachines(const std::vector<RawMachine> &raw, bool safe) {
+void Situation::AddMachines(const std::vector<RawMachine> &raw, BuildMode mode) {
   data_->machines_.reserve(raw.size());
   for (auto &rm : raw) {
     Machine m(new Machine::Data);
@@ -113,55 +116,58 @@ void Situation::AddMachines(const std::vector<RawMachine> &raw, bool safe) {
     m.data_->state = rm.state_;
     m.data_->context = rm.context_;
   }
-  SortAndVerify(&data_->machines_, safe);
+  SortAndVerify(&data_->machines_, mode);
 }
 
-void Situation::AddMachineSets(const std::vector<RawMachineSet> &raw, bool safe) {
+void Situation::AddMachineSets(const std::vector<RawMachineSet> &raw, BuildMode mode) {
   data_->machine_sets_.reserve(raw.size());
-  for (auto &rs : raw) {
-    MachineSet s(new MachineSet::Data);
-    data_->machine_sets_.push_back(s);
+  for (auto &raw_set : raw) {
+    MachineSet set(new MachineSet::Data);
+    data_->machine_sets_.push_back(set);
 
-    s.data_->id = Id<MachineSet>(rs.id_);
-    s.data_->machines.reserve(rs.machines_.size());
-    for (IdType m_id : rs.machines_) {
-      if (Machine m = (*this)[Id<Machine>(m_id)]) {
-        s.data_->machines.push_back(m);
-        m.data_->machine_sets.push_back(s);
-      } else if (safe || m_id != kIdNone) {
-        Exception() << "Invalid relation: MachineSet " << rs.id_
-            << " refers to nonexistent Machine " << m_id << Throw();
+    set.data_->id = Id<MachineSet>(raw_set.id_);
+    set.data_->machines.reserve(raw_set.machines_.size());
+    for (IdType machine_id : raw_set.machines_) {
+      if (Machine machine = (*this)[Id<Machine>(machine_id)]) {
+        set.data_->machines.push_back(machine);
+        machine.data_->machine_sets.push_back(set);
+      } else if (mode == BuildMode::kSafe
+          || (mode == BuildMode::kIgnoreMissing && machine_id != kIdNone)) {
+        Exception() << "Invalid relation: MachineSet " << raw_set.id_
+            << " refers to nonexistent Machine " << machine_id << Throw();
       }
     }
   }
-  SortAndVerify(&data_->machine_sets_, safe);
+  SortAndVerify(&data_->machine_sets_, mode);
 }
 
-void Situation::AddFairSets(const std::vector<RawFairSet> &raw, bool safe) {
+void Situation::AddFairSets(const std::vector<RawFairSet> &raw, BuildMode mode) {
   data_->fair_sets_.reserve(raw.size());
-  for (auto &rf : raw) {
-    FairSet f(new FairSet::Data);
-    data_->fair_sets_.push_back(f);
+  for (auto &raw_set : raw) {
+    FairSet set(new FairSet::Data);
+    data_->fair_sets_.push_back(set);
 
-    f.data_->id = Id<FairSet>(rf.id_);
-    f.data_->machines.reserve(rf.machines_.size());
-    for (IdType m_id : rf.machines_) {
-      if (Machine m = (*this)[Id<Machine>(m_id)]) {
-        if (m.fair_set())
-          Exception() << "FairSets " << rf.id_ << " and " << static_cast<IdType>(m.fair_set().id())
-              << " overlap on Machine " << m_id << Throw();
-        f.data_->machines.push_back(m);
-        m.data_->fair_set = f;
-      } else if (safe || m_id != kIdNone) {
-        Exception() << "Invalid relation: FairSet " << static_cast<IdType>(f.id())
+    set.data_->id = Id<FairSet>(raw_set.id_);
+    set.data_->machines.reserve(raw_set.machines_.size());
+    for (IdType m_id : raw_set.machines_) {
+      if (Machine machine = (*this)[Id<Machine>(m_id)]) {
+        if (machine.fair_set())
+          Exception() << "FairSets " << raw_set.id_ << " and "
+              << static_cast<IdType>(machine.fair_set().id()) << " overlap on Machine "
+              << m_id << Throw();
+        set.data_->machines.push_back(machine);
+        machine.data_->fair_set = set;
+      } else if (mode == BuildMode::kSafe
+          || (mode == BuildMode::kIgnoreMissing && m_id != kIdNone)) {
+        Exception() << "Invalid relation: FairSet " << static_cast<IdType>(set.id())
             << " refers to nonexistent Machine " << m_id << Throw();
       }
     }
   }
-  SortAndVerify(&data_->fair_sets_, safe);
+  SortAndVerify(&data_->fair_sets_, mode);
 }
 
-void Situation::AddAccounts(const std::vector<RawAccount> &raw, bool safe) {
+void Situation::AddAccounts(const std::vector<RawAccount> &raw, BuildMode mode) {
   data_->accounts_.reserve(raw.size());
   for (auto &ra : raw) {
     Account a(new Account::Data);
@@ -170,72 +176,82 @@ void Situation::AddAccounts(const std::vector<RawAccount> &raw, bool safe) {
     a.data_->id = Id<Account>(ra.id_);
     a.data_->alloc = ra.alloc_;
   }
-  SortAndVerify(&data_->accounts_, safe);
+  SortAndVerify(&data_->accounts_, mode);
 }
 
-void Situation::AddBatches(const std::vector<RawBatch> &raw, bool safe) {
+void Situation::AddBatches(const std::vector<RawBatch> &raw, BuildMode mode) {
   data_->batches_.reserve(raw.size());
-  for (auto &rb : raw) {
-    Batch b(new Batch::Data);
-    data_->batches_.push_back(b);
+  for (auto &raw_batch : raw) {
+    if (mode == BuildMode::kDropInvalid && !(*this)[Id<Account>(raw_batch.account_)])
+      continue;
 
-    b.data_->id = Id<Batch>(rb.id_);
-    b.data_->reward = rb.reward_;
-    b.data_->timely_reward = rb.timely_reward_;
-    b.data_->job_reward = rb.job_reward_;
-    b.data_->job_timely_reward = rb.job_timely_reward_;
-    b.data_->duration = rb.duration_;
-    b.data_->due_time = rb.due_;
-    if (Account a = (*this)[Id<Account>(rb.account_)]) {
-      b.data_->account = a;
-      a.data_->batches.push_back(b);
-    } else if (safe || rb.account_ != kIdNone) {
-      Exception() << "Invalid relation: Batch " << rb.id_ << " refers to nonexistent Account "
-          << rb.account_ << Throw();
+    Batch batch(new Batch::Data);
+    data_->batches_.push_back(batch);
+
+    batch.data_->id = Id<Batch>(raw_batch.id_);
+    batch.data_->reward = raw_batch.reward_;
+    batch.data_->timely_reward = raw_batch.timely_reward_;
+    batch.data_->job_reward = raw_batch.job_reward_;
+    batch.data_->job_timely_reward = raw_batch.job_timely_reward_;
+    batch.data_->duration = raw_batch.duration_;
+    batch.data_->due_time = raw_batch.due_;
+    if (Account account = (*this)[Id<Account>(raw_batch.account_)]) {
+      batch.data_->account = account;
+      account.data_->batches.push_back(batch);
+    } else if (mode == BuildMode::kSafe
+        || (mode == BuildMode::kIgnoreMissing && raw_batch.account_ != kIdNone)) {
+      Exception() << "Invalid relation: Batch " << raw_batch.id_
+          << " refers to nonexistent Account " << raw_batch.account_ << Throw();
     }
   }
-  SortAndVerify(&data_->batches_, safe);
+  SortAndVerify(&data_->batches_, mode);
 }
 
-void Situation::AddJobs(const std::vector<RawJob> &raw, bool safe) {
+void Situation::AddJobs(const std::vector<RawJob> &raw, BuildMode mode) {
   data_->jobs_.reserve(raw.size());
-  for (auto &rj : raw) {
-    Job j(new Job::Data);
-    data_->jobs_.push_back(j);
+  for (auto &raw_job : raw) {
+    if (mode == BuildMode::kDropInvalid
+        && !((*this)[Id<MachineSet>(raw_job.machine_set_)] && (*this)[Id<Batch>(raw_job.batch_)]))
+      continue;
 
-    j.data_->id = Id<Job>(rj.id_);
-    j.data_->duration = rj.duration_;
-    j.data_->context = rj.context_;
-    j.data_->start_time = rj.start_time_;
+    Job job(new Job::Data);
+    data_->jobs_.push_back(job);
 
-    if (Machine m = (*this)[Id<Machine>(rj.machine_)]) {
-      if (m.job())
-        Exception() << "Machine " << rj.machine_ << " has multiple jobs (" << rj.id_
-            << " and " << static_cast<IdType>(m.job().id()) << ")" << Throw();
-      j.data_->machine = m;
-      m.data_->job = j;
-    } else if (rj.machine_ != kIdNone) {
-      Exception() << "Invalid relation: Job " << static_cast<IdType>(j.id())
-          << " refers to nonexistent Machine " << rj.machine_ << Throw();
+    job.data_->id = Id<Job>(raw_job.id_);
+    job.data_->duration = raw_job.duration_;
+    job.data_->context = raw_job.context_;
+    job.data_->start_time = raw_job.start_time_;
+
+    if (Machine machine = (*this)[Id<Machine>(raw_job.machine_)]) {
+      if (machine.job())
+        Exception() << "Machine " << raw_job.machine_ << " has multiple jobs (" << raw_job.id_
+            << " and " << static_cast<IdType>(machine.job().id()) << ")" << Throw();
+      job.data_->machine = machine;
+      machine.data_->job = job;
+    } else if (mode != BuildMode::kDropInvalid && raw_job.machine_ != kIdNone) {
+      Exception() << "Invalid relation: Job " << static_cast<IdType>(job.id())
+          << " refers to nonexistent Machine " << raw_job.machine_ << Throw();
     }
 
-    if (MachineSet s = (*this)[Id<MachineSet>(rj.machine_set_)]) {
-      j.data_->machine_set = s;
-      s.data_->jobs.push_back(j);
-    } else if (safe || rj.machine_set_ != kIdNone) {
-      Exception() << "Invalid relation: Job " << static_cast<IdType>(j.id())
-          << " refers to nonexistent MachineSet " << rj.machine_set_ << Throw();
+    if (MachineSet set = (*this)[Id<MachineSet>(raw_job.machine_set_)]) {
+      job.data_->machine_set = set;
+      set.data_->jobs.push_back(job);
+    } else if (mode == BuildMode::kSafe
+        || (mode == BuildMode::kIgnoreMissing && raw_job.machine_set_ != kIdNone)) {
+      Exception() << "Invalid relation: Job " << raw_job.id_
+          << " refers to nonexistent MachineSet " << raw_job.machine_set_ << Throw();
     }
 
-    if (Batch b = (*this)[Id<Batch>(rj.batch_)]) {
-      j.data_->batch = b;
-      b.data_->jobs.push_back(j);
-    } else if (safe || rj.batch_ != kIdNone) {
-      Exception() << "Invalid relation: Job " << static_cast<IdType>(j.id())
-          << " refers to nonexistent Batch " << rj.batch_ << Throw();
+    if (Batch batch = (*this)[Id<Batch>(raw_job.batch_)]) {
+      job.data_->batch = batch;
+      batch.data_->jobs.push_back(job);
+    } else if (mode == BuildMode::kSafe
+        || (mode == BuildMode::kIgnoreMissing && raw_job.batch_ != kIdNone)) {
+      Exception() << "Invalid relation: Job " << raw_job.id_
+          << " refers to nonexistent Batch " << raw_job.batch_ << Throw();
     }
   }
-  SortAndVerify(&data_->jobs_, safe);
+  SortAndVerify(&data_->jobs_, mode);
 }
 
 }  // namespace lss
