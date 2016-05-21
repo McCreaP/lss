@@ -43,7 +43,7 @@ class FinishJob(Event):
         return "Finish job %s" % self.__job['id']
 
     def _execute_impl(self):
-        self.__state.finish_job(self.__job)
+        self.__state.finish_job(self._execution_time, self.__job)
 
 
 # finish_event = self.__state.try_to_take_job(self.__machine_id)

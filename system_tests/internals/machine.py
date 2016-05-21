@@ -24,6 +24,8 @@ class Machine:
         self.__taken_file = self.__lss_assignment_file + '-taken'
         self.__context = (-1, -1, -1)
         self.__context_changes_costs = context_changes_costs
+        self.finish_event_args = None
+        self.discarded_finish_events = set()
 
     def show(self):
         return '%s %s' % (self.__id, int(self.__state))
@@ -42,19 +44,23 @@ class Machine:
         job['real_start_time'] = now
         job['real_machine'] = self.__id
         duration = self.__calculate_setup_time(job) + job['expected_duration_barring_setup']
-        finish_event_args = [(now + duration, job)]
+        self.finish_event_args = (now + duration, job['id'])
         self.__context = (job['context1'], job['context2'], job['context3'])
-        LOGGER.debug('Job %s has been taken by machine: %s', job['id'], self.__id)
-        return finish_event_args
+        LOGGER.info('Job %s has been taken by machine: %s', job['id'], self.__id)
+        return [(now + duration, job)]
 
     def free(self):
         self.__state = MachineState.MACHINE_IDLE
+        self.finish_event_args = None
 
     def bring_to_life(self):
         self.__state = MachineState.MACHINE_IDLE
 
     def kill(self):
         self.__state = MachineState.MACHINE_DEAD
+        if self.finish_event_args:
+            self.discarded_finish_events.add(self.finish_event_args)
+            self.finish_event_args = None
 
     def __get_assigned_job(self, ready_jobs):
         os.rename(self.__lss_assignment_file, self.__taken_file)
