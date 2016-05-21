@@ -12,6 +12,7 @@ LOGGER = logging.getLogger('test_runner')
 class MachineState(IntEnum):
     MACHINE_IDLE = 0
     MACHINE_WORKING = 1
+    MACHINE_DEAD = 2
 
 
 class Machine:
@@ -48,6 +49,12 @@ class Machine:
 
     def free(self):
         self.__state = MachineState.MACHINE_IDLE
+
+    def bring_to_life(self):
+        self.__state = MachineState.MACHINE_IDLE
+
+    def kill(self):
+        self.__state = MachineState.MACHINE_DEAD
 
     def __get_assigned_job(self, ready_jobs):
         os.rename(self.__lss_assignment_file, self.__taken_file)

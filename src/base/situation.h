@@ -171,7 +171,7 @@ class ChangeCosts {
   ChangeCosts(const ChangeCosts &) = delete;
   ChangeCosts& operator=(const ChangeCosts &) = delete;
 
-  ChangeCosts(const std::vector<RawChangeCost> &raw, bool safe);
+  ChangeCosts(const std::vector<RawChangeCost> &raw, bool allow_missing);
 
   Cost cost_[Change::kNum] = {};
 
@@ -187,11 +187,15 @@ class Situation {
   using Batches = const std::vector<Batch>&;
   using Jobs = const std::vector<Job>&;
 
+  enum class BuildMode {
+    kSafe, kDropInvalid, kIgnoreMissing
+  };
+
   // Constructs an empty situation (no objects at all) with all change costs equal to 0.
   Situation();
 
-  // If `raw` is malformed std::invalid_argument will be thrown. For `raw` to be considered
-  // correct the following conditions must hold:
+  // Constructor behaves differently based on `mode`. If it is set to `kSafe` then
+  // std::invalid_argument will be thrown if any of the following conditions is not met:
   // - All objects must have non-default (!= kIdNone) and unique ids
   //   (amongst objects of the same type).
   // - All non-optional relations must be valid (!= kIdNone, the referenced object must exist).
@@ -199,12 +203,24 @@ class Situation {
   // - Fair sets must be disjoint.
   // - Each machine must have at most single job assigned to it.
   //
-  // If `safe` is set to false objects some constraints are relaxed:
+  // With `mode == kDropInvalid`:
+  // - If an optional relation is invalid (e.g. `MachineSet` references non-existent `Machine`),
+  //   it will be ignored.
+  // - If obligatory relation is invalid (e.g. `Job` references non-existent `Batch`),
+  //   whole object will be dropped. This might in turn lead to dropping even more objects
+  //   which referenced it.
+  //
+  // With `mode == kIgnoreMissing` all objects are included in the Situation but some constraints
+  // from safe mode are relaxed:
   // - Objects are allowed to have id == Id::kNone (such objects cannot be retrieved
   //   with operator[]).
   // - All relations are considered optional.
   // - Missing elements in `change_costs_` default to zero.
-  explicit Situation(const RawSituation &raw, bool safe = true);
+  explicit Situation(const RawSituation &raw, BuildMode mode = BuildMode::kSafe);
+
+  // DEPRECATED(kzyla): Use constructor with BuildMode instead (`safe == true` is the same
+  // `mode == kThrowOnErrors` and `safe == false` is the same as `mode == kIgnoreInvalid`).
+  explicit Situation(const RawSituation &raw, bool safe);
 
   Situation(const Situation &) = default;
   Situation& operator=(const Situation &) = default;
@@ -231,7 +247,8 @@ class Situation {
 
  private:
   struct Data {
-    Data(const std::vector<RawChangeCost> &raw, bool safe) : change_costs_(raw, safe) {}
+    Data(const std::vector<RawChangeCost> &raw, BuildMode mode)
+        : change_costs_(raw, mode == BuildMode::kIgnoreMissing) {}
 
     Time time_stamp_;
 
@@ -250,12 +267,12 @@ class Situation {
 
   void FreeMem();
 
-  void AddMachines(const std::vector<RawMachine> &raw, bool safe);
-  void AddMachineSets(const std::vector<RawMachineSet> &raw, bool safe);
-  void AddFairSets(const std::vector<RawFairSet> &raw, bool safe);
-  void AddAccounts(const std::vector<RawAccount> &raw, bool safe);
-  void AddBatches(const std::vector<RawBatch> &raw, bool safe);
-  void AddJobs(const std::vector<RawJob> &raw, bool safe);
+  void AddMachines(const std::vector<RawMachine> &raw, BuildMode mode);
+  void AddMachineSets(const std::vector<RawMachineSet> &raw, BuildMode mode);
+  void AddFairSets(const std::vector<RawFairSet> &raw, BuildMode mode);
+  void AddAccounts(const std::vector<RawAccount> &raw, BuildMode mode);
+  void AddBatches(const std::vector<RawBatch> &raw, BuildMode mode);
+  void AddJobs(const std::vector<RawJob> &raw, BuildMode mode);
 
   std::shared_ptr<Data> data_;
 };
@@ -319,7 +336,7 @@ struct Job::Data {
 };
 
 inline  Situation::Situation()
-    : data_(std::make_shared<Data>(std::vector<RawChangeCost>(), false)) {
+    : data_(std::make_shared<Data>(std::vector<RawChangeCost>(), BuildMode::kIgnoreMissing)) {
   // Possible optimization: make a single empty Data struct and share it across
   // default-constructed Situation objects.
 }

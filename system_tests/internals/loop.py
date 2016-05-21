@@ -1,8 +1,8 @@
 import logging
 from queue import PriorityQueue
 from internals import timer
-from internals.events import JobReady
-from internals.events import UseIdleMachines
+from internals.events import JobReady, MachineEvent, MachineSetEvent, FairSetEvent, UseIdleMachines, UpdateInput
+from internals.machine import MachineState
 from internals.skipper_api import SkipperApi
 from threading import Condition
 
@@ -11,26 +11,30 @@ LOGGER = logging.getLogger("test_runner")
 
 class EventLoop:
 
-    def __init__(self, story, state):
+    def __init__(self, story, state, machines_events_desc, fair_sets_events):
         self.__story = story
-        self.__events = PriorityQueue()
         self.__state = state
+        self.__machines_events_desc = machines_events_desc
+        self.__fair_sets_events_desc = fair_sets_events
+        self.__events = PriorityQueue()
         self.__progress_bar = ProgressBar(self.__story.get_raw('mint'), self.__story.get_raw('maxt'))
         self.__condition = Condition()
         self.__api_skipper = SkipperApi(self.stop_waiting)
 
     def run(self):
         self.__add_jobs_ready_events()
+        self.__add_machines_events()
+        self.__add_machine_sets_events()
+        self.__add_fair_sets_events()
         self.add_event(UseIdleMachines(timer.now(), self, self.__state))
+        self.add_event(UpdateInput(timer.now(), self, self.__state))
         while timer.now() < self.__story.get_raw('maxt'):
             event = self.__events.get()
             now = timer.now()
             if now < event.get_execution_time():
-                time_left = event.get_execution_time() - now
-                LOGGER.debug("Will wait for scheduler for %s s", str(time_left))
-                self.__condition.acquire()
-                self.__condition.wait(time_left)
-                self.__condition.release()
+                if type(event) is UpdateInput:
+                    time_left = event.get_execution_time() - now
+                    self.__wait_for(time_left)
                 timer.setup(event.get_execution_time())
             event.execute()
             self.__progress_bar.show_progress(now)
@@ -46,6 +50,25 @@ class EventLoop:
     def __add_jobs_ready_events(self):
         for job in self.__story.get_raw('jobs'):
             self.add_event(JobReady(job, self.__state))
+
+    def __add_machines_events(self):
+        for m_id, time, new_state in self.__machines_events_desc:
+            self.add_event(MachineEvent(m_id, time, new_state, self.__state))
+
+    def __add_machine_sets_events(self):
+        for ms_id, events in self.__story.get_raw('machine_set_events').items():
+            for time, changes in events:
+                self.add_event(MachineSetEvent(ms_id, time, changes, self.__state))
+
+    def __add_fair_sets_events(self):
+        for fs_id, time, new_machines, old_machines in self.__fair_sets_events_desc:
+            self.add_event(FairSetEvent(fs_id, time, new_machines, old_machines, self.__state))
+
+    def __wait_for(self, time):
+        LOGGER.debug("Will wait for scheduler for %s s", str(time))
+        self.__condition.acquire()
+        self.__condition.wait(time)
+        self.__condition.release()
 
 
 class ProgressBar:

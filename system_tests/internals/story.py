@@ -1,5 +1,4 @@
 class Story:
-
     def __init__(self, raw_story):
         self.__raw_history = raw_story
 

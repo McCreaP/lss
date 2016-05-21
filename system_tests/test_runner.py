@@ -31,6 +31,9 @@ def parse_args():
     parser.add_argument('-r', '--run-dir',
                         default='/home/vagrant/lss/system_tests/run',
                         help="Specify scheduler input directory (default: /home/vagrant/lss/system_tests/run)")
+    parser.add_argument('-w', '--without-run',
+                        action='store_true',
+                        help="Compute test result based on data stored in the scenario. Do not schedule jobs.")
     return parser.parse_args()
 
 
@@ -52,7 +55,8 @@ def generate_story_from_yaml(test_data_path):
         pickle.dump(story, f)
 
 
-def run_single_test(test_name, run_dir, scheduler_path, verbose):
+def run_single_test(test_name, args):
+    scheduler_path = os.path.join(os.curdir, args.scheduler)
     with LoggerConfig.test_file_handler(test_name) as test_log_dir:
         test_data_path = os.path.join(TESTS_DATA_PATH, test_name)
         if os.path.exists(test_data_path):
@@ -66,23 +70,31 @@ def run_single_test(test_name, run_dir, scheduler_path, verbose):
             return
         LOGGER.info("Test: %s ... ", test_name)
         test = Test(os.path.join(TESTS_DATA_PATH, test_name),
-                    run_dir,
+                    args.run_dir,
                     scheduler_path,
                     test_log_dir,
-                    verbose)
-        test.run()
+                    args.verbose)
+        if not args.without_run:
+            test.run()
+        else:
+            test.process_result(take_finished_jobs_from_story=True)
+
         if test.has_failed:
             LOGGER.error("Test: %s ... FAILED", test_name)
         else:
+            with open('result', 'wb') as f:
+                pickle.dump(test.result[1], f)
+            with open('quasi', 'wb') as f:
+                pickle.dump(test.quasi_optimal_result[1], f)
             LOGGER.info("Objective function: %f (%f%%)",
-                        test.result,
-                        test.result * 100 / test.quasi_optimal_result)
+                        test.result[0],
+                        test.result[0] * 100 / test.quasi_optimal_result[0])
             LOGGER.info("Test: %s ... PASSED", test_name)
 
 
-def run_all_tests(run_dir, scheduler_path, verbose):
+def run_all_tests(args):
     for test_name in get_all_tests_names():
-        run_single_test(test_name, run_dir, scheduler_path, verbose)
+        run_single_test(test_name, args)
         LOGGER.info(60 * '=')
 
 
@@ -97,11 +109,10 @@ def main():
             print(test_name)
         exit(0)
 
-    scheduler_path = os.path.join(os.curdir, args.scheduler)
     if args.test_name:
-        run_single_test(args.test_name, args.run_dir, scheduler_path, args.verbose)
+        run_single_test(args.test_name, args)
     else:
-        run_all_tests(args.run_dir, scheduler_path, args.verbose)
+        run_all_tests(args)
 
 
 if __name__ == "__main__":
