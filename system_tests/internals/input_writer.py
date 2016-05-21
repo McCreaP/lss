@@ -75,6 +75,8 @@ def show_batch(batch):
         batch['account'],
         batch['A'],
         batch['B'],
+        batch['C'],
+        batch['D'],
         batch['T'],
         batch['due']
     ])
