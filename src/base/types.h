@@ -1,15 +1,15 @@
 #ifndef LSS_BASE_TYPES_H_
 #define LSS_BASE_TYPES_H_
 
-#include <cstdlib>
-
 #include <array>
+#include <cstdint>
+#include <cstdlib>
 #include <limits>
 
 namespace lss {
 
 // More adequate types might be substituted in the future.
-using IdType = int;
+using IdType = int64_t;
 using FloatType = double;
 using Time = double;
 using Duration = double;
@@ -26,13 +26,11 @@ static constexpr IdType kIdNone = std::numeric_limits<IdType>::min();
 template<class T>
 class Id {
  public:
-  static constexpr int kNone = kIdNone;
-
   Id() = default;
-  explicit Id(int id) : id_(id) {}
+  explicit Id(IdType id) : id_(id) {}
 
-  explicit operator int() const { return id_; }
-  explicit operator bool() const { return id_ != kNone; }
+  explicit operator IdType() const { return id_; }
+  explicit operator bool() const { return id_ != kIdNone; }
 
   friend bool operator==(Id lhs, Id rhs) { return lhs.id_ == rhs.id_; }
   friend bool operator!=(Id lhs, Id rhs) { return lhs.id_ != rhs.id_; }
@@ -42,7 +40,7 @@ class Id {
   friend bool operator>=(Id lhs, Id rhs) { return lhs.id_ >= rhs.id_; }
 
  private:
-  int id_ = kNone;
+  IdType id_ = kIdNone;
 };
 
 class Context {
@@ -112,7 +110,9 @@ namespace std {
 
 template<class T>
 struct hash<lss::Id<T>> {
-  size_t operator()(const lss::Id<T> &x) const { return hash<int>()(static_cast<int>(x)); }
+  size_t operator()(const lss::Id<T> &x) const {
+    return hash<lss::IdType>()(static_cast<lss::IdType>(x));
+  }
 };
 
 template<>

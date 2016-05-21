@@ -6,13 +6,15 @@
 #include "gmock/gmock.h"
 #include "pstreams/pstream.h"
 
+#include "base/types.h"
+
 namespace lss {
 namespace io {
 
 class Writer {
  public:
-  virtual bool Assign(int machine_id, int job_id) = 0;
-  virtual bool Unassign(int machine_id) = 0;
+  virtual bool Assign(IdType machine_id, IdType job_id) = 0;
+  virtual bool Unassign(IdType  machine_id) = 0;
   virtual ~Writer() = default;
 };
 
@@ -24,11 +26,11 @@ class BasicWriter : public Writer {
 
   // Returns true on success. The assignment might fail if there is already
   // a pending assignment but that's not the only possibility.
-  bool Assign(int machine_id, int job_id) override;
+  bool Assign(IdType machine_id, IdType job_id) override;
 
   // Attempts to cancel a pending assignment. Returns false upon failure
   // or if there is no pending assignment.
-  bool Unassign(int machine_id) override;
+  bool Unassign(IdType machine_id) override;
 
  private:
   std::string output_path_;
@@ -36,8 +38,8 @@ class BasicWriter : public Writer {
 
 class WriterMock : public Writer {
  public:
-  MOCK_METHOD2(Assign, bool(int, int));
-  MOCK_METHOD1(Unassign, bool(int));
+  MOCK_METHOD2(Assign, bool(IdType, IdType));
+  MOCK_METHOD1(Unassign, bool(IdType));
 };
 
 void NotifyDriverIFinishedCompute();

@@ -107,7 +107,8 @@ int main(int argc, char **argv) {
   } else if (config["algorithm"].as<string>() == "genetic") {
     algorithm = BuildGeneticAlgorithm();
   } else {
-    LOG(ERROR) << "Unknown algorithm (valid values for algorithm flag are: genetic, local_search)\n";
+    LOG(ERROR)
+        << "Unknown algorithm (valid values for algorithm flag are: genetic, local_search)\n";
     exit(1);
   }
 

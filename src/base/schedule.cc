@@ -152,15 +152,15 @@ bool AssignmentsHandler::TryUnassign(MachinesAssignments::iterator assignment) {
 
   machines_assignments_.erase(assignment);
   jobs_assignments_.erase(job_id);
-  bool successful_unassigned = writer_->Unassign(static_cast<int>(machine_id));
+  bool successful_unassigned = writer_->Unassign(static_cast<IdType>(machine_id));
   jobs_states_[job_id] =
       successful_unassigned ? JobAssignmentState::kUnassigned : JobAssignmentState::kTaken;
   return successful_unassigned;
 }
 
 bool AssignmentsHandler::TryAssign(Machine machine, Job job) {
-  int machine_id = static_cast<int>(machine.id());
-  int job_id = static_cast<int>(job.id());
+  IdType machine_id = static_cast<IdType>(machine.id());
+  IdType job_id = static_cast<IdType>(job.id());
   if (writer_->Assign(machine_id, job_id)) {
     machines_assignments_.insert(std::make_pair(machine.id(), job.id()));
     jobs_assignments_.insert(std::make_pair(job.id(), machine.id()));

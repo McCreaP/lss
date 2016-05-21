@@ -38,7 +38,7 @@ void SortAndVerify(std::vector<T> *vec, Situation::BuildMode mode) {
 
   for (size_t i = 1; i < vec->size(); ++i)
     if ((*vec)[i-1].id() == (*vec)[i].id() && (*vec)[i].id())
-      Exception() << "Multiple objects with the same id (" << static_cast<int>((*vec)[i].id())
+      Exception() << "Multiple objects with the same id (" << static_cast<IdType>((*vec)[i].id())
           << ")" << Throw();
 }
 

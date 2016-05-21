@@ -16,7 +16,7 @@ void BasicWriter::SetOutputPath(const std::string &output_path) {
   output_path_ = output_path;
 }
 
-bool BasicWriter::Assign(int machine_id, int job_id) {
+bool BasicWriter::Assign(IdType machine_id, IdType job_id) {
   VLOG(2) << "An attempt to assign job: " << job_id
     << " to the machine: " << machine_id << " is being made" << std::endl;
   const std::string path = output_path_ + std::to_string(machine_id);
@@ -58,7 +58,7 @@ bool BasicWriter::Assign(int machine_id, int job_id) {
   return false;
 }
 
-bool BasicWriter::Unassign(int machine_id) {
+bool BasicWriter::Unassign(IdType machine_id) {
   const std::string path = output_path_ + std::to_string(machine_id);
   int result;
   PLOG_IF(WARNING, result = remove(path.c_str())) << "Unassign failed";
