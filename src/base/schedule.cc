@@ -6,6 +6,7 @@
 #include <limits>
 #include <set>
 #include <unordered_set>
+#include <glog/logging.h>
 
 #include "base/situation.h"
 
@@ -39,9 +40,9 @@ double JobsIngredient(const Schedule &schedule,
                       Situation situation,
                       JobFinishTime *job_finish_time) {
   double result = 0.;
-  for (Machine machine : situation.machines()) {
+  for (const auto &assignment : schedule.GetAssignments()) {
     Time time = situation.time_stamp();
-    auto jobs = schedule.GetJobsAssignedToMachine(machine);
+    auto jobs = assignment.second;
     for (size_t i = 0; i < jobs.size(); ++i) {
       Job job = jobs[i];
       double change_cost = (i ? ChangeCost(situation, jobs[i - 1], job) : 0);
@@ -71,11 +72,20 @@ double BatchIngredient(Situation situation, const JobFinishTime &job_finish_time
 
 }  // namespace
 
+double ObjectiveFunction(const Schedule &schedule, Situation situation) {
+  JobFinishTime job_finish_time;
+  double result = JobsIngredient(schedule, situation, &job_finish_time);
+  result += BatchIngredient(situation, job_finish_time);
+  return result;
+}
+
 void AssignmentsHandler::AdjustAssignments(const Schedule &schedule, Situation situation) {
   RemoveNotPresentMachines(situation);
   RemoveNotPresentJobs(situation);
-  for (auto machine : situation.machines()) {
-    Job job_to_assign = FindJobToAssign(schedule, machine);
+  for (const auto &assignment : schedule.GetAssignments()) {
+    Machine machine = assignment.first;
+    auto jobs = assignment.second;
+    Job job_to_assign = FindJobToAssign(jobs);
     if (job_to_assign) {
       auto pending_assignment = machines_assignments_.find(machine.id());
       if (pending_assignment != machines_assignments_.end()) {
@@ -116,10 +126,9 @@ void AssignmentsHandler::RemoveNotPresentJobs(Situation situation) {
   }
 }
 
-Job AssignmentsHandler::FindJobToAssign(const Schedule &schedule, Machine machine) {
+Job AssignmentsHandler::FindJobToAssign(const Schedule::Jobs &jobs) {
   Job job_to_assign;
-  auto m_schedule = schedule.GetJobsAssignedToMachine(machine);
-  for (Job job : m_schedule) {
+  for (Job job : jobs) {
     if (CanBeAssigned(job)) {
       job_to_assign = job;
       break;
@@ -168,13 +177,6 @@ bool AssignmentsHandler::TryAssign(Machine machine, Job job) {
     return true;
   }
   return false;
-}
-
-double ObjectiveFunction(const Schedule &schedule, Situation situation) {
-  JobFinishTime job_finish_time;
-  double result = JobsIngredient(schedule, situation, &job_finish_time);
-  result += BatchIngredient(situation, job_finish_time);
-  return result;
 }
 
 }  // namespace lss

@@ -4,6 +4,7 @@
 #include <map>
 #include <unordered_map>
 #include <vector>
+#include <bits/unordered_set.h>
 
 #include "base/situation.h"
 #include "io/basic_output.h"
@@ -15,6 +16,7 @@ namespace lss {
 class Schedule {
  public:
   using Jobs = std::vector<Job>;
+  using Assignments = std::unordered_map<Machine, Jobs>;
 
   Schedule() = default;
 
@@ -30,12 +32,12 @@ class Schedule {
     schedule_[machine].push_back(job);
   }
 
-  const Jobs &GetJobsAssignedToMachine(Machine machine) const {
-    return schedule_.at(machine);
-  }
+  const Assignments &GetAssignments() const {
+    return schedule_;
+  };
 
  private:
-  std::unordered_map<Machine, Jobs> schedule_;
+  Assignments schedule_;
 };
 
 class AssignmentsHandler {
@@ -56,7 +58,7 @@ class AssignmentsHandler {
 
   void RemoveNotPresentMachines(Situation situation);
   void RemoveNotPresentJobs(Situation situation);
-  Job FindJobToAssign(const Schedule &schedule, Machine machine);
+  Job FindJobToAssign(const Schedule::Jobs &jobs);
   bool CanBeAssigned(Job job);
   bool TryAssign(Machine machine, Job job);
   bool TryUnassign(MachinesAssignments::iterator assignment);
