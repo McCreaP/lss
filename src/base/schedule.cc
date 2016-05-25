@@ -6,7 +6,8 @@
 #include <limits>
 #include <set>
 #include <unordered_set>
-#include <glog/logging.h>
+
+#include "glog/logging.h"
 
 #include "base/situation.h"
 

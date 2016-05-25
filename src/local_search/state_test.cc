@@ -123,13 +123,13 @@ TEST_F(StateTest, ToSchedule) {
   State state(situation_);
 
   std::vector<Job> expected;
-  EXPECT_EQ(expected, state.ToSchedule().GetJobsAssignedToMachine(machine_));
+  EXPECT_EQ(expected, state.ToSchedule().GetAssignments().at(machine_));
   state.Assign(machine_, job0_);
   expected.push_back(job0_);
-  EXPECT_EQ(expected, state.ToSchedule().GetJobsAssignedToMachine(machine_));
+  EXPECT_EQ(expected, state.ToSchedule().GetAssignments().at(machine_));
   state.Assign(machine_, job1_);
   expected.push_back(job1_);
-  EXPECT_EQ(expected, state.ToSchedule().GetJobsAssignedToMachine(machine_));
+  EXPECT_EQ(expected, state.ToSchedule().GetAssignments().at(machine_));
 }
 
 TEST_F(StateTest, GetMachine) {

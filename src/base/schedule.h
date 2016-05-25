@@ -4,10 +4,9 @@
 #include <map>
 #include <unordered_map>
 #include <vector>
-#include <bits/unordered_set.h>
+#include <unordered_set>
 
 #include "base/situation.h"
-#include "io/basic_output.h"
 
 namespace lss {
 
@@ -34,7 +33,7 @@ class Schedule {
 
   const Assignments &GetAssignments() const {
     return schedule_;
-  };
+  }
 
  private:
   Assignments schedule_;

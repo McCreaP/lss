@@ -1,5 +1,5 @@
-#ifndef LSS_IO_ASSIGNMEN_THANDLER_H_
-#define LSS_IO_ASSIGNMEN_THANDLER_H_
+#ifndef LSS_IO_ASSIGNMENT_HANDLER_H_
+#define LSS_IO_ASSIGNMENT_HANDLER_H_
 
 #include "base/schedule.h"
 #include "io/basic_output.h"
@@ -39,4 +39,4 @@ class AssignmentsHandler {
 }  // namespace io
 }  // namespace lss
 
-#endif  // LSS_IO_ASSIGNMEN_THANDLER_H_
+#endif  // LSS_IO_ASSIGNMENT_HANDLER_H_

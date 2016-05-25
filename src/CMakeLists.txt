@@ -11,10 +11,11 @@ add_subdirectory(genetic)
 add_subdirectory(greedy)
 add_subdirectory(io)
 add_subdirectory(local_search)
+add_subdirectory(greedy_new)
 
 target_link_libraries(
         lss
-        base genetic greedy io local_search permutation_chromosome
+        base genetic greedy io local_search permutation_chromosome greedy_new
         glog ${Boost_LIBRARIES}
 )
 
