@@ -1,4 +1,4 @@
-#include "base/schedule.h"
+#include "io/assignment_handler.h"
 
 #include <vector>
 
@@ -8,6 +8,7 @@
 #include "genetic/test_utils.h"
 
 namespace lss {
+namespace io {
 
 using ::testing::Test;
 using ::testing::Return;
@@ -85,6 +86,5 @@ TEST_F(AssignmentsHandlerShould, not_unasigned_job_from_previous_machine_if_take
   assignments_handler.AdjustAssignments(new_schedule, situation_);
 }
 
-TEST_F(AssignmentsHandlerShould, adopt_to_new_situation) {}
-
+}  // namespace io
 }  // namespace lss
