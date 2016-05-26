@@ -83,5 +83,5 @@ class ProgressBar:
         progress = int(100 * (now - self.__min_t) / self.__timespan)
         if self.__progress_shown != progress:
             self.__progress_shown = progress
-            LOGGER.debug('%s%% of the simulated period elapsed (of %s s)',
+            LOGGER.info1('%s%% of the simulated period elapsed (of %s s)',
                          progress, self.__timespan)

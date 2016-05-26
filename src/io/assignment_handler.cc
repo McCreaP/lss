@@ -1,3 +1,4 @@
+#include <glog/logging.h>
 #include "io/assignment_handler.h"
 
 namespace lss {
@@ -19,6 +20,7 @@ void AssignmentsHandler::AdjustAssignments(const Schedule &schedule, Situation s
 
 
 void AssignmentsState::RemoveNotPresentJobs(Situation situation) {
+  VLOG(1) << "Taken jobs size: " << taken_jobs_.size();
   std::unordered_set<Id<Job>> jobs;
   for (Job job : situation.jobs()) {
     jobs.insert(job.id());
@@ -53,6 +55,8 @@ bool AssignmentsHandler::CanBeAssigned(Job job) {
 }
 
 void AssignmentsState::RemoveNotPresentMachines(Situation situation) {
+  VLOG(1) << "Machine assignments size: " << machines_assignments_.size();
+  VLOG(1) << "Jobs assignments size: " << jobs_assignments_.size();
   std::unordered_set<Id<Machine>> machines;
   for (Machine machine : situation.machines()) {
     machines.insert(machine.id());
