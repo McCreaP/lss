@@ -48,7 +48,7 @@ TEST_F(AssignmentsHandlerShould, assign_job_to_machines_wrt_schedule) {
   assignments_handler.AdjustAssignments(schedule, situation_);
 }
 
-TEST_F(AssignmentsHandlerShould, unasigned_job_from_previous_machine_if_not_taken) {
+TEST_F(AssignmentsHandlerShould, unasign_job_from_previous_machine_if_not_taken) {
   Schedule old_schedule = BuildSchedule({{0}, {1}, {2}}, situation_);
   Schedule new_schedule = BuildSchedule({{2}, {1}, {0}}, situation_);
 
@@ -67,7 +67,7 @@ TEST_F(AssignmentsHandlerShould, unasigned_job_from_previous_machine_if_not_take
   assignments_handler.AdjustAssignments(new_schedule, situation_);
 }
 
-TEST_F(AssignmentsHandlerShould, not_unasigned_job_from_previous_machine_if_taken) {
+TEST_F(AssignmentsHandlerShould, not_unasign_job_from_previous_machine_if_taken) {
   Schedule old_schedule = BuildSchedule({{0}, {1}, {2}}, situation_);
   Schedule new_schedule = BuildSchedule({{1, 3}, {0}, {2}}, situation_);
 
