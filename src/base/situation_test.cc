@@ -343,14 +343,6 @@ TEST_F(SituationSafeThrowTest, MissingCost) {
   }, std::invalid_argument);
 }
 
-// Verify that Situation constructor throws when fair sets are not disjoint.
-TEST_P(SituationThrowTest, OverlappingFairSets) {
-  raw_.add(RawMachine().id(0)).add(RawFairSet().id(0).add(0)).add(RawFairSet().id(1).add(0));
-  EXPECT_THROW({
-    Situation(raw_, GetParam());
-  }, std::invalid_argument);
-}
-
 // Verify that Situation constructor throws when a machine has more than one job assigned.
 TEST_P(SituationThrowTest, MachineWithMultipleJobs) {
   raw_.add(RawMachine().id(0)).add(RawMachineSet().id(0).add(0));
@@ -426,6 +418,30 @@ TEST(SituationTest, MissingCosts) {
   EXPECT_EQ(0, s.change_costs().cost(Change(1, 0, 1)));
   EXPECT_EQ(0, s.change_costs().cost(Change(1, 1, 0)));
   EXPECT_EQ(0, s.change_costs().cost(Change(1, 1, 1)));
+}
+
+// Verify that Situation constructor behaves as expected (depending on mode)
+// when fair sets are not disjoint.
+TEST(SituationTest, OverlappingFairSets) {
+  auto raw = RawSituation()
+      .add(RawMachine().id(0))
+      .add(RawFairSet().id(0).add(0))
+      .add(RawFairSet().id(1).add(0));
+  raw.change_costs_ = sample.change_costs_;
+
+  EXPECT_THROW({
+    Situation(raw, Situation::BuildMode::kSafe);
+  }, std::invalid_argument);
+
+  EXPECT_THROW({
+    Situation(raw, Situation::BuildMode::kIgnoreMissing);
+  }, std::invalid_argument);
+
+  auto situation = Situation(raw, Situation::BuildMode::kDropInvalid);
+  auto machine = situation[Id<Machine>(0)];
+  auto set = [&situation](IdType id) { return situation[Id<FairSet>(id)]; };
+  EXPECT_TRUE(set(0).machines().size() == 0 || set(1).machines().size() == 0);
+  EXPECT_EQ(machine, machine.fair_set().machines().front());
 }
 
 }  // namespace
