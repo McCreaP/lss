@@ -17,9 +17,15 @@ INFO_1 = logging.INFO - 1
 logging.addLevelName(INFO_1, 'INFO_1')
 
 
+def _info1(self, message, *args, **kwargs):
+  self._log(INFO_1, message, args, **kwargs)
+logging.Logger.info1 = _info1
+
+
 def info1(message, *args, **kwargs):
     logging.root._log(INFO_1, message, args, **kwargs)
 logging.info1 = info1
+
 
 VERBOSITY_TO_LOG_LEVEL = {
     0: logging.INFO,
