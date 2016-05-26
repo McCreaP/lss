@@ -5,12 +5,11 @@
 #include "glog/logging.h"
 
 #include "greedy_new/algorithm.h"
-#include "greedy_new/batch_wrapper.h"
 
 namespace lss {
 namespace greedy_new {
 
-Schedule GreedyAlgorithm::GreedyAlgorithmRunner::Run() {
+Schedule GreedyAlgorithm::Runner::Run() {
   std::vector<BatchWrapper> batches;
   for (Batch batch : situation_.batches()) {
     batches.push_back(BatchWrapper(batch));
@@ -22,7 +21,7 @@ Schedule GreedyAlgorithm::GreedyAlgorithmRunner::Run() {
   return schedule_;
 }
 
-void GreedyAlgorithm::GreedyAlgorithmRunner::AssignJobsFromBatch(const BatchWrapper &batch) {
+void GreedyAlgorithm::Runner::AssignJobsFromBatch(const BatchWrapper &batch) {
   for (Job job : batch.GetSortedJobs()) {
     Machine best_machine = FindBestMachine(job);
     if (best_machine) {
@@ -32,7 +31,7 @@ void GreedyAlgorithm::GreedyAlgorithmRunner::AssignJobsFromBatch(const BatchWrap
   }
 }
 
-Machine GreedyAlgorithm::GreedyAlgorithmRunner::FindBestMachine(Job job) const {
+Machine GreedyAlgorithm::Runner::FindBestMachine(Job job) const {
   double min_context_change_cost = std::numeric_limits<double>::max();
   Machine best_machine;
   for (Machine machine : job.machine_set().machines()) {

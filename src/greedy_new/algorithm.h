@@ -13,13 +13,13 @@ class GreedyAlgorithm: public Algorithm {
  public:
   Schedule Run(__attribute__((unused)) const Schedule &prev_schedule,
                Situation new_situation) override {
-    return GreedyAlgorithmRunner(new_situation).Run();
+    return Runner(new_situation).Run();
   }
 
  private:
-  class GreedyAlgorithmRunner {
+  class Runner {
    public:
-    explicit GreedyAlgorithmRunner(Situation situation) : situation_(situation) {}
+    explicit Runner(Situation situation) : situation_(situation) {}
     Schedule Run();
 
    private:
