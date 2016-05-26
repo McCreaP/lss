@@ -149,18 +149,29 @@ void Situation::AddFairSets(const std::vector<RawFairSet> &raw, BuildMode mode) 
 
     set.data_->id = Id<FairSet>(raw_set.id_);
     set.data_->machines.reserve(raw_set.machines_.size());
-    for (IdType m_id : raw_set.machines_) {
-      if (Machine machine = (*this)[Id<Machine>(m_id)]) {
-        if (machine.fair_set())
+    for (IdType machine_id : raw_set.machines_) {
+      Machine machine = (*this)[Id<Machine>(machine_id)];
+
+      if (!machine) {
+        bool ok = false;
+        ok |= mode == BuildMode::kDropInvalid;
+        ok |= mode == BuildMode::kIgnoreMissing && machine_id == kIdNone;
+        if (!ok)
+          Exception() << "Invalid relation: FairSet " << static_cast<IdType>(set.id())
+              << " refers to nonexistent Machine " << machine_id << Throw();
+      }
+
+      if (machine && machine.fair_set()) {
+        if (mode != BuildMode::kDropInvalid)
           Exception() << "FairSets " << raw_set.id_ << " and "
               << static_cast<IdType>(machine.fair_set().id()) << " overlap on Machine "
-              << m_id << Throw();
+              << machine_id << Throw();
+        machine = Machine();
+      }
+
+      if (machine) {
         set.data_->machines.push_back(machine);
         machine.data_->fair_set = set;
-      } else if (mode == BuildMode::kSafe
-          || (mode == BuildMode::kIgnoreMissing && m_id != kIdNone)) {
-        Exception() << "Invalid relation: FairSet " << static_cast<IdType>(set.id())
-            << " refers to nonexistent Machine " << m_id << Throw();
       }
     }
   }
