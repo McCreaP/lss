@@ -23,7 +23,7 @@ LSS_INPUT_NAME = 'input'
 
 
 class Test: #pylint: disable=R0903
-    def __init__(self, test_data_path, run_dir, lss_executable_path, log_dir, verbose, algorithm="genetic"):
+    def __init__(self, test_data_path, run_dir, lss_executable_path, algorithm, log_dir, verbose):
         self.has_failed = False
         self.__lss_input_dir = os.path.join(run_dir, LSS_INPUT_DIR)
         self.__lss_input_path = os.path.join(self.__lss_input_dir, LSS_INPUT_NAME)

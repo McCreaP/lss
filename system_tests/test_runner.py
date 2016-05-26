@@ -20,6 +20,9 @@ def parse_args():
     parser.add_argument('-s', '--scheduler',
                         default='/home/vagrant/lss/bin/lss',
                         help="The scheduler executable path (default: /home/vagrant/lss/bin/lss)")
+    parser.add_argument('-a', '--algorithm',
+                        default='greedy',
+                        help="Choose algorithm to run (genetic/local_search/greedy) (default greedy)")
     parser.add_argument('-t', '--test-name',
                         help="The name of a test to run. If it was not specified, all tests will be run")
     parser.add_argument('-l', '--list',
@@ -72,6 +75,7 @@ def run_single_test(test_name, args):
         test = Test(os.path.join(TESTS_DATA_PATH, test_name),
                     args.run_dir,
                     scheduler_path,
+                    args.algorithm,
                     test_log_dir,
                     args.verbose)
         if not args.without_run:
