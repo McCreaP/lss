@@ -77,12 +77,14 @@ class Test: #pylint: disable=R0903
         if take_finished_jobs_from_story:
             finished_jobs = self.__finished_jobs_in_story()
         raw_history = self.__state.gather_history(finished_jobs)
-        self.__write_history_to_files(raw_history)
 
         history = History(raw_history, self.__story.get_raw('jobs'), self.__machines_events, self.__fair_sets_events)
-        self.result = ObjectiveFunction(history).compute()
+        self.result, result_plot = ObjectiveFunction(history).compute()
+        self.quasi_optimal_result, quasi_plot = self.__determine_quasi_optimal_result()
 
-        self.__determine_quasi_optimal_result()
+        self.__write_to_file('history', history)
+        self.__write_to_file('result_plot', result_plot)
+        self.__write_to_file('quasi_plot', quasi_plot)
 
     def __prepare_machines_events(self):
         for m_id, events in self.__story.get_raw('machine_events').items():
@@ -130,7 +132,7 @@ class Test: #pylint: disable=R0903
                 finished_jobs.append(job)
         raw_history = self.__state.gather_history(finished_jobs)
         history = History(raw_history, self.__story.get_raw('jobs'), self.__machines_events, self.__fair_sets_events)
-        self.quasi_optimal_result = ObjectiveFunction(history, imbalance_factor=0).compute()
+        return ObjectiveFunction(history, imbalance_factor=0).compute()
 
     def __finished_jobs_in_story(self):
         mint = self.__story.get_raw('mint')
@@ -143,9 +145,7 @@ class Test: #pylint: disable=R0903
                 job['real_duration'] + job['real_start_time'] <= maxt
         ]
 
-    def __write_history_to_files(self, raw_history):
-        log_file = os.path.join(self.__log_dir, 'history')
+    def __write_to_file(self, file_name, obj):
+        log_file = os.path.join(self.__log_dir, file_name)
         with open(log_file, 'wb') as f:
-            pickle.dump(raw_history, f)
-        with open(log_file + '.json', 'wt') as f:
-            json.dump(raw_history, f, indent=2)
+            pickle.dump(obj, f)

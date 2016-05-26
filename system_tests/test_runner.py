@@ -86,13 +86,9 @@ def run_single_test(test_name, args):
         if test.has_failed:
             LOGGER.error("Test: %s ... FAILED", test_name)
         else:
-            with open('result', 'wb') as f:
-                pickle.dump(test.result[1], f)
-            with open('quasi', 'wb') as f:
-                pickle.dump(test.quasi_optimal_result[1], f)
             LOGGER.info("Objective function: %f (%f%%)",
-                        test.result[0],
-                        test.result[0] * 100 / test.quasi_optimal_result[0])
+                        test.result,
+                        test.result * 100 / test.quasi_optimal_result)
             LOGGER.info("Test: %s ... PASSED", test_name)
 
 
