@@ -79,10 +79,10 @@ class Test: #pylint: disable=R0903
         raw_history = self.__state.gather_history(finished_jobs)
 
         history = History(raw_history, self.__story.get_raw('jobs'), self.__machines_events, self.__fair_sets_events)
+        self.__write_to_file('history', history)
         self.result, result_plot = ObjectiveFunction(history).compute()
         self.quasi_optimal_result, quasi_plot = self.__determine_quasi_optimal_result()
 
-        self.__write_to_file('history', history)
         self.__write_to_file('result_plot', result_plot)
         self.__write_to_file('quasi_plot', quasi_plot)
 
