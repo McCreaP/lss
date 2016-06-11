@@ -1,6 +1,8 @@
+#include <chrono>
 #include <iostream>
 #include <memory>
 #include <string>
+#include <thread>
 
 #include "boost/program_options.hpp"
 #include "glog/logging.h"
@@ -10,7 +12,9 @@
 #include "genetic/algorithm.h"
 #include "genetic/permutation_chromosome/moves_impl.h"
 #include "genetic/selector_impl.h"
+#include "greedy_new/algorithm.h"
 #include "local_search/algorithm.h"
+#include "io/assignment_handler.h"
 #include "io/basic_input.h"
 #include "io/basic_output.h"
 
@@ -20,6 +24,8 @@ using std::cout;
 using std::string;
 using lss::local_search::LocalSearchAlgorithm;
 using GeneticAlgorithm = lss::genetic::GeneticAlgorithm<lss::genetic::PermutationJobMachine>;
+using lss::greedy_new::GreedyAlgorithm;
+using namespace std::chrono_literals;
 
 static
 void ConfigLogger(char *argv[], int verbose) {
@@ -40,7 +46,8 @@ program_opt::variables_map ProcessCommandLine(int argc, char **argv) {
       ("input,i", program_opt::value<string>()->required(), "Set input file path")
       ("assignments,a", program_opt::value<string>()->required(), "Set assignments directory path")
       ("verbose,v", program_opt::value<int>(), "Set verbosity level")
-      ("algorithm", program_opt::value<string>(), "Choose algorithm to run (genetic/local_search)");
+      ("algorithm", program_opt::value<string>(),
+       "Choose algorithm to run (genetic/local_search/greedy)");
   program_opt::store(program_opt::parse_command_line(argc, argv, desc), variables_map);
 
   if (variables_map.count("help")) {
@@ -61,8 +68,8 @@ std::unique_ptr<GeneticAlgorithm> BuildGeneticAlgorithm() {
   using lss::genetic::MutatorImpl;
   using lss::genetic::ConfigurableMoves;
 
-  int population_size = 50;
-  int number_of_generations = 1000;
+  int population_size = 20;
+  int number_of_generations = 100;
   double crossover_probability = 0.1;
   double mutation_probability = 0.01;
 
@@ -97,33 +104,36 @@ int main(int argc, char **argv) {
 
   lss::io::BasicReader reader(config["input"].as<string>());
   lss::io::BasicWriter writer(config["assignments"].as<string>());
-  lss::AssignmentsHandler assignments_handler(&writer);
-  lss::Situation situation;
+  lss::io::AssignmentsHandler assignments_handler(&writer);
   lss::Schedule schedule;
 
   std::unique_ptr<lss::Algorithm> algorithm;
-  if (config["algorithm"].as<string>() == "local_search") {
+  std::string algorithm_name = config["algorithm"].as<string>();
+  if (algorithm_name == "local_search") {
     algorithm = BuildLocalSearchAlgorithm();
-  } else if (config["algorithm"].as<string>() == "genetic") {
+  } else if (algorithm_name == "genetic") {
     algorithm = BuildGeneticAlgorithm();
+  } else if (algorithm_name == "greedy") {
+    algorithm = std::make_unique<GreedyAlgorithm>();
   } else {
     LOG(ERROR)
-        << "Unknown algorithm (valid values for algorithm flag are: genetic, local_search)\n";
+        << "Unknown algorithm (valid values for algorithm flag are: "
+            "genetic, local_search, greedy)\n";
     exit(1);
   }
 
   while (true) {
     lss::RawSituation raw;
-    while (!reader.Read(&raw))
+    while (!reader.Read(&raw)) {
       lss::io::NotifyDriverIFinishedCompute();
-    situation = lss::Situation(raw, lss::Situation::BuildMode::kDropInvalid);
-
-    VLOG(2) << "Run next iteration";
+      std::this_thread::sleep_for(100ms);
+    }
+    assignments_handler.AdjustRawSituation(&raw);
+    lss::Situation situation = lss::Situation(raw, lss::Situation::BuildMode::kDropInvalid);
     schedule = algorithm->Run(schedule, situation);
-
-    assignments_handler.AdjustAssignments(schedule, situation);
+    assignments_handler.AdjustAssignments(schedule);
   }
 
-  LOG(INFO) << "Scheduler stop";
-  return 0;
+  LOG(ERROR) << "Scheduler stop";
+  return 1;
 }

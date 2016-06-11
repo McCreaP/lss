@@ -20,6 +20,9 @@ def parse_args():
     parser.add_argument('-s', '--scheduler',
                         default='/home/vagrant/lss/bin/lss',
                         help="The scheduler executable path (default: /home/vagrant/lss/bin/lss)")
+    parser.add_argument('-a', '--algorithm',
+                        default='greedy',
+                        help="Choose algorithm to run (genetic/local_search/greedy) (default greedy)")
     parser.add_argument('-t', '--test-name',
                         help="The name of a test to run. If it was not specified, all tests will be run")
     parser.add_argument('-l', '--list',
@@ -72,6 +75,7 @@ def run_single_test(test_name, args):
         test = Test(os.path.join(TESTS_DATA_PATH, test_name),
                     args.run_dir,
                     scheduler_path,
+                    args.algorithm,
                     test_log_dir,
                     args.verbose)
         if not args.without_run:
@@ -82,13 +86,9 @@ def run_single_test(test_name, args):
         if test.has_failed:
             LOGGER.error("Test: %s ... FAILED", test_name)
         else:
-            with open('result', 'wb') as f:
-                pickle.dump(test.result[1], f)
-            with open('quasi', 'wb') as f:
-                pickle.dump(test.quasi_optimal_result[1], f)
             LOGGER.info("Objective function: %f (%f%%)",
-                        test.result[0],
-                        test.result[0] * 100 / test.quasi_optimal_result[0])
+                        test.result,
+                        test.result * 100 / test.quasi_optimal_result)
             LOGGER.info("Test: %s ... PASSED", test_name)
 
 

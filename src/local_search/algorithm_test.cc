@@ -31,7 +31,7 @@ TEST(LocalSearchAlgorithmTest, AllAssigned) {
   Schedule schedule(situation);
   schedule = algorithm.Run(schedule, situation);
 
-  auto jobs = schedule.GetJobsAssignedToMachine(situation[Id<Machine>(0)]);
+  auto jobs = schedule.GetAssignments().at(situation[Id<Machine>(0)]);
   EXPECT_EQ(situation.jobs().size(), jobs.size());
   for (auto job : situation.jobs()) {
     EXPECT_NE(jobs.end(), std::find(jobs.begin(), jobs.end(), job));
@@ -49,7 +49,7 @@ TEST(LocalSearchAlgorithm, CanImprove) {
   auto machine = situation[Id<Machine>(0)];
   auto job = [&situation](int id) { return situation[Id<Job>(id)]; };
   std::vector<Job> expected{job(0), job(2), job(3), job(1)};
-  EXPECT_EQ(expected, schedule.GetJobsAssignedToMachine(machine));
+  EXPECT_EQ(expected, schedule.GetAssignments().at(machine));
 }
 
 }  // namespace

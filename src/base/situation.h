@@ -223,7 +223,6 @@ class Situation {
   explicit Situation(const RawSituation &raw, bool safe);
 
   Situation(const Situation &) = default;
-  Situation& operator=(const Situation &) = default;
 
   ~Situation() { if (data_.unique()) FreeMem(); }
 

@@ -9,7 +9,7 @@
 namespace lss {
 namespace local_search {
 
-State::State(Situation s) : situation_(s) {
+State::State(Situation s) : situation_(s), eval_(0) {
   queue_[Machine()];
   for (auto m : situation_.machines()) queue_[m];
   for (auto j : situation_.jobs()) {

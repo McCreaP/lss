@@ -13,11 +13,31 @@ LOGGER = logging.getLogger("test_runner")
 COLOR_LOG_FORMAT = "%(log_color)s%(levelname)-8s%(reset)s | %(asctime)s | %(log_color)s%(message)s%(reset)s"
 MONOCHROMATIC_LOG_FORMAT = "%(levelname)-8s | %(asctime)s | %(message)s"
 
+INFO_1 = logging.INFO - 1
+logging.addLevelName(INFO_1, 'INFO_1')
+
+
+def _info1(self, message, *args, **kwargs):
+  self._log(INFO_1, message, args, **kwargs)
+logging.Logger.info1 = _info1
+
+
+def info1(message, *args, **kwargs):
+    logging.root._log(INFO_1, message, args, **kwargs)
+logging.info1 = info1
+
+
+VERBOSITY_TO_LOG_LEVEL = {
+    0: logging.INFO,
+    1: INFO_1,
+    2: logging.DEBUG
+}
+
 
 class LoggerConfig:
 
     @classmethod
-    def setup(cls, test_name, verbose=False):
+    def setup(cls, test_name, verbose=0):
         LOGGER.setLevel(logging.DEBUG)
         formatter = ColoredFormatter(COLOR_LOG_FORMAT)
 
@@ -31,10 +51,8 @@ class LoggerConfig:
         file_handeler.setFormatter(formatter)
 
         stream_handler = logging.StreamHandler()
-        if verbose:
-            stream_handler.setLevel(logging.DEBUG)
-        else:
-            stream_handler.setLevel(logging.INFO)
+        verbose = min(verbose, max(VERBOSITY_TO_LOG_LEVEL.keys()))
+        stream_handler.setLevel(VERBOSITY_TO_LOG_LEVEL[verbose])
         stream_handler.setFormatter(formatter)
 
         LOGGER.addHandler(stream_handler)

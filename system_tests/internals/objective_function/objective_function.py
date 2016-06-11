@@ -8,7 +8,7 @@ LOGGER = logging.getLogger('test_runner')
 
 class ObjectiveFunction:
 
-    def __init__(self, history, imbalance_factor=1):
+    def __init__(self, history, imbalance_factor=0):
         self.__history = history
         self.__events = PriorityQueue()
         self.__imbalance_factor = imbalance_factor
@@ -38,11 +38,13 @@ class ObjectiveFunction:
 
     def __add_machine_events(self):
         for m_id, time, new_state in self.__history.machine_events:
-            self.__events.put(MachineEvent(m_id, time, new_state))
+            self.__events.put(MachineEvent(m_id, time, new_state, self.__imbalance_factor))
 
     def __add_fair_service_events(self):
         for fs_id, time, new_machines, old_machines in self.__history.fair_sets_events:
-            self.__events.put(FairSetEvent(fs_id, time, new_machines, old_machines))
+            self.__events.put(
+                FairSetEvent(fs_id, time, new_machines, old_machines, self.__imbalance_factor)
+            )
 
     # Just for computing an imbalance ingredient at the end of the interval
     def __add_dummy_events(self):

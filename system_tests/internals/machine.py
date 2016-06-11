@@ -46,7 +46,7 @@ class Machine:
         duration = self.__calculate_setup_time(job) + job['expected_duration_barring_setup']
         self.finish_event_args = (now + duration, job['id'])
         self.__context = (job['context1'], job['context2'], job['context3'])
-        LOGGER.info('Job %s has been taken by machine: %s', job['id'], self.__id)
+        LOGGER.info1('Job %s has been taken by machine: %s', job['id'], self.__id)
         return [(now + duration, job)]
 
     def free(self):
@@ -75,6 +75,6 @@ class Machine:
 
     def __calculate_setup_time(self, job):
         return self.__context_changes_costs[(
-            1 if self.__context[0] == job['context1'] else 0,
-            1 if self.__context[1] == job['context2'] else 0,
-            1 if self.__context[2] == job['context3'] else 0)]
+            0 if self.__context[0] == job['context1'] or self.__context[0] == -1 else 1,
+            0 if self.__context[1] == job['context2'] or self.__context[1] == -1 else 1,
+            0 if self.__context[2] == job['context3'] or self.__context[2] == -1 else 1)]

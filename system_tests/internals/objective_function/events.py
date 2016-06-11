@@ -76,10 +76,11 @@ class FinishJob(Event):
 
 
 class MachineEvent(Event):
-    def __init__(self, machine, time, new_state):
+    def __init__(self, machine, time, new_state, imbalance_factor):
         super(MachineEvent, self).__init__(time)
         self.__machine = machine
         self.__new_state = new_state
+        self.__imbalance_factor = imbalance_factor
 
     def __str__(self):
         return "Machine event, machine id: %s, new state: %s, at %s" % \
@@ -87,17 +88,18 @@ class MachineEvent(Event):
 
     def _execute_impl(self):
         if self.__new_state == MachineState.MACHINE_DEAD:
-            return self.__machine.dead(self._execution_time)
+            return -self.__imbalance_factor * self.__machine.dead(self._execution_time)
         else:
-            return self.__machine.idle(self._execution_time)
+            return -self.__imbalance_factor * self.__machine.idle(self._execution_time)
 
 
 class FairSetEvent(Event):
-    def __init__(self, fair_set, time, new_machines, old_machines):
+    def __init__(self, fair_set, time, new_machines, old_machines, imbalance_factor):
         super(FairSetEvent, self).__init__(time)
         self.__fair_set = fair_set
         self.__new_machines = new_machines
         self.__old_machines = old_machines
+        self.__imbalance_factor = imbalance_factor
 
     def __str__(self):
         return "Fair machine set event: %s at %s" % (str(self.__fair_set), self._execution_time)
@@ -110,4 +112,4 @@ class FairSetEvent(Event):
         for machine in self.__old_machines:
             value += self.__fair_set.remove_machine(machine, self._execution_time)
             machine.fair_machine_set = None
-        return value
+        return -self.__imbalance_factor * value

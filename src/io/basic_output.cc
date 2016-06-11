@@ -49,7 +49,7 @@ bool BasicWriter::Assign(IdType machine_id, IdType job_id) {
     PLOG_IF(WARNING, !ok) << "Rename failed";
   }
   if (ok) {
-    VLOG(1) << "Job: " << job_id << " assigned to machine: " << machine_id;
+    VLOG(2) << "Job: " << job_id << " assigned to machine: " << machine_id;
     return true;
   }
 
@@ -61,12 +61,22 @@ bool BasicWriter::Assign(IdType machine_id, IdType job_id) {
 bool BasicWriter::Unassign(IdType machine_id) {
   const std::string path = output_path_ + std::to_string(machine_id);
   int result;
-  PLOG_IF(WARNING, result = remove(path.c_str())) << "Unassign failed";
+  PLOG_IF(INFO, result = remove(path.c_str())) << "Unassign failed";
   if (result == 0) {
-    VLOG(1) << "Job unassigned from machine: " << machine_id;
+    VLOG(2) << "Job unassigned from machine: " << machine_id;
     return true;
   }
   return false;
+}
+
+bool BasicWriter::DoesAssignmentExist(IdType machine_id) {
+  const std::string path = output_path_ + std::to_string(machine_id);
+  int fd = open(path.c_str(), O_RDONLY, S_IRUSR);
+  if (fd == -1) {
+    return false;
+  }
+  PLOG_IF(WARNING, close(fd) == -1) << "Close failed";
+  return true;
 }
 
 void NotifyDriverIFinishedCompute() {

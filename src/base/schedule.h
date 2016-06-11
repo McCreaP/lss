@@ -4,9 +4,9 @@
 #include <map>
 #include <unordered_map>
 #include <vector>
+#include <unordered_set>
 
 #include "base/situation.h"
-#include "io/basic_output.h"
 
 namespace lss {
 
@@ -15,6 +15,7 @@ namespace lss {
 class Schedule {
  public:
   using Jobs = std::vector<Job>;
+  using Assignments = std::unordered_map<Machine, Jobs>;
 
   Schedule() = default;
 
@@ -30,41 +31,12 @@ class Schedule {
     schedule_[machine].push_back(job);
   }
 
-  const Jobs &GetJobsAssignedToMachine(Machine machine) const {
-    return schedule_.at(machine);
+  const Assignments &GetAssignments() const {
+    return schedule_;
   }
 
  private:
-  std::unordered_map<Machine, Jobs> schedule_;
-};
-
-class AssignmentsHandler {
- public:
-  explicit AssignmentsHandler(io::Writer *writer) : writer_(writer) { }
-
-  void AdjustAssignments(const Schedule &schedule, Situation situation);
-
- private:
-  enum class JobAssignmentState {
-    kUnassigned = 0,
-    kTaken = 1
-  };
-
-  using JobsAssignments = std::unordered_map<Id<Job>, Id<Machine>>;
-  using MachinesAssignments = std::unordered_map<Id<Machine>, Id<Job>>;
-  using JobsStates = std::unordered_map<Id<Job>, JobAssignmentState>;
-
-  void RemoveNotPresentMachines(Situation situation);
-  void RemoveNotPresentJobs(Situation situation);
-  Job FindJobToAssign(const Schedule &schedule, Machine machine);
-  bool CanBeAssigned(Job job);
-  bool TryAssign(Machine machine, Job job);
-  bool TryUnassign(MachinesAssignments::iterator assignment);
-
-  io::Writer *writer_;
-  JobsAssignments jobs_assignments_;
-  MachinesAssignments machines_assignments_;
-  JobsStates jobs_states_;
+  Assignments schedule_;
 };
 
 double ObjectiveFunction(const Schedule &schedule, Situation situation);

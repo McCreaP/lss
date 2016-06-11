@@ -5,7 +5,7 @@ from internals.machine import MachineState
 LOGGER = logging.getLogger('test_runner')
 
 USE_IDLE_MACHINES_INTERVAL = 3
-UPDATE_INPUT_INTERVAL = 3
+UPDATE_INPUT_INTERVAL = 30
 
 
 class Event:

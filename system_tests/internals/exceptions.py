@@ -5,4 +5,4 @@ class InvalidJobException(Exception):
         self.__message = message
 
     def __str__(self):
-        return "Invalid job %s: " + self.__message
+        return "Invalid job " + str(self.__job_id) + ": " + self.__message
