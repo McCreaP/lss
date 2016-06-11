@@ -26,8 +26,8 @@ class EventLoop:
         self.__add_machines_events()
         self.__add_machine_sets_events()
         self.__add_fair_sets_events()
-        self.add_event(UseIdleMachines(timer.now(), self, self.__state))
         self.add_event(UpdateInput(timer.now(), self, self.__state))
+        self.add_event(UseIdleMachines(timer.now() + 1, self, self.__state))
         while timer.now() < self.__story.get_raw('maxt'):
             event = self.__events.get()
             now = timer.now()
