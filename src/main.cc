@@ -1,6 +1,8 @@
+#include <chrono>
 #include <iostream>
 #include <memory>
 #include <string>
+#include <thread>
 
 #include "boost/program_options.hpp"
 #include "glog/logging.h"
@@ -23,6 +25,7 @@ using std::string;
 using lss::local_search::LocalSearchAlgorithm;
 using GeneticAlgorithm = lss::genetic::GeneticAlgorithm<lss::genetic::PermutationJobMachine>;
 using lss::greedy_new::GreedyAlgorithm;
+using namespace std::chrono_literals;
 
 static
 void ConfigLogger(char *argv[], int verbose) {
@@ -65,8 +68,8 @@ std::unique_ptr<GeneticAlgorithm> BuildGeneticAlgorithm() {
   using lss::genetic::MutatorImpl;
   using lss::genetic::ConfigurableMoves;
 
-  int population_size = 50;
-  int number_of_generations = 1000;
+  int population_size = 20;
+  int number_of_generations = 100;
   double crossover_probability = 0.1;
   double mutation_probability = 0.01;
 
@@ -102,7 +105,6 @@ int main(int argc, char **argv) {
   lss::io::BasicReader reader(config["input"].as<string>());
   lss::io::BasicWriter writer(config["assignments"].as<string>());
   lss::io::AssignmentsHandler assignments_handler(&writer);
-  lss::Situation situation;
   lss::Schedule schedule;
 
   std::unique_ptr<lss::Algorithm> algorithm;
@@ -122,11 +124,14 @@ int main(int argc, char **argv) {
 
   while (true) {
     lss::RawSituation raw;
-    while (!reader.Read(&raw))
+    while (!reader.Read(&raw)) {
       lss::io::NotifyDriverIFinishedCompute();
-    situation = lss::Situation(raw, lss::Situation::BuildMode::kDropInvalid);
+      std::this_thread::sleep_for(100ms);
+    }
+    assignments_handler.AdjustRawSituation(&raw);
+    lss::Situation situation = lss::Situation(raw, lss::Situation::BuildMode::kDropInvalid);
     schedule = algorithm->Run(schedule, situation);
-    assignments_handler.AdjustAssignments(schedule, situation);
+    assignments_handler.AdjustAssignments(schedule);
   }
 
   LOG(ERROR) << "Scheduler stop";
