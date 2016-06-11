@@ -3,6 +3,8 @@
 
 #include <unordered_set>
 
+#include "glog/logging.h"
+
 #include "base/algorithm.h"
 #include "greedy_new/batch_wrapper.h"
 
@@ -28,7 +30,8 @@ class GreedyAlgorithm: public Algorithm {
 
     Schedule schedule_;
     Situation situation_;
-    std::unordered_set<Machine> used_machines_;
+    std::unordered_map<Machine, Time> available_at_;
+    std::unordered_map<Machine, Context> last_context_;
   };
 };
 

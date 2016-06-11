@@ -10,6 +10,10 @@ namespace lss {
 namespace greedy_new {
 
 Schedule GreedyAlgorithm::Runner::Run() {
+  for (Machine machine : situation_.machines()) {
+    available_at_[machine];
+    last_context_[machine] = machine.context();
+  }
   std::vector<BatchWrapper> batches;
   for (Batch batch : situation_.batches()) {
     batches.push_back(BatchWrapper(batch));
@@ -26,22 +30,21 @@ void GreedyAlgorithm::Runner::AssignJobsFromBatch(const BatchWrapper &batch) {
     Machine best_machine = FindBestMachine(job);
     if (best_machine) {
       schedule_.AssignJob(best_machine, job);
-      used_machines_.insert(best_machine);
+      last_context_[best_machine] = job.context();
+      double change_cost = situation_.change_costs().cost(last_context_[best_machine], job.context());
+      available_at_[best_machine] += change_cost + job.duration();
     }
   }
 }
 
 Machine GreedyAlgorithm::Runner::FindBestMachine(Job job) const {
-  double min_context_change_cost = std::numeric_limits<double>::max();
+  double min_start_time = std::numeric_limits<double>::max();
   Machine best_machine;
   for (Machine machine : job.machine_set().machines()) {
-    if (used_machines_.count(machine)) {
-      continue;
-    }
-    double change_cost = situation_.change_costs().cost(machine.context(), job.context());
-    if (change_cost < min_context_change_cost) {
+    double change_cost = situation_.change_costs().cost(last_context_.at(machine), job.context());
+    if (available_at_.at(machine) + change_cost < min_start_time) {
       best_machine = machine;
-      min_context_change_cost = change_cost;
+      min_start_time = available_at_.at(machine) + change_cost;
     }
   }
   return best_machine;
