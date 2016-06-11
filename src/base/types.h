@@ -73,6 +73,14 @@ class Context {
     return lhs.context_ >= rhs.context_;
   }
 
+  friend std::ostream &operator<<(std::ostream &os, const Context &context) {
+    os << "Context: ("
+        << context.context_[0] << ", "
+        << context.context_[1] << ", "
+        << context.context_[2] << ")";
+    return os;
+  }
+
  private:
   std::array<int, kSize> context_{{kNone, kNone, kNone}};
 };

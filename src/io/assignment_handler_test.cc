@@ -28,12 +28,13 @@ Schedule BuildSchedule(const std::vector<std::vector<int>> &assignments, Situati
 class AssignmentsHandlerShould : public Test {
  protected:
   void SetUp() {
-    RawSituation rawSituation_ = genetic::GetSimpleRawSituation(kNumberOfJobs, kNumberOfMachines);
-    situation_ = Situation(rawSituation_);
+    raw_situation_ = genetic::GetSimpleRawSituation(kNumberOfJobs, kNumberOfMachines);
+    situation_ = Situation(raw_situation_);
   }
 
   const int kNumberOfJobs = 4;
   const int kNumberOfMachines = 3;
+  RawSituation raw_situation_;
   Situation situation_;
   io::WriterMock writer_;
 };
@@ -45,7 +46,7 @@ TEST_F(AssignmentsHandlerShould, assign_job_to_machines_wrt_schedule) {
   EXPECT_CALL(writer_, Assign(2, 3));
 
   AssignmentsHandler assignments_handler(&writer_);
-  assignments_handler.AdjustAssignments(schedule, situation_);
+  assignments_handler.AdjustAssignments(schedule);
 }
 
 TEST_F(AssignmentsHandlerShould, unasign_job_from_previous_machine_if_not_taken) {
@@ -63,8 +64,8 @@ TEST_F(AssignmentsHandlerShould, unasign_job_from_previous_machine_if_not_taken)
   EXPECT_CALL(writer_, Assign(2, 0));
 
   AssignmentsHandler assignments_handler(&writer_);
-  assignments_handler.AdjustAssignments(old_schedule, situation_);
-  assignments_handler.AdjustAssignments(new_schedule, situation_);
+  assignments_handler.AdjustAssignments(old_schedule);
+  assignments_handler.AdjustAssignments(new_schedule);
 }
 
 TEST_F(AssignmentsHandlerShould, not_unasign_job_from_previous_machine_if_taken) {
@@ -82,8 +83,42 @@ TEST_F(AssignmentsHandlerShould, not_unasign_job_from_previous_machine_if_taken)
   EXPECT_CALL(writer_, Assign(1, 0));
 
   AssignmentsHandler assignments_handler(&writer_);
-  assignments_handler.AdjustAssignments(old_schedule, situation_);
-  assignments_handler.AdjustAssignments(new_schedule, situation_);
+  assignments_handler.AdjustAssignments(old_schedule);
+  assignments_handler.AdjustAssignments(new_schedule);
+}
+
+TEST_F(AssignmentsHandlerShould, set_empty_context_on_new_machine) {
+  AssignmentsHandler assignments_handler(&writer_);
+  assignments_handler.AdjustRawSituation(&raw_situation_);
+  for (const RawMachine &raw_machine : raw_situation_.machines_) {
+    EXPECT_EQ(Context(), raw_machine.context_);
+  }
+}
+
+TEST_F(AssignmentsHandlerShould, fill_machine_context) {
+  const Context kContexts[] = { Context(1, 2, 3), Context(4, 5, 6), Context(7, 8, 9) };
+  RawSituation raw_situation = genetic::GetSimpleRawSituation(kNumberOfJobs, kNumberOfMachines);
+  for (size_t i = 0; i < raw_situation.jobs_.size(); ++i) {
+    raw_situation.jobs_[i].context(kContexts[i]);
+  }
+  Situation situation(raw_situation);
+  Schedule schedule = BuildSchedule({{0}, {1}, {2}}, situation);
+
+  EXPECT_CALL(writer_, Assign(0, 0)).WillOnce(Return(true));
+  EXPECT_CALL(writer_, Assign(1, 1)).WillOnce(Return(true));
+  EXPECT_CALL(writer_, Assign(2, 2)).WillOnce(Return(true));
+
+  EXPECT_CALL(writer_, DoesAssignmentExist(0)).WillOnce(Return(false));
+  EXPECT_CALL(writer_, DoesAssignmentExist(1)).WillOnce(Return(false));
+  EXPECT_CALL(writer_, DoesAssignmentExist(2)).WillOnce(Return(true));
+
+  AssignmentsHandler assignments_handler(&writer_);
+  assignments_handler.AdjustAssignments(schedule);
+  assignments_handler.AdjustRawSituation(&raw_situation);
+
+  EXPECT_EQ(kContexts[0], raw_situation.machines_[0].context_);
+  EXPECT_EQ(kContexts[1], raw_situation.machines_[1].context_);
+  EXPECT_EQ(Context(), raw_situation.machines_[2].context_);
 }
 
 }  // namespace io

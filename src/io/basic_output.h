@@ -14,7 +14,8 @@ namespace io {
 class Writer {
  public:
   virtual bool Assign(IdType machine_id, IdType job_id) = 0;
-  virtual bool Unassign(IdType  machine_id) = 0;
+  virtual bool Unassign(IdType machine_id) = 0;
+  virtual bool DoesAssignmentExist(IdType machine_id) = 0;
   virtual ~Writer() = default;
 };
 
@@ -32,6 +33,7 @@ class BasicWriter : public Writer {
   // or if there is no pending assignment.
   bool Unassign(IdType machine_id) override;
 
+  bool DoesAssignmentExist(IdType machine_id) override;
  private:
   std::string output_path_;
 };
@@ -40,6 +42,7 @@ class WriterMock : public Writer {
  public:
   MOCK_METHOD2(Assign, bool(IdType, IdType));
   MOCK_METHOD1(Unassign, bool(IdType));
+  MOCK_METHOD1(DoesAssignmentExist, bool(IdType));
 };
 
 void NotifyDriverIFinishedCompute();

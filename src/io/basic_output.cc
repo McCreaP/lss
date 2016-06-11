@@ -69,6 +69,16 @@ bool BasicWriter::Unassign(IdType machine_id) {
   return false;
 }
 
+bool BasicWriter::DoesAssignmentExist(IdType machine_id) {
+  const std::string path = output_path_ + std::to_string(machine_id);
+  int fd = open(path.c_str(), O_RDONLY, S_IRUSR);
+  if (fd == -1) {
+    return false;
+  }
+  PLOG_IF(WARNING, close(fd) == -1) << "Close failed";
+  return true;
+}
+
 void NotifyDriverIFinishedCompute() {
   redi::ipstream proc("curl localhost:8000 > /dev/null", redi::pstreams::pstderr);
 }
